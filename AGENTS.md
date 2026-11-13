@@ -11,6 +11,7 @@
 - Invalidate relevant manual confirmations when underlying data or documents change.
 - Treat user input, filenames and imported JSON as untrusted data. Keep archive paths safe and originals byte-identical.
 - Preserve explicit demo markings in example documents and exports.
+- Keep `docs/DEVELOPMENT-HANDOFF.md` and `docs/RELEASE-GATES.md` in mind. A green CI run is not permission to launch or remove noindex.
 - After code changes run the meaningful checks with `npm test`, then regenerate the portable HTML with `npm run build`.
 - Keep third-party licence notices in `vendor/` and in the portable distribution. Do not grant an application-wide open-source licence by accident.
 - Never commit credentials, real customer documents, personal data or temporary QA downloads.

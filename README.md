@@ -58,6 +58,12 @@ npm run build
 | `docs/NAME-OPTIONS.md` | Naamopties en de waargenomen SIDN-status |
 | `docs/PLAN.md` | Vervolg van concept naar productie |
 
+## Geautomatiseerde kwaliteitscontrole
+
+Bij pull requests en wijzigingen op `main` controleert [GitHub Actions](.github/workflows/quality.yml) de Node.js-tests (Node 20 en 22), het opnieuw bouwen van het zelfstandige HTML-concept en of die versie overeenkomt met de broncode. Extra tests bewaken `noindex` tijdens de conceptfase en de aanwezigheid van lokale, gebundelde assets.
+
+De [ontwikkeloverdracht](docs/DEVELOPMENT-HANDOFF.md) beschrijft de actuele status en openstaande beslissingen. Gebruik de [release-gates](docs/RELEASE-GATES.md) voordat hosting, centrale analytics of indexering wordt geactiveerd.
+
 ## Grenzen van dit concept
 
 De bestanden worden nog niet met OCR of PDF-tekstextractie gelezen. Het systeem controleert aanwezigheid en de bevestigingen van de gebruiker. Na relevante wijzigingen vervallen eerdere bevestigingen. RVO voert de inhoudelijke beoordeling uit.
