@@ -1,0 +1,53 @@
+@pdf-lib/fontkit 1.1.1 — attribution and license provenance
+=========================================================
+
+Vendored file: fontkit-1.1.1.min.js
+Published package: @pdf-lib/fontkit, version 1.1.1
+Package artifact:
+https://registry.npmjs.org/@pdf-lib/fontkit/-/fontkit-1.1.1.tgz
+Original artifact path: package/dist/fontkit.umd.min.js
+
+The exact published package metadata declares the license as MIT, names
+Andrew Dillon as the author, and lists Devon Govett as a contributor.
+Metadata verified on 13 November 2026 using:
+npm view @pdf-lib/fontkit@1.1.1 name version license author contributors repository --json
+
+Package source repository: https://github.com/Hopding/fontkit
+Its README identifies this project as a fork of https://github.com/foliojs/fontkit
+and also declares MIT licensing.
+
+The published fork does not include a standalone LICENSE file. The original
+upstream Fontkit MIT license is reproduced verbatim below, with its original
+copyright notice. The fork attribution above comes from the published package
+metadata; it does not invent a separate copyright notice for the fork.
+
+License source: https://github.com/foliojs/fontkit/blob/master/LICENSE
+Git blob SHA: 34d142021809672bcbbd880ec9c8957d9c474dd2
+Retrieved from the upstream repository on 13 November 2026.
+Keep existing notices embedded in the distributed JavaScript bundle.
+
+----- Begin original upstream LICENSE -----
+
+MIT License
+
+Copyright (c) 2014-present Devon Govett
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+----- End original upstream LICENSE -----

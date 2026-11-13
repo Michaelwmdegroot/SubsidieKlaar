@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /
+# Concept. Verwijder de indexeringsblokkade pas bij de definitieve lancering.
