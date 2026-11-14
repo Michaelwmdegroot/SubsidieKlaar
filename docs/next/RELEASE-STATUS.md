@@ -1,5 +1,8 @@
 # Next-level testrelease — opgeleverd en nog open
 
+> **Nieuwe opdracht 14 november 2026:** na de apart geteste release wil de eigenaar de complete website-ervaring op `main` beoordelen. De passages hieronder over `niet mergen` waren de vorige reviewafspraak. Deze opdracht autoriseert uitsluitend de **publieke, noindex proef-UI en de lokale planfuncties** — niet het activeren van echte accounts, online dossier-/documentopslag, mailverzending of leadopvolging. De online API blijft op productie fail-closed (503), ook na merge. Deze afbakening en de uitgebreide productiecontrole zijn leidend.
+
+
 **Datum:** 14 november 2026. **Branch:** `feat/nextlevel-testrelease`. **Basis:** `9158e019cbd52340d0fbc0d2d4b834f94b2d3a7d`. **Publicatiebeleid:** eerst eigenaartest; geen merge, deployment of activatie op main.
 
 Dit is een geïntegreerde testrelease van roadmap #17. Niet alle latere groeifuncties zijn af en de online backend is nog geen vrijgegeven productieplatform.
