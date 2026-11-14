@@ -29,6 +29,16 @@
 
 Meer ontvangers in toekomst: kies maximaal één passende, bij naam genoemde commerciële bestemming per aanvraag (of laat de gebruiker duidelijk kiezen); **geen algemene selectie `alle bedrijven van ons`**.
 
+## 1A. Snelste pilot met bestaande eigen adviesroute (nieuw geverifieerd)
+
+De bestaande website van **Thuisbatterij Team B.V.** heeft al een concreet formulier voor vrijwillig batterijadvies: https://thuisbatterijteam.nl/contact/adviesgesprek/ . De pagina vraagt onder meer naam, telefoon, e-mail en adresgegevens en toont expliciete aanvraagcontactkeuze. Dit is een **bestaande** commerciële route; niet zelf nadoen voordat de juridische/documenttechnische inrichting is getoetst.
+
+**Quick-win vóór nieuwe CRM:** toon op SubsidieReady na een relevante dossieractie of in een kennisartikel één transparante kaart: `Meer weten over een thuisbatterij? Vraag vrijblijvend advies bij Thuisbatterij Team B.V.` met een **gewone uitgaande link** naar de bestaande adviespagina. Geen automatische persoonsgegevens, dossierinhoud, URL-parameters met privégegevens, server-leadcreatie, accountkopieën, verborgen iframe of e-mailcontact vanuit SubsidieReady. De gebruiker vult zelf op de TBT-site in wat hij wil delen. Presenteer duidelijk dat het om een commerciële eigen onderneming gaat en dat dit **geen RVO-dienst** is.
+
+**Meetbaarheid:** start veilig met anonieme/geaggregeerde, toegestane CTA-tellingen binnen bestaande analyticsinstellingen, indien ingeschakeld, en vraag de salesorganisatie handmatig of de aanvraagbron vrijwillig werd ingevuld. Geen cross-domain persoonlijke tracking of fingerprinting. Voor attributie kan later een niet-persoonlijke campagnecode worden beoordeeld; laat privégegevens achterwege.
+
+**Preflight voor pilot:** check actuele TBT-formulierwerking en privacytekst, commerciële band op SubsidieReady, doelgroep en geen verstoring van de gratis gastenflow. Dit is een **laag-risico ontwikkelpilot**, geen nu al goedgekeurde publieke omzetroute.
+
 ## 2. Productervaring en conversiemomenten
 
 1. **Homepage**: primaire knop `Start gratis documentencheck`; secundair `Mijn dossiers / Inloggen`. Geen verplichte contactvraag.
