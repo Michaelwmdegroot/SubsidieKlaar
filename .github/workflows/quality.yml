@@ -1,42 +1,30 @@
-name: Concept quality
-
+name: SubsidieReady quality
 on:
   pull_request:
   push:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
-
 permissions:
   contents: read
-
 jobs:
   verify:
-    name: Node ${{ matrix.node }} — tests and portable build
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        node: ["20", "22"]
+        node: ['22', '24']
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
-
-      - name: Run regression tests
-        run: npm test
-
-      - name: Rebuild standalone concept
-        run: npm run build
-
-      - name: Check whitespace
-        run: git diff --check
-
-      - name: Verify committed standalone HTML is up to date
-        run: git diff --exit-code -- concept/SubsidieKlaar-concept.html
+      - name: Require PHP for real backend regression tests
+        run: php -v
+      - run: npm run build
+      - run: npm test
+      - run: npm run package
+      - name: Generated site is committed and reproducible
+        run: git diff --exit-code -- index.html .htaccess robots.txt sitemap.xml version.json concept hulp privacy bronnen over
+      - run: git diff --check
