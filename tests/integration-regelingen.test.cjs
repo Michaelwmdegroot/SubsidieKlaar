@@ -37,5 +37,12 @@ test('all internal static links point to real files, directories or anchors',()=
  for(const r of routes){const h=read(file(r));for(const [,url]of h.matchAll(/(?:href|src)="(\/(?!\/)[^"]*)"/g)){const pathname=url.split(/[?#]/)[0];const p=path.join(root,pathname);assert.ok(fs.existsSync(p),r+' broken link '+url);if(pathname.endsWith('/'))assert.ok(fs.existsSync(path.join(p,'index.html'))||fs.existsSync(path.join(p,'index.php')),url);}}
 });
 test('packaging and live verification include the integrated public surface',()=>{
- const pack=read('scripts/package.cjs'),live=read('scripts/check-live.cjs');for(const r of ['regelingen','subsidies','btw','financiering']){assert.ok(pack.includes("'"+r+"'"));assert.ok(live.includes("'/"+r+"/'"));}for(const f of ['.github/workflows/quality.yml','.github/workflows/release.yml'])assert.ok(read(f).includes('regelingen subsidies btw financiering assets/regelingen-engine.js'));
+ const pack=read('scripts/package.cjs'),live=read('scripts/check-live.cjs');for(const r of ['regelingen','subsidies','btw','financiering']){assert.ok(pack.includes("'"+r+"'"));assert.ok(live.includes("'/"+r+"/'"));}for(const f of ['.github/workflows/quality.yml','.github/workflows/release.yml']) {
+  const command=read(f).split(/\r?\n/).find(line=>line.trim().startsWith('run: git diff --exit-code -- '));
+  assert.ok(command,f+' must check committed generated files');
+  const checked=new Set(command.split('git diff --exit-code -- ')[1].trim().split(/\s+/));
+  for(const output of ['index.html','.htaccess','robots.txt','sitemap.xml','version.json','next-version.json','concept','hulp','privacy','bronnen','over','regelingen','subsidies','btw','financiering','assets/regelingen-engine.js','mijn-plan','advies','sales','bronbeheer']) {
+   assert.ok(checked.has(output),f+' omits generated output: '+output);
+  }
+ }
 });

@@ -82,13 +82,32 @@ async function checkLive({fetchImpl = globalThis.fetch, expected} = {}) {
     const r = await request(ORIGIN + '/' + file);
     check('Asset ' + file, status200(r) && type.test(r.headers.get('content-type') || '') && r.text.length > 1000 && !/^\s*<!doctype/i.test(r.text));
   }
+  // Review-only additions are public for owner assessment, never account-ready in production.
+  const betaPages = ['/mijn-plan/','/advies/','/sales/','/bronbeheer/'];
+  for (const page of betaPages) {
+    const r = await request(ORIGIN + page);
+    const metaNoindex = /<meta\s+name=["']robots["']\s+content=["'][^"']*noindex/i.test(r?.text || '');
+    check('Proefpagina bereikbaar en noindex: ' + page,
+      status200(r) && /SubsidieReady/.test(r.text) && metaNoindex && noindex(r));
+  }
+  const nextVersion = await request(ORIGIN + '/next-version.json');
+  const expectedNext = JSON.parse(fs.readFileSync(path.join(__dirname, '../next-version.json'), 'utf8'));
+  const onlineNext = parse(nextVersion);
+  check('Exacte proefversie en cloud blijft uit', status200(nextVersion) && onlineNext?.product === 'SubsidieReady' &&
+    onlineNext?.build === expectedNext.build && onlineNext?.mode === 'review-only' && onlineNext?.cloudDefault === 'disabled');
+  const betaApi = await request(ORIGIN + '/api/next/?action=bootstrap');
+  const betaSettings = parse(betaApi);
+  check('Account- en sales-API standaard veilig afgesloten', betaApi?.status === 503 &&
+    betaSettings?.configured === false && noindex(betaApi) &&
+    /no-store/.test(betaApi?.headers.get('cache-control') || '') &&
+    !betaApi?.headers.get('set-cookie'));
   const robots = await request(ORIGIN + '/robots.txt');
   check('Robots beschermt beheer, niet de hele site', status200(robots) && /Disallow:\s*\/admin\//.test(robots.text) &&
     !/^Disallow:\s*\/\s*$/m.test(robots.text) && robots.text.includes(ORIGIN + '/sitemap.xml'));
   const sitemap = await request(ORIGIN + '/sitemap.xml');
   check('Sitemap bevat alleen publieke pagina’s', status200(sitemap) && [ORIGIN + '/', ...pages.map(p => ORIGIN + p)]
     .every(u => sitemap.text.includes('<loc>' + u + '</loc>')) && !/\/(?:admin|api|dossier)(?:\/|<)/.test(sitemap.text));
-  for (const file of ['/.git/config','/.env','/server/bootstrap.php','/scripts/setup-admin.php','/tests/core.test.cjs','/templates/index.html']) {
+  for (const file of ['/.git/config','/.env','/server/bootstrap.php','/server/next/service.php','/scripts/setup-admin.php','/scripts/next/setup.php','/tests/core.test.cjs','/templates/index.html']) {
     const r = await request(ORIGIN + file);
     check('Interne route afgeschermd: ' + file, r && [403,404].includes(r.status));
   }

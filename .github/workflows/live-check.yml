@@ -42,7 +42,7 @@ jobs:
           const report=JSON.parse(fs.readFileSync('qa/live-check.json','utf8'));
           const hash=b=>crypto.createHash('sha256').update(b).digest('hex');
           (async()=>{
-            for(const file of ['assets/mark.svg','assets/images/home-hero.webp','assets/images/home-hero-small.webp','assets/regelingen-engine.js','assets/regelingen-app.js','assets/regelingen.css','regelingen/index.html','subsidies/index.html','btw/index.html','financiering/index.html']){
+            for(const file of ['assets/mark.svg','assets/images/home-hero.webp','assets/images/home-hero-small.webp','assets/regelingen-engine.js','assets/regelingen-app.js','assets/regelingen.css','regelingen/index.html','subsidies/index.html','btw/index.html','financiering/index.html','assets/plan-core.js','assets/workbench-rules.js','assets/plan-app.js','assets/plan.css','assets/next-api.js','assets/sales-app.js','assets/advice-app.js','assets/plan-bridge.js','mijn-plan/index.html','advies/index.html','sales/index.html','bronbeheer/index.html']){
               let pass=false;
               try {
                 const expected=fs.readFileSync(file);

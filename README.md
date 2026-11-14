@@ -1,3 +1,8 @@
+> **Nieuwe ontwikkelbranch: next-level testrelease.** Nog niet naar `main` mergen. Start bij [de testhandleiding](docs/next/TESTEN.md) en [de releasegrenzen](docs/next/RELEASE-STATUS.md). De onderstaande 1.0-beschrijving betreft de bestaande productie-basis.
+
+> **3.0 proefrelease voor beoordeling:** de eigenaar heeft gevraagd de nieuwe gebruikersinterface op `main` te zetten om het als complete website te testen. `/mijn-plan/` biedt lokale plan-/werkbankfuncties. `/advies/`, `/sales/` en `/bronbeheer/` zijn noindex proefpagina's; de salesdemo is fictief. **Accounts, online bijlagen en echte adviesaanvragen zijn op `subsidieready.nl` niet geactiveerd.** De nieuwe API moet daar 503 retourneren. Zie `docs/next/RELEASE-STATUS.md` en `docs/next/SECURITY.md`. De bestaande gratis warmtepompwerkbank blijft intact.
+
+
 # SubsidieReady
 
 Gratis regelingenverkenner voor verduurzaming, met een aparte documentenwerkbank voor eigenaar-bewoners die een ISDE-warmtepompaanvraag voorbereiden. **Definitieve naam: SubsidieReady. Domein: `subsidieready.nl`.**

@@ -3,6 +3,8 @@ const test = require('node:test'), assert = require('node:assert/strict');
 const {checkLive, bodyText} = require('../scripts/check-live.cjs');
 const origin = 'https://subsidieready.nl';
 const expected = {product:'SubsidieReady',version:'1.0.0',build:'test-build',documents:'browser-only'};
+const nextExpected = require('../next-version.json');
+const betaPages = ['/mijn-plan/','/advies/','/sales/','/bronbeheer/'];
 const pages = ['/regelingen/','/subsidies/','/btw/','/financiering/','/hulp/','/hulp/factuur-warmtepomp/','/hulp/betaalbewijs/','/hulp/meldcode/','/privacy/','/bronnen/','/over/'];
 function fixture(overrides = {}) {
   const calls = [];
@@ -17,10 +19,14 @@ function fixture(overrides = {}) {
         'Content-Security-Policy':"default-src 'self'; object-src 'none'; frame-ancestors 'none'"});
     } else if (p === '/version.json') {
       headers['Content-Type']='application/json';text=JSON.stringify(expected);
+    } else if (p === '/next-version.json') {
+      headers['Content-Type']='application/json';text=JSON.stringify(nextExpected);
     } else if (p.startsWith('/api/')) {
       headers['Content-Type']='application/json';headers['X-Robots-Tag']='noindex, nofollow';
-      text=JSON.stringify(p.endsWith('health.php')?{service:'SubsidieReady',version:'1.0.0',status:'ok',document_processing:'browser-only'}:{service:'SubsidieReady',analytics:false});
-    } else if (pages.includes(p)) text='<h1>SubsidieReady uitleg</h1>';
+      if (p === '/api/next/') {status=503;headers['Cache-Control']='no-store, private';text=JSON.stringify({configured:false,error:'Online functies zijn niet geconfigureerd.'});}
+      else text=JSON.stringify(p.endsWith('health.php')?{service:'SubsidieReady',version:'1.0.0',status:'ok',document_processing:'browser-only'}:{service:'SubsidieReady',analytics:false});
+    } else if (betaPages.includes(p)) {text='<title>SubsidieReady testrelease</title><meta name="robots" content="noindex,nofollow"><h1>Mijn plan</h1>';headers['X-Robots-Tag']='noindex, nofollow';}
+    else if (pages.includes(p)) text='<h1>SubsidieReady uitleg</h1>';
     else if (p.startsWith('/assets/')) {headers['Content-Type']=p.endsWith('.css')?'text/css':'application/javascript';text='x'.repeat(1001);}
     else if (p === '/robots.txt') text='User-agent: *\nDisallow: /admin/\nSitemap: '+origin+'/sitemap.xml\n';
     else if (p === '/sitemap.xml') text=['/',...pages].map(p=>'<loc>'+origin+p+'</loc>').join('');
@@ -70,4 +76,17 @@ test('unauthenticated stats export is a failure, not a valid dashboard',async()=
 test('response bytes are bounded and release identity is required',async()=>{
   await assert.rejects(()=>bodyText(new Response('x'.repeat(6*1024*1024+1))),/response-too-large/);
   await assert.rejects(()=>checkLive({expected:{}}),/metadata/);
+});
+
+test('beta release is not accepted if an account service is active on production',async()=>{
+  const f=fixture({'/api/next/':{status:200,text:JSON.stringify({configured:true,accounts:true})}}),r=await checkLive({expected,fetchImpl:f.fetchImpl});
+  assert.ok(failed(r,'Account- en sales-API'));
+});
+test('beta pages must be reachable and not indexable',async()=>{
+  const f=fixture({'/sales/':{headers:{'X-Robots-Tag':''}}}),r=await checkLive({expected,fetchImpl:f.fetchImpl});
+  assert.ok(failed(r,'/sales/'));
+});
+test('stale beta version is detected independently of existing v1',async()=>{
+  const f=fixture({'/next-version.json':{text:JSON.stringify({...nextExpected,build:'stale'})}}),r=await checkLive({expected,fetchImpl:f.fetchImpl});
+  assert.ok(failed(r,'Exacte proefversie'));
 });
