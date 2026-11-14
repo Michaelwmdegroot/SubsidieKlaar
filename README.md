@@ -1,4 +1,4 @@
-> **Nieuwe ontwikkelbranch: next-level testrelease.** Nog niet naar `main` mergen. Start bij [de testhandleiding](docs/next/TESTEN.md) en [de releasegrenzen](docs/next/RELEASE-STATUS.md). De onderstaande 1.0-beschrijving betreft de bestaande productie-basis.
+> **ACTUELE STATUS & OVERDRACHT (14 november 2026):** de premium, sitebreed ontworpen SubsidieReady is live op `main` en de visuele fase is afgesloten. Productie-release **e1ab8f8d**, sitebuild **a95e1539d1244098**, 160 regressietests en 83/83 livecontroles geslaagd. **Volgende fase: SEO-ready en vrijwillige first-party leadgeneratie.** Lees eerst de [canonieke overdracht](docs/HANDOFF-SEO-LEADGEN-2026-11-14.md), vervolgens de [volledige startprompt voor de nieuwe agent](docs/NEXT-AGENT-SEO-LEAD-START.md) en [Issue #21](https://github.com/Michaelwmdegroot/SubsidieKlaar/issues/21). Bestaande oude release- en beta-notities hieronder zijn historische context; `main` is altijd de gezaghebbende bron. **Accounts, online dossiers en echte leads zijn nog niet actief.**
 
 ## Eén premium stijl op alle pagina's
 

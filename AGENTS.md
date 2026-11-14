@@ -1,5 +1,8 @@
 # SubsidieReady engineering notes
 
+> **CANONIEKE AFSLUITING / NEXT AGENT (14 november 2026):** premium website breed op productie, commit `e1ab8f8d0d0632bb3cca03bcebf8456c0e82f19c`, builds `a95e1539d1244098` en `6377d2731227bf88`, 160 regressietests + 83/83 livechecks. De eerdere aanwijzing `niet mergen voor testrelease` is HISTORISCH; PR #18/#19/#20 zijn bewust al gemerged. Volgende doel = SEO en gecontroleerde vrijwillige eigen leads. Begin bij [docs/HANDOFF-SEO-LEADGEN-2026-11-14.md](docs/HANDOFF-SEO-LEADGEN-2026-11-14.md), [docs/NEXT-AGENT-SEO-LEAD-START.md](docs/NEXT-AGENT-SEO-LEAD-START.md) en Issue #21. Account-/cloud-/leadbackend blijft op productie uit (503) en mag niet zomaar worden aangezet. Dit is een documentatiecheckpoint; nieuwe HEAD kan veranderen terwijl dezelfde functionele build wordt behouden.
+
+
 - The owner approved the concept and bought **SubsidieReady.nl** on 14 November 2026. Working-name phase is over. Keep the existing repository `Michaelwmdegroot/SubsidieKlaar`.
 - Target: existing Hostinger PHP/HTML hosting, root of `main`, no paid dependencies or additional hosting purchases. Do not claim live status until domain/HTTPS/production checks actually succeed.
 - The public site is indexable for `https://subsidieready.nl/`. Admin/API/internal paths and standalone distribution are not indexable. Never add private dossiers to URLs, sitemap or analytics.
