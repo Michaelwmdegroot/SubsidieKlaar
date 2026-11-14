@@ -20,7 +20,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        database_image: ['mysql:8.4', 'mariadb:11.4']
+        include:
+          - database_image: 'mysql:8.4'
+            health_command: 'mysqladmin ping -h 127.0.0.1 -uroot -pci-root-synthetic'
+          - database_image: 'mariadb:11.4'
+            health_command: 'mariadb-admin ping -h 127.0.0.1 -uroot -pci-root-synthetic'
     services:
       mysql:
         image: ${{ matrix.database_image }}
@@ -32,7 +36,7 @@ jobs:
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -pci-root-synthetic"
+          --health-cmd="${{ matrix.health_command }}"
           --health-interval=5s
           --health-timeout=5s
           --health-retries=20
