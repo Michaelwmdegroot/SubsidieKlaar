@@ -1,0 +1,127 @@
+.regelingen-page{--ink:#11213a;--muted:#536071;--green:#107e22;--lime:#36b51b;--paper:#f5f9f5;--line:#dce6dd;--amber:#85530c;--radius:22px}
+.regelingen-page *{box-sizing:border-box}
+.regelingen-page .hero>*,.regelingen-page .layout>*,.regelingen-page .fields>*{min-width:0}
+.regelingen-page select{min-width:0;max-width:100%}
+.regelingen-page{scroll-behavior:smooth}
+.regelingen-page{margin:0;background:#fbfdfb;color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.regelingen-page button,.regelingen-page input,.regelingen-page select{font:inherit}
+.regelingen-page button,.regelingen-page a,.regelingen-page input,.regelingen-page select,.regelingen-page summary{outline-offset:5px}
+.regelingen-page a{color:var(--green)}
+.regelingen-page button,.regelingen-page a{-webkit-tap-highlight-color:transparent}
+.regelingen-page button{cursor:pointer}
+.regelingen-page .wrap{width:min(1240px,calc(100% - 64px));margin:auto}
+.regelingen-page .badge,.regelingen-page .tag{font-size:11px;font-weight:750;letter-spacing:.07em;text-transform:uppercase;border-radius:9px;padding:5px 9px;background:#eef7ee;color:#256a2d}
+.regelingen-page .hero{display:grid;grid-template-columns:1.2fr 1fr;gap:70px;align-items:center;padding:62px 0 42px}
+.regelingen-page .eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--green);font-weight:750}
+.regelingen-page .eyebrow:before{content:"●";margin-right:10px}
+.regelingen-page h1{font-size:clamp(36px,4vw,58px);line-height:1.08;letter-spacing:-2.4px;margin:20px 0}
+.regelingen-page h1 span{color:var(--green)}
+.regelingen-page .intro{font-size:19px;color:var(--muted);max-width:570px}
+.regelingen-page .hero-pills{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-top:25px}
+.regelingen-page .hero-pills b{color:var(--green)}
+.regelingen-page .overview{background:#fff;border:1px solid var(--line);border-radius:28px;padding:28px;box-shadow:0 20px 65px #2447230d;transform:rotate(1deg)}
+.regelingen-page .overview h2{font-size:18px;margin:0 0 18px}
+.regelingen-page .overview-row{display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;padding:15px 0;border-top:1px solid #edf0ec}
+.regelingen-page .overview-row .num{background:var(--paper);border-radius:12px;width:40px;height:40px;display:grid;place-items:center;color:var(--green);font-weight:750}
+.regelingen-page .overview-row small{color:var(--muted);display:block}
+.regelingen-page .overview-row .end{font-size:12px;color:var(--green)}
+.regelingen-page .note{padding:16px 18px;background:#eef6ed;border:1px solid #d6e7d3;border-radius:14px;color:#34583a;font-size:14px}
+.regelingen-page .preview-note{background:#fff9ec;border-color:#efdfbc;color:#68491b;margin-bottom:30px}
+.regelingen-page .layout{display:grid;grid-template-columns:1fr 300px;gap:28px;align-items:start}
+.regelingen-page .panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:30px}
+.regelingen-page .panel h2{margin:0 0 5px;font-size:25px;letter-spacing:-.6px}
+.regelingen-page .sub{margin:0 0 24px;color:var(--muted)}
+.regelingen-page .fields{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.regelingen-page label.field{display:flex;flex-direction:column;font-size:14px;font-weight:650;gap:6px}
+.regelingen-page select{width:100%;padding:11px 12px;border:1px solid #cbd8cd;border-radius:10px;background:#fbfdfb;color:var(--ink);min-height:48px}
+.regelingen-page fieldset{border:0;padding:0;margin:28px 0}
+.regelingen-page legend{font-weight:750;margin-bottom:12px}
+.regelingen-page .choice-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.regelingen-page .choice{display:flex;align-items:center;gap:9px;border:1px solid var(--line);padding:13px 11px;min-height:52px;border-radius:12px;font-size:14px;cursor:pointer}
+.regelingen-page .choice:has(input:checked){border-color:#45a23b;background:#eff9ec}
+.regelingen-page .choice input{accent-color:var(--green);width:17px;height:17px;flex-shrink:0}
+.regelingen-page .context{padding:18px;border-radius:13px;background:var(--paper);margin:18px 0}
+.regelingen-page .context h3{font-size:16px;margin:0 0 12px}
+.regelingen-page .context .fields{gap:12px}
+.regelingen-page button.primary,.regelingen-page .button{border:0;background:linear-gradient(140deg,#219e12,#076d21);color:white;border-radius:12px;padding:14px 22px;font-weight:720;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:16px;box-shadow:0 5px 10px #16802518}
+.regelingen-page button.secondary{border:1px solid var(--line);background:#fff;padding:12px 17px;border-radius:12px;color:var(--ink);font-weight:650}
+.regelingen-page .actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.regelingen-page .privacy{font-size:13px;color:var(--muted);margin-top:15px}
+.regelingen-page .side{background:#f0f6ef}
+.regelingen-page .side h3{margin:0 0 14px;font-size:19px}
+.regelingen-page .side p{font-size:14px;color:var(--muted)}
+.regelingen-page .side hr{border:0;border-top:1px solid #d6e2d4;margin:22px 0}
+.regelingen-page .smalltag{display:block;color:var(--green);font-size:12px;font-weight:700;margin-top:6px}
+.regelingen-page .results{padding:50px 0 75px}
+.regelingen-page .results-head{display:flex;justify-content:space-between;gap:20px;align-items:center}
+.regelingen-page .results h2{font-size:32px;letter-spacing:-1px;margin:0 0 6px}
+.regelingen-page .counts{display:flex;flex-wrap:wrap;gap:9px;margin:22px 0}
+.regelingen-page .counts span{background:#fff;border:1px solid var(--line);padding:7px 13px;border-radius:10px;font-size:13px}
+.regelingen-page .counts b{color:var(--green);margin-right:6px}
+.regelingen-page .alerts{margin:20px 0}
+.regelingen-page .alerts p{margin:9px 0}
+.regelingen-page .section-title{font-size:22px;margin:33px 0 16px}
+.regelingen-page .cards{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.regelingen-page .card{border:1px solid var(--line);background:#fff;padding:25px;border-radius:18px;min-width:0}
+.regelingen-page .card h3{font-size:21px;line-height:1.25;margin:16px 0 12px;letter-spacing:-.4px}
+.regelingen-page .card p{font-size:15px;margin:11px 0;color:var(--muted)}
+.regelingen-page .card .reason{background:#f2f6f2;border-radius:10px;padding:12px;font-size:13px;color:#3f5442}
+.regelingen-page .card.specialist .tag,.regelingen-page .card.source_review .tag,.regelingen-page .card.regional_route .tag{background:#fff4de;color:#78500e}
+.regelingen-page .card.not_applicable .tag{background:#f0f2f5;color:#596475}
+.regelingen-page .sources{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;margin-top:20px}
+.regelingen-page .sources a{display:block;padding:5px 0;overflow-wrap:anywhere}
+.regelingen-page .card .button{font-size:13px;margin-top:12px}
+.regelingen-page .empty{border:1px dashed #b7cdb9;border-radius:20px;padding:30px;background:#f3f8f2;text-align:center}
+.regelingen-page .empty strong{font-size:20px}
+.regelingen-page .future{background:#122738;color:#fff;border-radius:22px;padding:28px;margin-top:30px}
+.regelingen-page .future h3{margin:0}
+.regelingen-page .future p{color:#c5d5cc;font-size:14px}
+.regelingen-page .future span{color:#a1e282;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em}
+.regelingen-page #result-heading:focus{outline:2px solid var(--green)}
+.regelingen-page [hidden]{display:none!important}
+.regelingen-page .choice:hover,.regelingen-page button.secondary:hover{border-color:var(--green)}
+@media (max-width:1000px){.regelingen-page .hero{gap:28px}
+.regelingen-page .layout{grid-template-columns:1fr 250px}
+.regelingen-page .choice-grid{grid-template-columns:1fr 1fr}
+.regelingen-page .panel{padding:23px}}
+@media (max-width:760px){.regelingen-page .wrap{width:calc(100% - 32px)}
+.regelingen-page .badge{font-size:9px}
+.regelingen-page .hero{grid-template-columns:1fr;padding:32px 0 25px;gap:20px}
+.regelingen-page h1{letter-spacing:-1.5px}
+.regelingen-page .intro{font-size:17px}
+.regelingen-page .overview{transform:none;padding:22px}
+.regelingen-page .layout{grid-template-columns:1fr}
+.regelingen-page .side{display:none}
+.regelingen-page .cards{grid-template-columns:1fr}
+.regelingen-page .results-head{align-items:flex-start;flex-direction:column}
+.regelingen-page .fields{gap:12px}
+.regelingen-page .results{padding-top:34px}}
+@media (max-width:390px){.regelingen-page .fields{grid-template-columns:1fr}
+.regelingen-page .choice-grid{grid-template-columns:1fr 1fr}
+.regelingen-page .choice{padding:10px 7px;font-size:12px}
+.regelingen-page .panel{padding:19px}
+.regelingen-page button.primary{width:100%}}
+@media (prefers-reduced-motion:reduce){.regelingen-page{scroll-behavior:auto}}
+@media  print{.regelingen-page .hero,.regelingen-page .preview-note,.regelingen-page .layout,.regelingen-page #export{display:none}
+.regelingen-page .wrap{width:100%}
+.regelingen-page .cards{display:block}
+.regelingen-page .card{break-inside:avoid;margin-bottom:15px}
+.regelingen-page .results{padding:0}
+.regelingen-page .future{display:none}}
+/* Shared-site adaptation; keep all controls and printed results usable. */
+.regelingen-page{margin:0 auto;background:transparent;font:inherit;padding-top:0;min-width:0}
+.regelingen-page .hero{min-height:0;overflow:visible}.regelingen-page .hero h1{font-size:clamp(32px,3.6vw,54px);line-height:1.1;max-width:650px}
+.regelingen-page .overview{transform:none}.regelingen-page .hero h1 span{display:inline}
+.regelingen-page .scan-fields{padding:0;margin:0;border:0;min-width:0}
+.regelingen-page .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.regelingen-page fieldset:disabled{opacity:.6}.regelingen-page select{font-size:16px}
+.regelingen-page .context .fields{grid-template-columns:1fr}.regelingen-page label.field{margin-bottom:0}
+.regelingen-page .intro{line-height:1.7}.regelingen-page .preview-note a{color:inherit;text-decoration:underline}
+.regelingen-page .card .sources{line-height:1.6}.regelingen-page .future a{background:white;color:#116b21;box-shadow:none}
+.regelingen-page .context[hidden],.regelingen-page [hidden]{display:none!important}
+.regelingen-page #result-heading{scroll-margin-top:110px}.regelingen-page .hero-pills{margin-bottom:0}
+.regelingen-page .choice input{appearance:auto;border-radius:4px;position:static;opacity:1}
+.regelingen-page .choice{margin:0}.regelingen-page .counts span{line-height:1.5}
+@media(max-width:760px){.regelingen-page{width:100%;padding-inline:20px}.regelingen-page .hero{padding-inline:0}.regelingen-page .hero h1{font-size:36px}.regelingen-page .choice-grid{grid-template-columns:1fr 1fr}.regelingen-page .hero-pills{font-size:12px}.regelingen-page .results h2{font-size:29px}.regelingen-page .result-tools{width:100%}}
+@media(max-width:390px){.regelingen-page{padding-inline:15px}.regelingen-page .choice-grid{grid-template-columns:1fr}.regelingen-page .choice{font-size:14px;padding:12px}.regelingen-page .hero h1{font-size:31px}.regelingen-page .overview-row{grid-template-columns:38px 1fr}.regelingen-page .overview-row .end{display:none}}
+@media print{body>header,body>footer,.site-header,.site-footer,.metrics-choice{display:none!important}.regelingen-page{max-width:none;padding:0}.regelingen-page .hero,.regelingen-page .preview-note,.regelingen-page .layout,.regelingen-page .result-tools{display:none!important}.regelingen-page .results{padding:0}.regelingen-page .card{break-inside:avoid}.regelingen-page .sources a{color:#111}}

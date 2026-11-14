@@ -23,7 +23,7 @@ test('portable distribution remains standalone and makes no metrics requests',()
  assert.ok(html.includes('Third-party license notices'));assert.ok(!html.includes("fetch('/api/event.php'"));
 });
 test('homepage is prerendered and all discoverable local information links exist',()=>{
- const html=read('index.html');assert.ok(html.includes('<h1>Je subsidieaanvraag,'));
+ const html=read('index.html');assert.ok(html.includes('<h1>Verduurzamen?'));
  assert.ok(!html.includes('<!-- PRERENDER -->'));
  for(const route of ['hulp','hulp/factuur-warmtepomp','hulp/betaalbewijs','hulp/meldcode','privacy','bronnen','over']){
   const file=read(route+'/index.html');assert.ok(file.includes('https://subsidieready.nl/'+route+'/'));assert.ok(file.includes('<h1>'));

@@ -4,8 +4,8 @@ const root=path.resolve(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p
 test('photo-led home is real prerendered UI rather than a screenshot',()=>{
  const h=read('index.html');
  for(const cls of ['hero-landscape','hero-copy','dossier-card','benefit-strip','how-panel','document-stack','privacy-band','installer-band','faq-list','bottom-cta']) assert.ok(h.includes('class="'+cls),cls);
- assert.match(h,/<h1>Je subsidieaanvraag,/);assert.match(h,/data-action="start"/);assert.match(h,/data-action="demo"/);
- assert.match(h,/Woningbeeld ter illustratie/);assert.match(h,/Voorbeeld · geen subsidiebesluit/);
+ assert.match(h,/<h1>Verduurzamen\?/);assert.match(h,/data-action="start"/);assert.match(h,/data-action="demo"/);
+ assert.match(h,/Woningbeeld ter illustratie/);assert.match(h,/Informatieroutes · geen toekenning/);
  assert.doesNotMatch(h,/100% ISDE-proof|maximale subsidie|voorkomen afwijzing/i);
 });
 test('optimized original generated images are local WebP files with a size budget',()=>{

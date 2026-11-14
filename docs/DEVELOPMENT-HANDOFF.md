@@ -1,3 +1,5 @@
+> **Actuele stap:** de eigenaar heeft de brede regelingencheck goedgekeurd voor integratie/publicatie op `main`. Zie `REGELINGEN-LIVE-INTEGRATION.md` voor inhoud, tests en afzonderlijke live-acceptatie. De passages over nog niet uitgevoerde initiële hosting hieronder zijn historisch. Accounts en sales blijven apart.
+
 # Overdracht — SubsidieReady 1.0.0, 14 november 2026
 
 ## Eigenaarbesluit

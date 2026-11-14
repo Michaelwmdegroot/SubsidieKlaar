@@ -14,3 +14,11 @@
 - Never expose `.git`, `.env`, source tests, templates or configuration through the Node preview or public server. Retain .htaccess on Hostinger.
 - Preserve bundled third-party notices. No global application licence is implied by dependency licences.
 - Read `docs/HOSTINGER-LIVE.md`, `docs/DEVELOPMENT-HANDOFF.md` and `docs/QA-v1.md`. Live hosting and admin activation remain separate verifiable operations.
+
+## Approved public integration (14 November 2026)
+- The owner approved integrating PR #13 and publishing it to `main`. The public routes are `/regelingen/`, `/subsidies/`, `/btw/`, `/financiering/` alongside the existing warmtepomp workspace `/#dossier`.
+- Read `docs/REGELINGEN-LIVE-INTEGRATION.md`. The preview-era draft-only instruction in older notes is historical, not a prohibition on this explicitly authorized integration.
+- `scripts/regelingen-engine.cjs` is the single source for the browser engine. `build-site.cjs` generates `assets/regelingen-engine.js`; never let it diverge.
+- Preserve subsidy/VAT/loan distinctions, incomplete local coverage, date/source warnings, unknown answers and guest document export. No loan or money-total recommendations.
+- Regelingen answers stay in the page; no storage, URL parameters, CRM or telemetry. Accounts/uploads/first-party leads in PR #11 remain separate and inactive.
+- New public pages/assets must stay in packaging, sitemap and exact live acceptance. Update generators rather than generated HTML.

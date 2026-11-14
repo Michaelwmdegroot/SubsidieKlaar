@@ -32,7 +32,7 @@ jobs:
             if [ "$attempt" != '4' ]; then sleep 15; fi
           done
           exit 1
-      - name: Verify exact public image assets
+      - name: Verify exact public integration assets
         id: images
         if: steps.live.outcome == 'success'
         continue-on-error: true
@@ -42,19 +42,19 @@ jobs:
           const report=JSON.parse(fs.readFileSync('qa/live-check.json','utf8'));
           const hash=b=>crypto.createHash('sha256').update(b).digest('hex');
           (async()=>{
-            for(const file of ['assets/mark.svg','assets/images/home-hero.webp','assets/images/home-hero-small.webp']){
+            for(const file of ['assets/mark.svg','assets/images/home-hero.webp','assets/images/home-hero-small.webp','assets/regelingen-engine.js','assets/regelingen-app.js','assets/regelingen.css','regelingen/index.html','subsidies/index.html','btw/index.html','financiering/index.html']){
               let pass=false;
               try {
                 const expected=fs.readFileSync(file);
                 const r=await fetch('https://subsidieready.nl/'+file,{method:'GET',credentials:'omit',redirect:'manual',cache:'no-store',signal:AbortSignal.timeout(10000)});
-                const type=file.endsWith('.svg')?'image/svg+xml':'image/webp';
+                const type=file.endsWith('.svg')?'image/svg+xml':file.endsWith('.webp')?'image/webp':file.endsWith('.js')?'javascript':file.endsWith('.css')?'text/css':'text/html';
                 if(r.status===200&&(r.headers.get('content-type')||'').includes(type)){
                   let size=0;const chunks=[];
                   for await(const chunk of r.body){size+=chunk.length;if(size>expected.length)throw Error('size');chunks.push(chunk);}
                   pass=hash(Buffer.concat(chunks))===hash(expected);
                 } else if(r.body) await r.body.cancel();
               } catch {}
-              report.checks.push({name:'Exacte lokale visual: '+file,pass,detail:''});
+              report.checks.push({name:'Exact publiek bestand: '+file,pass,detail:''});
               console.log((pass?'PASS ':'FAIL ')+file);
             }
             report.ok=report.checks.every(x=>x.pass);
@@ -72,5 +72,5 @@ jobs:
       - name: Keep deployment acceptance separate from code quality
         if: steps.live.outcome != 'success' || steps.images.outcome != 'success'
         run: |
-          echo 'NO-GO: the exact live release has not passed HTTP and image acceptance. See the JSON report.'
+          echo 'NO-GO: the exact live release has not passed HTTP and integrated-asset acceptance. See the JSON report.'
           exit 1

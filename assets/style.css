@@ -31,3 +31,12 @@ html[data-view=wizard] body{background:linear-gradient(145deg,#f4f8f0,#f7f9fb 70
 @media(max-width:760px){.field input,.field select,.field textarea{font-size:16px}.hero-art{height:405px;min-height:405px;padding-bottom:55px}.art-label{bottom:0;right:5px}.file-sample-header{margin:0}.hero-landscape{height:440px}}
 @media(max-width:420px){.hero h1{font-size:clamp(30px,9.4vw,37px)}.hero-art{height:405px;min-height:405px;padding-bottom:55px}.art-label{bottom:0}.hero-landscape{height:425px}.folder-back{bottom:45px}}
 @media(max-width:420px){.document-stack:before{inset:12px -4px -9px 12px;transform:rotate(1deg)}}
+
+/* Connected regelingen release: shared navigation and discovery cards. */
+.regulation-entry{padding-top:65px;padding-bottom:20px}.regulation-entry-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.regulation-entry-card{display:flex;flex-direction:column;align-items:flex-start;background:#fff;border:1px solid #e1e9df;border-radius:24px;padding:30px;color:#0c1732;text-decoration:none;box-shadow:0 12px 32px -28px #16412d66}
+.regulation-entry-card:hover{border-color:#80b46d;transform:translateY(-2px)}.regulation-entry-card h3{font-size:23px;letter-spacing:-.5px;margin:20px 0 10px}.regulation-entry-card p{font-size:15px;color:#606b7e;line-height:1.7;margin:0 0 16px}.regulation-entry-card .read-more{margin-top:auto}
+.regulation-catalogue{display:grid;gap:18px;margin:24px 0}.regulation-catalogue article{padding:24px;border:1px solid #dfe8da;border-radius:17px;background:#fff}.regulation-catalogue h3{margin:0 0 12px;font-size:22px}.regulation-catalogue p{margin:10px 0}.regulation-catalogue .source-note{font-size:12px;margin-top:20px}.regulation-catalogue .source-note a{display:block;margin-top:8px;overflow-wrap:anywhere}.regulation-source-list a{overflow-wrap:anywhere}.source-review-date{font-size:13px;color:#606b7e}.category-cta{margin:24px 0}.category-cta p{font-size:14px}
+.nav-links{gap:21px}.nav-links a{font-size:13px}.footer-col a{line-height:1.5}
+@media(max-width:1180px){.nav-links{display:none}.mobile-nav{display:block}.nav-actions{margin-left:auto}}
+@media(max-width:760px){.regulation-entry{padding-top:45px}.regulation-entry-grid{grid-template-columns:1fr;gap:15px}.regulation-entry-card{padding:24px}.regulation-entry-card h3{font-size:22px}.regulation-entry-card p{font-size:14px}.regulation-catalogue article{padding:20px}.regulation-catalogue h3{font-size:21px}}
