@@ -5,6 +5,9 @@ const imageAssets=['assets/images/home-hero.webp','assets/images/home-hero-small
 function inlineImages(text){for(const file of imageAssets){const uri='data:image/webp;base64,'+fs.readFileSync(path.join(root,file)).toString('base64');text=text.replaceAll('/'+file,uri).replaceAll(file,uri);}return text;}
 
 let html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+// Offline exports keep all vendor code embedded; the public homepage loads it on demand.
+const exportVendors=['pdf-lib-1.17.1.min.js','fontkit-1.1.1.min.js','noto-sans-font.js','jszip-3.10.1.min.js'];
+html=html.replace('<script defer src="assets/export-loader.js"></script>',exportVendors.map(f=>'<script defer src="vendor/'+f+'"></script>').join('')+'<script defer src="assets/export-loader.js"></script>');
 html=html.replace('<meta name="robots" content="index, follow">','<meta name="robots" content="noindex, nofollow">').replace('<script defer src="assets/metrics.js"></script>','').replace(/<link rel="canonical"[^>]*>/g,'').replace(/<meta property="og:[^"]+"[^>]*>/g,'').replace('<html lang="nl">','<html lang="nl" data-offline="true">');
 let css=fs.readFileSync(path.join(root,'assets/style.css'),'utf8');
 const font=fs.readFileSync(path.join(root,'vendor/NotoSans-Regular.ttf')).toString('base64');

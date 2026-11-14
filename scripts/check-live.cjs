@@ -73,7 +73,7 @@ async function checkLive({fetchImpl = globalThis.fetch, expected} = {}) {
     Object.keys(s).every(k => ['service','version','analytics','operator','contact'].includes(k)) && noindex(settings);
   check('Publieke instellingen bevatten alleen toegestane velden', settingsOK);
   if (settingsOK && s.analytics === false) report.warnings.push('Gebruikstellingen staan uit; dit blokkeert de documentenwerkbank niet.');
-  const pages = ['/regelingen/','/subsidies/','/btw/','/financiering/','/hulp/','/hulp/factuur-warmtepomp/','/hulp/betaalbewijs/','/hulp/meldcode/','/privacy/','/bronnen/','/over/'];
+  const pages = ['/regelingen/','/subsidies/','/btw/','/financiering/','/hulp/','/hulp/factuur-warmtepomp/','/hulp/betaalbewijs/','/hulp/meldcode/','/hulp/zonnepanelen-btw/','/hulp/thuisbatterij-btw/','/privacy/','/bronnen/','/over/'];
   for (const page of pages) {
     const r = await request(ORIGIN + page);
     check('Pagina ' + page, status200(r) && /SubsidieReady/.test(r.text) && /<h1\b/.test(r.text));
@@ -106,7 +106,8 @@ async function checkLive({fetchImpl = globalThis.fetch, expected} = {}) {
     !/^Disallow:\s*\/\s*$/m.test(robots.text) && robots.text.includes(ORIGIN + '/sitemap.xml'));
   const sitemap = await request(ORIGIN + '/sitemap.xml');
   check('Sitemap bevat alleen publieke pagina’s', status200(sitemap) && [ORIGIN + '/', ...pages.map(p => ORIGIN + p)]
-    .every(u => sitemap.text.includes('<loc>' + u + '</loc>')) && !/\/(?:admin|api|dossier)(?:\/|<)/.test(sitemap.text));
+    .every(u => sitemap.text.includes('<loc>' + u + '</loc>')) && !/\/(?:admin|api|dossier|mijn-plan|advies|sales|bronbeheer)(?:\/|<)/.test(sitemap.text) &&
+    !/hulp\/(?:isolatie-checklist|lokale-regelingen)\//.test(sitemap.text));
   for (const file of ['/.git/config','/.env','/server/bootstrap.php','/server/next/service.php','/scripts/setup-admin.php','/scripts/next/setup.php','/tests/core.test.cjs','/templates/index.html']) {
     const r = await request(ORIGIN + file);
     check('Interne route afgeschermd: ' + file, r && [403,404].includes(r.status));
