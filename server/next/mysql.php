@@ -84,6 +84,11 @@ function srn_mysql_state(array $c, PDO $pdo): array {
         }
     }
     $s['audit'] = array_slice($s['audit'], -2000);
+    // This pilot must never import or operate on legacy files or sales records.
+    // Those need their own storage migrations, access policy and restore proof.
+    if ($s['files'] !== [] || $s['leads'] !== []) {
+        throw new RuntimeException('MySQL pilot bevat niet-ondersteunde documenten of salesgegevens.');
+    }
     return $s;
 }
 
@@ -93,6 +98,10 @@ function srn_mysql_tx(array $c, callable $fn): mixed {
     try {
         $state = srn_mysql_state($c, $pdo);
         $result = $fn($state);
+        // Refuse unsupported file deletion BEFORE committing the SQL state.
+        if (is_array($result) && isset($result['_purge']) && $result['_purge'] !== []) {
+            throw new RuntimeException('MySQL pilot bevat onverwachte documentverwijderingen.');
+        }
         $json = json_encode($state, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
         if (strlen($json) > 10 * 1024 * 1024) {
             throw new RuntimeException('Opslaglimiet bereikt.');
@@ -105,14 +114,8 @@ function srn_mysql_tx(array $c, callable $fn): mixed {
             throw new RuntimeException('Opslagtransactie niet bevestigd.');
         }
         $pdo->commit();
-        // Vault is disabled in this pilot. Refuse silently deleting objects
-        // if an unexpected state contains old vault records.
-        if (is_array($result) && isset($result['_purge'])) {
-            if ($result['_purge'] !== []) {
-                throw new RuntimeException('MySQL pilot bevat onverwachte documentverwijderingen.');
-            }
-            unset($result['_purge']);
-        }
+        // Existing account deletion returns _purge=[], removed from the response.
+        if (is_array($result)) unset($result['_purge']);
         return $result;
     } catch (Throwable $error) {
         if ($pdo->inTransaction()) {
