@@ -17,9 +17,13 @@ jobs:
   mysql-account-pilot:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        database_image: ['mysql:8.4', 'mariadb:11.4']
     services:
       mysql:
-        image: mysql:8.4
+        image: ${{ matrix.database_image }}
         env:
           MYSQL_ROOT_PASSWORD: ci-root-synthetic
           MYSQL_DATABASE: sr_synthetic
