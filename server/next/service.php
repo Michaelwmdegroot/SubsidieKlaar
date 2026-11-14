@@ -3,22 +3,27 @@ declare(strict_types=1);
 require_once __DIR__.'/mysql.php';
 /* Testrelease backend: encrypted, locked single-host pilot storage. Off without private config. */
 const SRN_SCHEMA=1;
+const SRN_TERMS_VERSION='2026-11-14-account-v1';
+const SRN_PRIVACY_VERSION='2026-11-14-privacy-v1';
+const SRN_EMAIL_MARKETING_VERSION='2026-11-14-nivo-email-v1';
 const SRN_RULE='2026.11.14.3-beta';
 function srn_id(): string { return bin2hex(random_bytes(16)); }
 function srn_error(string $message,int $status=400): array {return ['_status'=>$status,'error'=>$message];}
 function srn_config(): array {
- $root=realpath(dirname(__DIR__,2));$cfg=getenv('SR_NEXT_CONFIG');if(is_string($cfg))clearstatcache(true,$cfg);
+ $root=realpath(dirname(__DIR__,2));$cfg=getenv('SR_NEXT_CONFIG');if(!$cfg)$cfg=dirname($root).'/subsidieready-private/next-config.php';if(is_string($cfg))clearstatcache(true,$cfg);
  if(!$cfg || !is_file($cfg) || is_link($cfg)) throw new RuntimeException('Niet geconfigureerd.');
  $real=realpath($cfg);if(!$real || str_starts_with($real,$root.DIRECTORY_SEPARATOR))throw new RuntimeException('Private configuratie vereist.');
- if(function_exists('opcache_invalidate'))@opcache_invalidate($real,true);$c=require $real;if(!is_array($c)||!in_array($c['mode']??'', ['local','staging'],true))throw new RuntimeException('Alleen testmodus toegestaan.');
+ if(function_exists('opcache_invalidate'))@opcache_invalidate($real,true);$c=require $real;if(!is_array($c)||!in_array($c['mode']??'', ['local','staging','production'],true))throw new RuntimeException('Ongeldige modus.');
  $dir=realpath($c['dir']??'');if(!$dir||!is_dir($dir)||is_link($c['dir'])||$dir===$root||str_starts_with($dir,$root.DIRECTORY_SEPARATOR))throw new RuntimeException('Private opslag vereist.');
  $origin=$c['origin']??'';$u=parse_url($origin);if(!$u||!isset($u['scheme'],$u['host'])||isset($u['user'])||isset($u['pass'])||isset($u['query'])||isset($u['fragment'])||($u['path']??'')!=='')throw new RuntimeException('Ongeldige origin.');
  $local=$c['mode']==='local';if($local && !preg_match('~^http://127\.0\.0\.1:[0-9]{2,5}$~D',$origin))throw new RuntimeException('Loopback vereist.');
- if(!$local && ($u['scheme']!=='https'||in_array(strtolower($u['host']),['subsidieready.nl','www.subsidieready.nl'])))throw new RuntimeException('Productiedomein niet toegestaan in deze testrelease.');
+ if(!$local && ($u['scheme']!=='https'||($c['mode']==='staging'&&in_array(strtolower($u['host']),['subsidieready.nl','www.subsidieready.nl'],true))))throw new RuntimeException('Productiedomein niet toegestaan in deze testrelease.');
+ if($c['mode']==='production' && ($origin!=='https://subsidieready.nl'||($c['storage_driver']??'')!=='mysql'||($c['controller']??'')!=='NIVO Groep Holland B.V.'||($c['contact']??'')!=='info@nivogroepholland.nl'||($c['legal_reviewed']??false)!==true||($c['vault_enabled']??false)!==false||($c['leads_enabled']??false)!==false||($c['staff_enabled']??false)!==false))throw new RuntimeException('Productievoorwaarden voor uitsluitend accounts ontbreken.');
  if(!extension_loaded('sodium')||!is_string($c['key']??null)||!preg_match('/^[a-f0-9]{64}$/D',$c['key']))throw new RuntimeException('Sleutel ontbreekt.');
  if(!is_string($c['controller']??null)||trim($c['controller'])===''||!filter_var($c['contact']??'',FILTER_VALIDATE_EMAIL))throw new RuntimeException('Verantwoordelijke ontbreekt.');
  if(!$local && ($c['privacy_reviewed']??false)!==true)throw new RuntimeException('Privacy-goedkeuring ontbreekt.');
  if(!in_array($c['transport']??'', ['spool','mail'],true)||(!$local && $c['transport']==='spool'))throw new RuntimeException('Mailtransport ontbreekt.');
+ if($c['mode']==='production' && ($c['mail_ready']??false)!==true)throw new RuntimeException('Productie vereist werkende verificatiemail.');
  if(!in_array($c['storage_driver']??'file',['file','mysql'],true))throw new RuntimeException('Opslagdriver onbekend.');
  if(($c['storage_driver']??'file')==='mysql')srn_mysql_validate($c);
  $c['dir']=$dir;$c['keyBytes']=hex2bin($c['key']);return $c;
@@ -45,7 +50,7 @@ function srn_date(mixed $v): string {if(!is_string($v)||!preg_match('/^\d{4}-\d{
 function srn_session(array &$s,string $token): ?array {return $s['sessions'][hash('sha256',$token)]??null;}
 function srn_new_session(array &$s,?string $account=null,?string $contact=null): array {if(count($s['sessions'])>=2000)throw new RuntimeException('Sessielimiet bereikt.');$token=bin2hex(random_bytes(32));$csrf=bin2hex(random_bytes(32));$s['sessions'][hash('sha256',$token)]=['account'=>$account,'contact'=>$contact,'csrf'=>$csrf,'created'=>time(),'authAt'=>$account||$contact?time():0,'expires'=>time()+1800];return ['token'=>$token,'csrf'=>$csrf];}
 function srn_user(array $s,?array $session): ?array {return isset($session['account'])?($s['accounts'][$session['account']]??null):null;}
-function srn_public_user(?array $u,array $c): ?array {if(!$u)return null;$staff=($c['staff_enabled']??false)===true?($c['staff'][$u['email']]??null):null;return ['id'=>$u['id'],'email'=>$u['email'],'role'=>$staff['role']??'consumer','entity'=>$staff['entity']??null];}
+function srn_public_user(?array $u,array $c): ?array {if(!$u)return null;$staff=($c['staff_enabled']??false)===true?($c['staff'][$u['email']]??null):null;return ['id'=>$u['id'],'email'=>$u['email'],'role'=>$staff['role']??'consumer','entity'=>$staff['entity']??null,'marketingEmail'=>($u['marketingEmail']??false)===true];}
 function srn_queue(array &$s,string $to,string $type,string $text,string $idempotency,array $meta=[]): void {foreach($s['outbox']as$v)if(($v['key']??'')===$idempotency)return;if(count($s['outbox'])>1000)throw new RuntimeException('Mailwachtrij vol.');$id=srn_id();$s['outbox'][$id]=['id'=>$id,'to'=>$to,'type'=>$type,'text'=>$text,'key'=>$idempotency,'created'=>time(),'expires'=>time()+($type==='otp'?600:86400),'attempts'=>0,'state'=>'queued','meta'=>$meta];}
 function srn_audit(array &$s,string $action,string $actor,string $object): void {$s['audit'][]=['at'=>gmdate('c'),'action'=>$action,'actor'=>$actor,'object'=>$object];}
 function srn_plan(array $input): array {
@@ -68,7 +73,7 @@ function srn_handle(array $c,string $action,array $in,string $token,string $csrf
   if($action==='bootstrap'){
    if(!$session){if(!srn_limit($s,'bootstrap:'.$ipKey,80,600))return srn_error('Te veel verzoeken.',429);$new=srn_new_session($s);$session=srn_session($s,$new['token']);}else$new=['token'=>$token,'csrf'=>$session['csrf']];
    $dest=[];if(($c['leads_enabled']??false)===true&&($c['mode']==='local'||($c['mail_ready']??false)===true))foreach($c['destinations']??[]as$id=>$d)if(($d['enabled']??false)===true)$dest[]=['id'=>$id,'name'=>$d['name'],'topics'=>$d['topics'],'privacy'=>$d['privacy']];
-   return ['mode'=>$c['mode'],'accounts'=>($c['accounts_enabled']??false)===true&&($c['mode']==='local'||($c['mail_ready']??false)===true),'vault'=>($c['vault_enabled']??false)===true,'leads'=>count($dest)>0,'controller'=>$c['controller'],'contact'=>$c['contact'],'destinations'=>$dest,'user'=>srn_public_user($u,$c),'csrf'=>$new['csrf'],'_cookie'=>$new['token'],'message'=>$c['mode']==='local'?'Lokale testserver: alleen fictieve gegevens, e-mails staan in de private testpostbus.':'Afgeschermde staging; nog geen productieacceptatie.'];
+   return ['mode'=>$c['mode'],'accounts'=>($c['accounts_enabled']??false)===true&&($c['mode']==='local'||($c['mail_ready']??false)===true),'vault'=>($c['vault_enabled']??false)===true,'leads'=>count($dest)>0,'controller'=>$c['controller'],'contact'=>$c['contact'],'destinations'=>$dest,'user'=>srn_public_user($u,$c),'csrf'=>$new['csrf'],'_cookie'=>$new['token'],'message'=>$c['mode']==='local'?'Lokale testserver: alleen fictieve gegevens, e-mails staan in de private testpostbus.':($c['mode']==='production'?'Optioneel account om plannen te bewaren. Aanmelden is geen automatisch adviesverzoek of reclame-toestemming.':'Afgeschermde staging; nog geen productieacceptatie.')];
   }
   if(!$session||!hash_equals($session['csrf'],$csrf))return srn_error('Sessie verlopen. Vernieuw en probeer opnieuw.',403);
   if(!srn_limit($s,'requests:'.$ipKey,300,300))return srn_error('Te veel verzoeken.',429);
@@ -77,9 +82,11 @@ function srn_handle(array $c,string $action,array $in,string $token,string $csrf
    if($c['mode']!=='local'&&($c['mail_ready']??false)!==true)return srn_error('Transactionele mail is nog niet vrijgegeven.',503);
    $email=srn_email($in['email']??null);$purpose=$in['purpose']??'account';if(!$email||!in_array($purpose,['account','requests'],true))return srn_error('Vul een geldig e-mailadres in.');
    if($purpose==='account'&&(($c['accounts_enabled']??false)!==true||($in['serviceAccepted']??false)!==true))return srn_error('Accountdienst niet beschikbaar of niet gekozen.',503);
+   if($purpose==='account'&&($c['mode']==='production'||array_key_exists('termsAccepted',$in))&&(($in['termsAccepted']??false)!==true||($in['termsVersion']??'')!==SRN_TERMS_VERSION))return srn_error('Accepteer de actuele accountvoorwaarden.',400);
+   if($purpose==='account'&&array_key_exists('marketingEmailOptIn',$in)&&!is_bool($in['marketingEmailOptIn']))return srn_error('Ongeldige commerciële voorkeur.',400);
    if($purpose==='requests'&&($c['leads_enabled']??false)!==true)return srn_error('Aanvragen niet beschikbaar.',503);
    $h=srn_hash($email,$c);$allowed=srn_limit($s,'mail:'.$h,3,900)&&srn_limit($s,'mailip:'.$ipKey,12,900);$id=srn_id();
-   if($allowed){foreach($s['challenges']as$k=>$ch)if($ch['emailHash']===$h&&$ch['purpose']===$purpose)unset($s['challenges'][$k]);$code=(string)random_int(10000000,99999999);$s['challenges'][$id]=['email'=>$email,'emailHash'=>$h,'code'=>srn_hash($id.'|'.$code,$c),'purpose'=>$purpose,'session'=>$sessionKey,'attempts'=>0,'expires'=>time()+600];srn_queue($s,$email,'otp',"Je SubsidieReady-code is: $code\nGeldig voor 10 minuten. Alleen gebruiken voor je eigen verzoek. Geen account of nieuwsbrief aangevraagd? Negeer dit bericht.",'otp:'.$id);}
+   if($allowed){foreach($s['challenges']as$k=>$ch)if($ch['emailHash']===$h&&$ch['purpose']===$purpose)unset($s['challenges'][$k]);$code=(string)random_int(10000000,99999999);$s['challenges'][$id]=['email'=>$email,'emailHash'=>$h,'code'=>srn_hash($id.'|'.$code,$c),'purpose'=>$purpose,'session'=>$sessionKey,'attempts'=>0,'expires'=>time()+600,'termsVersion'=>$purpose==='account'?(($in['termsAccepted']??false)===true?SRN_TERMS_VERSION:'legacy-local'):'','marketingEmailOptIn'=>$purpose==='account'&&($in['marketingEmailOptIn']??false)===true];srn_queue($s,$email,'otp',"Je SubsidieReady-code is: $code\nGeldig voor 10 minuten. Alleen gebruiken voor je eigen verzoek. Geen account of nieuwsbrief aangevraagd? Negeer dit bericht.",'otp:'.$id);}
    return ['accepted'=>true,'challenge'=>$id,'message'=>'Een code is aangevraagd. Controleer je inbox; bij teveel verzoeken wordt geen nieuwe mail verstuurd.'];
   }
   if($action==='auth-verify'){
@@ -88,8 +95,10 @@ function srn_handle(array $c,string $action,array $in,string $token,string $csrf
    if(!preg_match('/^\d{8}$/D',$code)||!hash_equals($ch['code'],srn_hash($id.'|'.$code,$c)))return srn_error('Code ongeldig of verlopen.',401);
    unset($s['challenges'][$id]);$aid=null;if($ch['purpose']==='account'){
     foreach($s['accounts']as$a)if($a['emailHash']===$ch['emailHash']){$aid=$a['id'];break;}
-    if(!$aid){if(count($s['accounts'])>=200)return srn_error('Pilotcapaciteit bereikt.',503);$aid=srn_id();$s['accounts'][$aid]=['id'=>$aid,'email'=>$ch['email'],'emailHash'=>$ch['emailHash'],'created'=>time(),'lastUsed'=>time(),'reminders'=>false];}
+    if(!$aid){if(($c['storage_driver']??'file')!=='mysql'&&count($s['accounts'])>=200)return srn_error('Lokale testcapaciteit bereikt.',503);$aid=srn_id();$s['accounts'][$aid]=['id'=>$aid,'email'=>$ch['email'],'emailHash'=>$ch['emailHash'],'created'=>time(),'lastUsed'=>time(),'reminders'=>false,'termsVersion'=>$ch['termsVersion'],'termsAcceptedAt'=>gmdate('c'),'privacyVersion'=>SRN_PRIVACY_VERSION,'marketingEmail'=>false,'marketingHistory'=>[]];}
     $s['accounts'][$aid]['lastUsed']=time();
+    if(($ch['termsVersion']??'')===SRN_TERMS_VERSION){$s['accounts'][$aid]['termsVersion']=SRN_TERMS_VERSION;$s['accounts'][$aid]['termsAcceptedAt']=gmdate('c');$s['accounts'][$aid]['privacyVersion']=SRN_PRIVACY_VERSION;}
+    if(($ch['marketingEmailOptIn']??false)===true){$s['accounts'][$aid]['marketingEmail']=true;$s['accounts'][$aid]['marketingHistory']=array_slice([...($s['accounts'][$aid]['marketingHistory']??[]),['enabled'=>true,'at'=>gmdate('c'),'version'=>SRN_EMAIL_MARKETING_VERSION,'method'=>'verified-account-signup','entity'=>'NIVO Groep Holland B.V.']],-20);}
    }
    if($ch['purpose']==='requests'&&$u&&$u['emailHash']===$ch['emailHash'])$aid=$u['id'];$new=srn_new_session($s,$aid,$ch['emailHash']);unset($s['sessions'][$sessionKey]);return ['user'=>srn_public_user($aid?$s['accounts'][$aid]:null,$c),'requestsVerified'=>true,'csrf'=>$new['csrf'],'_cookie'=>$new['token']];
   }
@@ -109,7 +118,15 @@ function srn_handle(array $c,string $action,array $in,string $token,string $csrf
   }
   if($action==='reminder-set'){if(!$u)return srn_error('Inloggen vereist.',401);$p=srn_owned($s,$u,srn_text($in['project']??'',64));$due=srn_date($in['date']??'');if(!$p||!$due||$due<date('Y-m-d')||$due>date('Y-m-d',time()+3*366*86400))return srn_error('Ongeldige herinnering.');$id=$p['id'].'|'.$due;if(($in['enabled']??false)!==true){unset($s['reminders'][$id]);return ['ok'=>true];}$s['reminders'][$id]=['id'=>$id,'owner'=>$u['id'],'project'=>$p['id'],'date'=>$due,'created'=>time(),'sent'=>false];return ['ok'=>true];}
   if($action==='reminders-off'){if(!$u)return srn_error('Inloggen vereist.',401);foreach($s['reminders']as$id=>$r)if($r['owner']===$u['id'])unset($s['reminders'][$id]);return ['ok'=>true];}
-  if($action==='account-export'){if(!$u)return srn_error('Inloggen vereist.',401);return ['account'=>['email'=>$u['email'],'created'=>$u['created']],'projects'=>array_values(array_map(fn($p)=>$p['data'],array_filter($s['projects'],fn($p)=>$p['owner']===$u['id']))),'files'=>array_values(array_map(fn($f)=>array_intersect_key($f,array_flip(['id','project','measure','name','mime','size'])),array_filter($s['files'],fn($f)=>$f['owner']===$u['id']))),'note'=>'Bestanden afzonderlijk downloaden. Geen andere gebruikersdata.' ];}
+  if($action==='marketing-email-set'){
+    if(!$u)return srn_error('Inloggen vereist.',401);
+    if(!is_bool($in['enabled']??null)||($in['version']??'')!==SRN_EMAIL_MARKETING_VERSION)return srn_error('Onbekende marketingvoorkeur.',400);
+    $enabled=$in['enabled'];$s['accounts'][$u['id']]['marketingEmail']=$enabled;
+    $s['accounts'][$u['id']]['marketingHistory']=array_slice([...($s['accounts'][$u['id']]['marketingHistory']??[]),['enabled'=>$enabled,'at'=>gmdate('c'),'version'=>SRN_EMAIL_MARKETING_VERSION,'method'=>'account-preferences','entity'=>'NIVO Groep Holland B.V.']],-20);
+    srn_audit($s,$enabled?'marketing_email_opt_in':'marketing_email_opt_out',$u['id'],$u['id']);
+    return ['ok'=>true,'user'=>srn_public_user($s['accounts'][$u['id']],$c)];
+   }
+   if($action==='account-export'){if(!$u)return srn_error('Inloggen vereist.',401);return ['account'=>['email'=>$u['email'],'created'=>$u['created'],'termsVersion'=>$u['termsVersion']??null,'termsAcceptedAt'=>$u['termsAcceptedAt']??null,'privacyVersion'=>$u['privacyVersion']??null,'marketingEmail'=>($u['marketingEmail']??false)===true,'marketingHistory'=>$u['marketingHistory']??[]],'projects'=>array_values(array_map(fn($p)=>$p['data'],array_filter($s['projects'],fn($p)=>$p['owner']===$u['id']))),'files'=>array_values(array_map(fn($f)=>array_intersect_key($f,array_flip(['id','project','measure','name','mime','size'])),array_filter($s['files'],fn($f)=>$f['owner']===$u['id']))),'note'=>'Bestanden afzonderlijk downloaden. Geen andere gebruikersdata.' ];}
   if($action==='account-delete'){
    if(!$u||time()-($session['authAt']??0)>600)return srn_error('Log opnieuw in om je account te verwijderen.',401);if(($in['confirm']??'')!=='VERWIJDER')return srn_error('Bevestig verwijderen.');
    $purge=[];foreach($s['files']as$id=>$f)if($f['owner']===$u['id']){unset($s['files'][$id]);$purge[]=$id;}

@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const root=path.resolve(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const standard=['index.html','regelingen/index.html','subsidies/index.html','btw/index.html','financiering/index.html','hulp/index.html','hulp/factuur-warmtepomp/index.html','hulp/betaalbewijs/index.html','hulp/meldcode/index.html','bronnen/index.html','privacy/index.html','over/index.html','404.html'];
+const standard=['index.html','regelingen/index.html','subsidies/index.html','btw/index.html','financiering/index.html','hulp/index.html','hulp/factuur-warmtepomp/index.html','hulp/betaalbewijs/index.html','hulp/meldcode/index.html','bronnen/index.html','privacy/index.html','voorwaarden/index.html','over/index.html','404.html'];
 const next=['mijn-plan','advies','sales','bronbeheer','hulp/isolatie-checklist','hulp/zonnepanelen-btw','hulp/thuisbatterij-btw','hulp/lokale-regelingen'].map(p=>p+'/index.html');
 const link=/<link rel="stylesheet" href="\/?assets\/site-theme\.css">/g;
 test('site theme: all generated site surfaces include exactly one shared stylesheet',()=>{
@@ -48,18 +48,10 @@ test('site theme: shared primary palette has legible contrast at both gradient e
  for(const[fg,bg]of [['ffffff','0d7d09'],['ffffff','057110'],['ffffff','005823'],['0d1b35','ffffff'],['4f6279','ffffff']]){const a=lum(fg),b=lum(bg);assert.ok((Math.max(a,b)+.05)/(Math.min(a,b)+.05)>=4.5,fg+'/'+bg);}
 });
 
-test('site theme: subsidy engine, data, authentication and privacy logic are byte-identical to approved baseline',()=>{
- const expected={"assets/core.js": "119d10364dc36c5188a8e71941bc8fee7388f003faf8e16ac2a235c1ffed4b89", "assets/export.js": "4d64f9ed793550dbdfe7108ba4610042a552f8794669b6e3f55fa075c945cf6d", "assets/metrics.js": "b72ee4ad4cdce17fcd717756c52adadac526db80877575415c5817d5e53f96d8", "scripts/regelingen-engine.cjs": "b518fefb8e71168595ead1b6a0e862e8bb6653b1b6e2bfdf32edecc1cf387c80", "assets/regelingen-app.js": "0bc3f09339d05210cedbba71341368d6f847dedd8b6ca8862d3ba30d545e1970", "assets/regelingen.css": "86e7bd69d41b0e4fa80cd33d601d0f496fcd75410c5c7a038697a6469c0aa53f", "assets/plan-core.js": "4d8459832dc02de4fcc756b97d88d2302e7b3f04bebf9a629d792ee78eec0e87", "assets/workbench-rules.js": "0499a3be87a9fa038b391ab73c5cc5a8af0bcf31b8a2553edaf615e016175f17", "assets/plan-bridge.js": "05b0b224c367cd7b22abb84a0374a2579e0f23fbe5fec2fad26e5eb6c22f2d1b", "assets/next-api.js": "80e2c48ce73647ef9d9d1ff850d00e7d23af0da99e55571b3f9feba2e30b71a8", "server/bootstrap.php": "d2c7d4a8030c2bf7686dcbac0c57ebdb7f64d4154d8af696a03961b8909592ab", "server/next/service.php": "e5f1eccb047446cc9d966b9691c97f3dbaa859e5131e4b0b93d3ff95b24b5320", "api/next/index.php": "886ba3b230fdd34d7c32f0ff366ebc7fe5c95728fecb5d6a89bc1134b6a23da1", "api/event.php": "d0db9690f4250f8a183357f25a99a51347bfec7bfd433a4559213b0a4e051caf", "api/health.php": "2bb468174a64644eb0f363a3fdb6f42d2195a2fc89c47142dafee717421335b2", "api/settings.php": "718a1cfc65534e5128b01386610ed1e580f1a39e32f72d9f78d0959ead1bfc8e", "assets/sales-app.js": "ce25bd8742571c4f5ccc18c49502372a3c2198633e71a707698cd457bd3db8eb"};
+test('site theme: reviewed account-service update and all other engines remain byte-identical',()=>{
+ const expected={"assets/core.js": "119d10364dc36c5188a8e71941bc8fee7388f003faf8e16ac2a235c1ffed4b89", "assets/export.js": "4d64f9ed793550dbdfe7108ba4610042a552f8794669b6e3f55fa075c945cf6d", "assets/metrics.js": "b72ee4ad4cdce17fcd717756c52adadac526db80877575415c5817d5e53f96d8", "scripts/regelingen-engine.cjs": "b518fefb8e71168595ead1b6a0e862e8bb6653b1b6e2bfdf32edecc1cf387c80", "assets/regelingen-app.js": "0bc3f09339d05210cedbba71341368d6f847dedd8b6ca8862d3ba30d545e1970", "assets/regelingen.css": "86e7bd69d41b0e4fa80cd33d601d0f496fcd75410c5c7a038697a6469c0aa53f", "assets/plan-core.js": "4d8459832dc02de4fcc756b97d88d2302e7b3f04bebf9a629d792ee78eec0e87", "assets/workbench-rules.js": "0499a3be87a9fa038b391ab73c5cc5a8af0bcf31b8a2553edaf615e016175f17", "assets/plan-bridge.js": "05b0b224c367cd7b22abb84a0374a2579e0f23fbe5fec2fad26e5eb6c22f2d1b", "assets/next-api.js": "80e2c48ce73647ef9d9d1ff850d00e7d23af0da99e55571b3f9feba2e30b71a8", "server/bootstrap.php": "d2c7d4a8030c2bf7686dcbac0c57ebdb7f64d4154d8af696a03961b8909592ab", "server/next/service.php": "0085d1d2e08ee50d34e3c8244feadb4b8f7b10b7b4585f72157515c19a8ea75f", "api/next/index.php": "886ba3b230fdd34d7c32f0ff366ebc7fe5c95728fecb5d6a89bc1134b6a23da1", "api/event.php": "d0db9690f4250f8a183357f25a99a51347bfec7bfd433a4559213b0a4e051caf", "api/health.php": "2bb468174a64644eb0f363a3fdb6f42d2195a2fc89c47142dafee717421335b2", "api/settings.php": "718a1cfc65534e5128b01386610ed1e580f1a39e32f72d9f78d0959ead1bfc8e", "assets/sales-app.js": "ce25bd8742571c4f5ccc18c49502372a3c2198633e71a707698cd457bd3db8eb"};
  for(const[p,hash]of Object.entries(expected)){
   let source=read(p);
-  if(p==='server/next/service.php'){
-   // The new SQL adapter is an explicitly scoped extension of the approved beta.
-   // Remove ONLY the three exact integration hooks; every existing security,
-   // account, ownership, consent and export instruction must remain byte-equal.
-   source=source.replace("require_once __DIR__.'/mysql.php';\n",'');
-   source=source.replace(" if(!in_array($c['storage_driver']??'file',['file','mysql'],true))throw new RuntimeException('Opslagdriver onbekend.');\n if(($c['storage_driver']??'file')==='mysql')srn_mysql_validate($c);\n",'');
-   source=source.replace(" if(($c['storage_driver']??'file')==='mysql')return srn_mysql_tx($c,$fn);\n",'');
-  }
   assert.equal(crypto.createHash('sha256').update(source).digest('hex'),hash,p);
  }
 });

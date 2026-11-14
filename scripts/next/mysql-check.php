@@ -27,17 +27,17 @@ try {
         throw $error;
     }
     echo json_encode([
-        'status' => 'ready_for_synthetic_staging_tests',
+        'status' => 'database_ready',
         'mode' => $config['mode'],
         'database' => 'connected',
         'encrypted_schema' => 'readable',
         'accounts_flag' => ($config['accounts_enabled'] ?? false) === true,
         'vault_flag' => false,
         'leads_flag' => false,
-        'production_enabled' => false,
+        'production_enabled' => $config['mode'] === 'production' && ($config['accounts_enabled'] ?? false) === true,
     ], JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)."\n";
 } catch (Throwable $error) {
     // Fail closed without reproducing SQL errors, DB hostnames, secrets or data.
-    fwrite(STDERR, "NO-GO: de MySQL-stagingcontrole is niet geslaagd. Controleer private configuratie, PDO-MySQL en schema.\n");
+    fwrite(STDERR, "NO-GO: de MySQL-controle is niet geslaagd. Controleer private configuratie, PDO-MySQL en schema.\n");
     exit(1);
 }

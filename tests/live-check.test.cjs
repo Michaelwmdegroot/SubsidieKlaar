@@ -5,7 +5,7 @@ const origin = 'https://subsidieready.nl';
 const expected = {product:'SubsidieReady',version:'1.0.0',build:'test-build',documents:'browser-only'};
 const nextExpected = require('../next-version.json');
 const betaPages = ['/mijn-plan/','/advies/','/sales/','/bronbeheer/'];
-const pages = ['/regelingen/','/subsidies/','/btw/','/financiering/','/hulp/','/hulp/factuur-warmtepomp/','/hulp/betaalbewijs/','/hulp/meldcode/','/hulp/zonnepanelen-btw/','/hulp/thuisbatterij-btw/','/privacy/','/bronnen/','/over/'];
+const pages = ['/regelingen/','/subsidies/','/btw/','/financiering/','/hulp/','/hulp/factuur-warmtepomp/','/hulp/betaalbewijs/','/hulp/meldcode/','/hulp/zonnepanelen-btw/','/hulp/thuisbatterij-btw/','/privacy/','/voorwaarden/','/bronnen/','/over/'];
 function fixture(overrides = {}) {
   const calls = [];
   function response(url) {
@@ -80,7 +80,7 @@ test('response bytes are bounded and release identity is required',async()=>{
 
 test('beta release is not accepted if an account service is active on production',async()=>{
   const f=fixture({'/api/next/':{status:200,text:JSON.stringify({configured:true,accounts:true})}}),r=await checkLive({expected,fetchImpl:f.fetchImpl});
-  assert.ok(failed(r,'Account- en sales-API'));
+  assert.ok(failed(r,'Accountservice veilig gesloten'));
 });
 test('beta pages must be reachable and not indexable',async()=>{
   const f=fixture({'/sales/':{headers:{'X-Robots-Tag':''}}}),r=await checkLive({expected,fetchImpl:f.fetchImpl});

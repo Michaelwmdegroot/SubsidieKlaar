@@ -17,7 +17,7 @@ const paths={
 function icon(name){return `<svg class="sr-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name]||paths.book}</svg>`;}
 function category(route){
  if(route.startsWith('/hulp/'))return {label:'Kennisbank',icon:'book',section:'/hulp/'};
- return ({'/subsidies/':{label:'Subsidies',icon:'subsidy',section:'/subsidies/'},'/btw/':{label:'Btw & belasting',icon:'vat',section:'/btw/'},'/financiering/':{label:'Financiering',icon:'finance',section:'/financiering/'},'/privacy/':{label:'Privacy',icon:'shield'},'/bronnen/':{label:'Bronnen & grenzen',icon:'sources'},'/over/':{label:'Over SubsidieReady',icon:'home'},'/404.html':{label:'Even de weg kwijt?',icon:'local'}})[route]||{label:'SubsidieReady',icon:'plan'};
+ return ({'/subsidies/':{label:'Subsidies',icon:'subsidy',section:'/subsidies/'},'/btw/':{label:'Btw & belasting',icon:'vat',section:'/btw/'},'/financiering/':{label:'Financiering',icon:'finance',section:'/financiering/'},'/privacy/':{label:'Privacy',icon:'shield'},'/voorwaarden/':{label:'Accountvoorwaarden',icon:'shield'},'/bronnen/':{label:'Bronnen & grenzen',icon:'sources'},'/over/':{label:'Over SubsidieReady',icon:'home'},'/404.html':{label:'Even de weg kwijt?',icon:'local'}})[route]||{label:'SubsidieReady',icon:'plan'};
 }
 function navigation(markup, route){
  const section=category(route).section;

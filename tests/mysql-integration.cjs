@@ -104,7 +104,7 @@ test('MySQL adapter: real PHP auth, persistent encrypted plans, ownership and ac
     async login(email) {
       const bootstrap = await this.boot();
       assert.equal(bootstrap.r.status, 200);
-      const first = await this.post('auth-start', {email, serviceAccepted: true});
+      const first = await this.post('auth-start', {email, serviceAccepted: true, termsAccepted: true, termsVersion: '2026-11-14-account-v1', marketingEmailOptIn: false});
       assert.equal(first.r.status, 200);
       const response = await this.post('auth-verify', {
         challenge: first.d.challenge,
@@ -118,7 +118,7 @@ test('MySQL adapter: real PHP auth, persistent encrypted plans, ownership and ac
     const check = JSON.parse(execFileSync('php', ['scripts/next/mysql-check.php', '--check'], {
       cwd: root, env, encoding: 'utf8'
     }));
-    assert.equal(check.status, 'ready_for_synthetic_staging_tests');
+    assert.equal(check.status, 'database_ready');
     assert.equal(check.production_enabled, false);
     await start();
     await t.test('staging pilot presents accounts but no vault or sales', async () => {
@@ -159,6 +159,15 @@ test('MySQL adapter: real PHP auth, persistent encrypted plans, ownership and ac
       })).r.status, 409);
       assert.equal(JSON.stringify(readState()).includes('SECRET-MUST-NOT-BE-SAVED'), false);
     });
+    await t.test('explicit email marketing consent can be withdrawn after verified login',async()=>{
+      assert.equal(alice.user.marketingEmail,false);
+      const accepted=await alice.post('marketing-email-set',{enabled:true,version:'2026-11-14-nivo-email-v1'});
+      assert.equal(accepted.r.status,200);assert.equal(accepted.d.user.marketingEmail,true);
+      assert.equal(readState().accounts[alice.user.id].marketingHistory.at(-1).enabled,true);
+      const withdrawn=await alice.post('marketing-email-set',{enabled:false,version:'2026-11-14-nivo-email-v1'});
+      assert.equal(withdrawn.r.status,200);assert.equal(withdrawn.d.user.marketingEmail,false);
+      assert.equal(readState().accounts[alice.user.id].marketingHistory.at(-1).enabled,false);
+    });
     await t.test('second account cannot access first account data', async () => {
       const bob = new Client();
       await bob.login('bob@example.invalid');
@@ -182,6 +191,16 @@ test('MySQL adapter: real PHP auth, persistent encrypted plans, ownership and ac
       assert.equal(Object.values(readState().accounts).some(x => x.email === 'alice@example.invalid'), false);
       assert.equal(readState().projects[id], undefined);
       assert.equal((await alice.post('projects-list')).r.status, 403);
+    });
+    await t.test('NIVO production account-only config can load but rejects premature sales and vault',async()=>{
+      const original=fs.readFileSync(config);
+      const modify=phpPrefix=>php(phpPrefix+'unset($c["keyBytes"]);$c["mode"]="production";$c["origin"]="https://subsidieready.nl";$c["controller"]="NIVO Groep Holland B.V.";$c["contact"]="info@nivogroepholland.nl";$c["transport"]="mail";$c["mail_ready"]=true;$c["privacy_reviewed"]=true;$c["legal_reviewed"]=true;file_put_contents('+JSON.stringify(config)+',"<?php return ".var_export($c,true).";");',env);
+      try{
+        modify(prefix);
+        assert.equal(php('require '+JSON.stringify(path.join(root,'server/next/service.php'))+';$c=srn_config();echo $c["mode"];',env),'production');
+        php('require '+JSON.stringify(path.join(root,'server/next/service.php'))+';$c=srn_config();unset($c["keyBytes"]);$c["leads_enabled"]=true;file_put_contents('+JSON.stringify(config)+',"<?php return ".var_export($c,true).";");',env);
+        assert.equal(php('require '+JSON.stringify(path.join(root,'server/next/service.php'))+'try{srn_config();echo "unsafe";}catch(Throwable $e){echo "blocked";}',env),'blocked');
+      }finally{fs.writeFileSync(config,original);}
     });
     await t.test('production origin remains blocked even with a working SQL connection', async () => {
       const original = fs.readFileSync(config);
