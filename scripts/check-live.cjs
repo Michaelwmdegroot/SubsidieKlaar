@@ -107,7 +107,7 @@ async function checkLive({fetchImpl = globalThis.fetch, expected} = {}) {
   const sitemap = await request(ORIGIN + '/sitemap.xml');
   check('Sitemap bevat alleen publieke pagina’s', status200(sitemap) && [ORIGIN + '/', ...pages.map(p => ORIGIN + p)]
     .every(u => sitemap.text.includes('<loc>' + u + '</loc>')) && !/\/(?:admin|api|dossier)(?:\/|<)/.test(sitemap.text));
-  for (const file of ['/.git/config','/.env','/server/bootstrap.php','/scripts/setup-admin.php','/tests/core.test.cjs','/templates/index.html']) {
+  for (const file of ['/.git/config','/.env','/server/bootstrap.php','/server/next/service.php','/scripts/setup-admin.php','/scripts/next/setup.php','/tests/core.test.cjs','/templates/index.html']) {
     const r = await request(ORIGIN + file);
     check('Interne route afgeschermd: ' + file, r && [403,404].includes(r.status));
   }
