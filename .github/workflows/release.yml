@@ -16,16 +16,21 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: php -v && npm run build && npm test && npm run package
+      - run: php -v && npm run build && npm test && npm run package && npm run preview:next
       - name: Verify generated files
-        run: git diff --exit-code -- index.html .htaccess robots.txt sitemap.xml version.json concept hulp privacy bronnen over regelingen subsidies btw financiering assets/regelingen-engine.js
+        run: git diff --exit-code -- index.html .htaccess robots.txt sitemap.xml version.json next-version.json concept hulp privacy bronnen over regelingen subsidies btw financiering mijn-plan advies sales bronbeheer assets/regelingen-engine.js
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SubsidieReady-testpreviews
+          path: qa/SubsidieReady-*-test.html
+          retention-days: 14
       - uses: actions/upload-artifact@v4
         with:
           name: SubsidieReady-hostinger
           path: dist/
           retention-days: 14
       - name: Archive reproducible source
-        run: tar --exclude=.git --exclude=node_modules --exclude=dist -czf "$RUNNER_TEMP/subsidieready-source.tar.gz" .
+        run: tar --exclude=.git --exclude=node_modules --exclude=dist --exclude=qa -czf "$RUNNER_TEMP/subsidieready-source.tar.gz" .
       - uses: actions/upload-artifact@v4
         with:
           name: subsidieready-source
