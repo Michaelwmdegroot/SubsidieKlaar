@@ -11,7 +11,7 @@ test('selection immediately recomputes local results and never navigates to a re
  const s=js();assert.ok(s.includes("form.addEventListener('change',onChange)"));assert.ok(s.includes('snapshot=engine.evaluate(x)'));assert.ok(s.includes('snapshot=null'));assert.ok(s.includes('renderList();buildPrint()'));assert.doesNotMatch(s,/scrollIntoView|location\.(?:href|assign)|history\.(?:pushState|replaceState)/);
 });
 test('visible desktop viewport remains fixed; only internal dashboard panels scroll',()=>{
- const s=css();assert.match(s,/body\.r-dashboard-ready\{overflow:hidden\}/);assert.match(s,/height:var\(--r-viewport-height/);assert.match(s,/\.r-route-list\{[^}]*overflow:auto/);assert.match(s,/\.r-route-detail\{[^}]*overflow:auto/);assert.match(s,/@media\(max-width:1020px\)/);assert.match(s,/data-active-panel="details"/);
+ const s=css();assert.match(s,/body\.r-dashboard-ready\{overflow:hidden\}/);assert.match(s,/height:var\(--r-viewport-height/);assert.match(s,/\.r-route-list\{[^}]*overflow:auto/);assert.match(s,/\.r-route-detail\{[^}]*overflow:auto/);assert.match(s,/@media\(max-width:1150px\)/);assert.match(s,/data-active-panel="details"/);
 });
 test('subsidy VAT loan and local stay distinct, with attributable official source links',()=>{
  const s=js();for(const kind of ['subsidie','btw','financiering','lokaal'])assert.ok(s.includes(kind));assert.ok(s.includes('r-loan-warning'));assert.ok(s.includes('r.sources.map'));assert.ok(s.includes('noopener noreferrer'));assert.ok(s.includes('Geen automatische goedkeuring.'));

@@ -1,0 +1,52 @@
+[
+  {
+    "file": "assets/images/dashboard-home.webp",
+    "source": "sustainable_dutch_home_by_the_canal.png",
+    "width": 1280,
+    "height": 720,
+    "bytes": 118178,
+    "sha256": "4b1cb77d12e22c8a78048f207af1d1b05bab719c394f6d3b237a54041923970a",
+    "origin": "Generated with GPT Images in this conversation, 14 November 2026",
+    "usage": "Decorative only; all functional labels and statuses remain HTML."
+  },
+  {
+    "file": "assets/images/dashboard-home-small.webp",
+    "source": "sustainable_dutch_home_by_the_canal.png",
+    "width": 640,
+    "height": 360,
+    "bytes": 39750,
+    "sha256": "c731d99888c0c09e2fdac2e9cf1aaddc19c0fdde9dd14ba977d2a9355dc2d613",
+    "origin": "Generated with GPT Images in this conversation, 14 November 2026",
+    "usage": "Decorative only; all functional labels and statuses remain HTML."
+  },
+  {
+    "file": "assets/images/dashboard-dossier.webp",
+    "source": "smartphone_dashboard_with_green_checkmark_folder.png",
+    "width": 320,
+    "height": 318,
+    "bytes": 24448,
+    "sha256": "351c0b835732faaa61eba441e204f069eadb2be0d8a8ccb468e054ea81213026",
+    "origin": "Generated with GPT Images in this conversation, 14 November 2026",
+    "usage": "Decorative only; all functional labels and statuses remain HTML."
+  },
+  {
+    "file": "assets/images/dashboard-sustainability.webp",
+    "source": "glossy_green_sustainability_subsidies_badge.png",
+    "width": 520,
+    "height": 165,
+    "bytes": 25986,
+    "sha256": "d87a0f56c4c53b0e7ffc627248f46be4ea827e0e2c28ecee50f99546ca0d43cb",
+    "origin": "Generated with GPT Images in this conversation, 14 November 2026",
+    "usage": "Decorative only; all functional labels and statuses remain HTML."
+  },
+  {
+    "file": "assets/images/dashboard-trust.webp",
+    "source": "bronvermelding_badge_met_groene_check.png",
+    "width": 96,
+    "height": 96,
+    "bytes": 2494,
+    "sha256": "dbeb9b79c55c738a938896e5886cc2404c9bd370f11482a2531e0b71ee05c08b",
+    "origin": "Generated with GPT Images in this conversation, 14 November 2026",
+    "usage": "Decorative only; all functional labels and statuses remain HTML."
+  }
+]

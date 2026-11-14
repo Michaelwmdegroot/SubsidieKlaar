@@ -39,3 +39,10 @@
 - `/mijn-plan/`, `/advies/`, `/sales/` en `/bronbeheer/` zijn noindex proefpagina's. Op de live website kan de gebruiker de lokale planner en de fictieve salesdemo beoordelen, niet een echte cloudaccount of verkoopintake.
 - De bestaande gratis gasttool en documentdownloads blijven beschikbaar, bron-/financieringsclaims ongewijzigd. `scripts/check-live.cjs` moet niet alleen de exacte versie en proefpagina's maar ook een **503** voor de ongeconfigureerde nieuwe API bevestigen.
 - Productieaccounts en echte leads vragen afzonderlijke eigenaarstoestemming na Hostinger persistence/mail/malwarecontrole, juridische verwerkingsverantwoordelijke, bewaartermijnen, rollen/MFA en hersteltest.
+
+## Approved premium dashboard publication (14 November 2026)
+- Owner approved the image-led concept and generated assets and explicitly asked to build it on the website. Complete PR #19's premium dashboard implementation and publish only after quality/release checks. The earlier draft-only review boundary for that UI is superseded by this request.
+- Read `docs/PREMIUM-DASHBOARD-RELEASE.md`. Keep sources, rates, loan boundaries, privacy and backend gates unchanged. No example money/guarantees from the mockup; real route counts only.
+- Generated optimized visuals are local assets with byte/hash provenance in `docs/DASHBOARD-ASSETS.json`. Important UI remains HTML, decorative imagery has empty alt text, no external fonts or APIs introduced.
+- Test narrow/short viewports and keyboard. Header must not squeeze CTA labels. Internal panel scroll is intentional; desktop workspace and action bar remain within viewport.
+- No production account/lead activation or storage migration is part of this visual deployment.

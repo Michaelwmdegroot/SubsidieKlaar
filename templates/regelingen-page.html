@@ -1,11 +1,12 @@
 <main id="main" class="container regelingen-page" data-active-panel="selection">
   <div class="r-dashboard-intro">
+    <div class="r-hero-art" aria-hidden="true"><img class="r-hero-house" src="/assets/images/dashboard-home.webp" srcset="/assets/images/dashboard-home-small.webp 640w, /assets/images/dashboard-home.webp 1280w" sizes="(max-width: 600px) 300px, 720px" width="1280" height="720" alt="" fetchpriority="high"><img class="r-hero-badge" src="/assets/images/dashboard-sustainability.webp" width="520" height="165" alt="" decoding="async"></div>
     <div class="r-dashboard-title">
       <div class="r-kicker"><span class="r-kicker-dot" aria-hidden="true"></span> PERSOONLIJKE REGELINGENCHECK <span class="r-shortcut">· GRATIS</span></div>
       <h1>Jouw regelingen. <span>In één overzicht.</span></h1>
       <p>Geef aan wat je wilt verduurzamen. Je mogelijkheden en vervolgstappen verschijnen meteen.</p>
     </div>
-    <div class="r-trust-note"><span class="r-trust-icon" aria-hidden="true">✓</span><span><strong>Gebaseerd op officiële bronnen</strong><small>Subsidie, btw en lening apart · geen overheidsdienst</small></span></div>
+    <div class="r-trust-note"><img class="r-trust-icon" src="/assets/images/dashboard-trust.webp" width="40" height="40" alt="" aria-hidden="true"><span><strong>Gebaseerd op officiële bronnen</strong><small>Subsidie, btw en lening apart · geen overheidsdienst</small></span></div>
   </div>
 
   <div class="r-mobile-tabs" role="tablist" aria-label="Onderdelen van de regelingencheck">
@@ -18,31 +19,32 @@
     <fieldset id="scan-fields" disabled class="r-dashboard-fields"><legend class="r-sr-only">Kies jouw verduurzamingssituatie</legend>
       <aside id="r-panel-selection" class="r-surface r-selection" role="tabpanel" aria-labelledby="r-tab-selection">
         <div class="r-panel-heading">
-          <div><span class="r-section-overline">STAP 1</span><h2>Kies je maatregelen</h2></div>
+          <div class="r-title-group"><span class="r-step-number" aria-hidden="true">1</span><div><span class="r-section-overline">STAP 1</span><h2>Kies je<br class="r-desktop-break"> maatregelen</h2></div></div>
           <span class="r-count" id="selected-count">0 gekozen</span>
         </div>
         <p class="r-hint">Je kunt er meerdere kiezen.</p>
         <div class="r-measures" aria-label="Welke onderdelen wil je verduurzamen?">
-          <label class="r-measure"><input type="checkbox" name="measures" value="warmtepomp"><span class="r-glyph" aria-hidden="true">♨</span><span>Warmtepomp</span></label>
-          <label class="r-measure"><input type="checkbox" name="measures" value="isolatie"><span class="r-glyph" aria-hidden="true">⌂</span><span>Isolatie &amp; glas</span></label>
-          <label class="r-measure"><input type="checkbox" name="measures" value="ventilatie"><span class="r-glyph" aria-hidden="true">◌</span><span>Ventilatie</span></label>
-          <label class="r-measure"><input type="checkbox" name="measures" value="zonnepanelen"><span class="r-glyph" aria-hidden="true">☀</span><span>Zonnepanelen</span></label>
-          <label class="r-measure"><input type="checkbox" name="measures" value="pv_constructie"><span class="r-glyph" aria-hidden="true">▤</span><span>PV-constructie</span></label>
-          <label class="r-measure"><input type="checkbox" name="measures" value="thuisbatterij"><span class="r-glyph" aria-hidden="true">▣</span><span>Thuisbatterij</span></label>
-          <label class="r-measure"><input type="checkbox" name="measures" value="zonneboiler"><span class="r-glyph" aria-hidden="true">◐</span><span>Zonneboiler</span></label>
-          <label class="r-measure"><input type="checkbox" name="measures" value="warmtenet"><span class="r-glyph" aria-hidden="true">⇄</span><span>Warmtenet</span></label>
-          <label class="r-measure"><input type="checkbox" name="measures" value="koken"><span class="r-glyph" aria-hidden="true">⌁</span><span>Elektrisch koken</span></label>
+          <label class="r-measure"><input type="checkbox" name="measures" value="warmtepomp"><span class="r-glyph" aria-hidden="true"><svg class="r-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="2.2"/><path d="M11 9C4 4 12 0 14 5c.7 2-.4 3.2-1 4M15 11c5-7 9 1 4 3-2 .7-3.2-.4-4-1M13 15c7 5-1 9-3 4-.7-2 .4-3.2 1-4M9 13c-5 7-9-1-4-3 2-.7 3.2.4 4 1"/></svg></span><span>Warmtepomp</span></label>
+          <label class="r-measure"><input type="checkbox" name="measures" value="isolatie"><span class="r-glyph" aria-hidden="true"><svg class="r-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m3 11 9-8 9 8M5 9v12h5v-7h4v7h5V9M18 4v3"/></svg></span><span>Isolatie &amp; glas</span></label>
+          <label class="r-measure"><input type="checkbox" name="measures" value="ventilatie"><span class="r-glyph" aria-hidden="true"><svg class="r-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 8h12a3 3 0 1 0-3-3M2 12h17a3 3 0 1 1-3 3M4 16h6a3 3 0 1 1-3 3"/></svg></span><span>Ventilatie</span></label>
+          <label class="r-measure"><input type="checkbox" name="measures" value="zonnepanelen"><span class="r-glyph" aria-hidden="true"><svg class="r-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 1v2m0 18v2M1 12h2m18 0h2M4.2 4.2l1.4 1.4m12.8 12.8 1.4 1.4M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg></span><span>Zonnepanelen</span></label>
+          <label class="r-measure"><input type="checkbox" name="measures" value="pv_constructie"><span class="r-glyph" aria-hidden="true"><svg class="r-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 4h14l3 13H2L5 4Zm-1 6h16M9 4l-1 13m7-13 1 13M8 21h8m-4-4v4"/></svg></span><span>PV-constructie</span></label>
+          <label class="r-measure"><input type="checkbox" name="measures" value="thuisbatterij"><span class="r-glyph" aria-hidden="true"><svg class="r-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="6" y="4" width="12" height="18" rx="2"/><path d="M9 4V2h6v2m-3 4v5m-2-3h4m-4 7h4"/></svg></span><span>Thuisbatterij</span></label>
+          <label class="r-measure"><input type="checkbox" name="measures" value="zonneboiler"><span class="r-glyph" aria-hidden="true"><svg class="r-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2S4 10 4 15a8 8 0 0 0 16 0c0-5-8-13-8-13Z"/><path d="M8 15a4 4 0 0 0 4 4"/></svg></span><span>Zonneboiler</span></label>
+          <label class="r-measure"><input type="checkbox" name="measures" value="warmtenet"><span class="r-glyph" aria-hidden="true"><svg class="r-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 7h17m-4-4 4 4-4 4M21 17H4m4-4-4 4 4 4"/></svg></span><span>Warmtenet</span></label>
+          <label class="r-measure"><input type="checkbox" name="measures" value="koken"><span class="r-glyph" aria-hidden="true"><svg class="r-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m13 2-9 12h7l-1 8 10-13h-8l1-7Z"/></svg></span><span>Elektrisch koken</span></label>
         </div>
         <div class="r-selection-footer">
-          <button type="button" id="example" class="r-example"><span aria-hidden="true">✦</span> Vul een voorbeeld in</button>
-          <button type="button" id="reset-check" class="r-text-button">Begin opnieuw</button>
+          <button type="button" id="example" class="r-example"><svg class="r-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 3 10 5-10 5L2 8l10-5ZM2 12l10 5 10-5M2 16l10 5 10-5"/></svg> Vul een voorbeeld in</button>
+          <button type="button" id="reset-check" class="r-text-button"><svg class="r-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 10a9 9 0 1 1 2 8M3 4v6h6m3-4v7l4 2"/></svg>Begin opnieuw</button>
         </div>
-        <div class="r-privacy-mini"><span aria-hidden="true">♢</span><span>Geen account of contactgegevens. Je antwoorden blijven op deze pagina.</span></div>
+        <div class="r-privacy-mini"><svg class="r-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v.2"/></svg><span>Geen account of contactgegevens. Je antwoorden blijven op deze pagina.</span></div>
       </aside>
 
       <section id="r-panel-results" class="r-surface r-results-panel" role="tabpanel" aria-labelledby="r-tab-results">
+        <nav class="r-journey" aria-label="Zo werkt je regelingencheck"><button type="button" data-guide="selection"><span class="r-journey-number">1</span><span>Maatregelen kiezen</span><span class="r-journey-tick" aria-hidden="true">✓</span></button><button type="button" data-guide="profile"><span class="r-journey-number">2</span><span>Jouw situatie</span></button><button type="button" data-guide="routes"><span class="r-journey-number">3</span><span>Regelingen bekijken</span></button></nav>
         <div class="r-panel-heading r-heading-profile">
-          <div><span class="r-section-overline">JOUW PROFIEL</span><h2>Vertel iets over je situatie</h2></div>
+          <div class="r-title-group"><span class="r-heading-symbol"><svg class="r-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="7" r="3.5"/><path d="M5 21v-3a7 7 0 0 1 14 0v3H5Z"/></svg></span><div><span class="r-section-overline">JOUW PROFIEL</span><h2>Vertel iets over je situatie</h2></div></div>
           <span class="r-instant-label"><span class="r-signal" aria-hidden="true"></span> Direct bijgewerkt</span>
         </div>
         <div class="r-profile-fields">
@@ -60,15 +62,15 @@
           </div>
         </div>
         <div class="r-results-head">
-          <div><span class="r-section-overline">STAP 2</span><h2 id="result-heading" tabindex="-1">Jouw mogelijke regelingen</h2><p id="result-caption" role="status" aria-live="polite">Selecteer links een maatregel om te beginnen.</p></div>
-          <span id="routes-total" class="r-bubble">0 routes</span>
+          <div class="r-results-title"><span class="r-heading-symbol"><svg class="r-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 3 10 5-10 5L2 8l10-5ZM2 12l10 5 10-5M2 16l10 5 10-5"/></svg></span><div><span class="r-section-overline">JOUW OVERZICHT</span><h2 id="result-heading" tabindex="-1">Jouw mogelijke regelingen</h2><p id="result-caption" role="status" aria-live="polite">Selecteer links een maatregel om te beginnen.</p></div></div>
+          <div class="r-routes-badge" aria-label="Aantal informatieroutes"><span>Voor jouw keuzes</span><strong id="routes-total" class="r-bubble">0 routes</strong></div>
         </div>
         <nav class="r-filters" aria-label="Filter de resultaten op soort regeling">
           <button type="button" data-filter="all" aria-pressed="true">Alles <span id="count-all">0</span></button>
-          <button type="button" data-filter="subsidie" aria-pressed="false">Subsidie <span id="count-subsidie">0</span></button>
-          <button type="button" data-filter="btw" aria-pressed="false">Btw <span id="count-btw">0</span></button>
-          <button type="button" data-filter="financiering" aria-pressed="false">Financiering <span id="count-financiering">0</span></button>
-          <button type="button" data-filter="lokaal" aria-pressed="false">Lokaal <span id="count-lokaal">0</span></button>
+          <button type="button" data-filter="subsidie" aria-pressed="false"><svg class="r-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 3 10 5-10 5L2 8l10-5ZM2 12l10 5 10-5M2 16l10 5 10-5"/></svg>Subsidie <span id="count-subsidie">0</span></button>
+          <button type="button" data-filter="btw" aria-pressed="false"><b class="r-percent" aria-hidden="true">%</b>Btw <span id="count-btw">0</span></button>
+          <button type="button" data-filter="financiering" aria-pressed="false"><svg class="r-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><ellipse cx="10" cy="5" rx="7" ry="3"/><path d="M3 5v5c0 4 14 4 14 0V5m-5 10v4c0 4 10 4 10 0v-5m-19-3v4c0 2 3 3 6 3"/><ellipse cx="17" cy="14" rx="5" ry="2.5"/></svg>Financiering <span id="count-financiering">0</span></button>
+          <button type="button" data-filter="lokaal" aria-pressed="false"><svg class="r-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 9c0 6-8 13-8 13S4 15 4 9a8 8 0 1 1 16 0Z"/><circle cx="12" cy="9" r="2.5"/></svg>Lokaal <span id="count-lokaal">0</span></button>
         </nav>
         <div id="result" class="r-route-list" aria-label="Regelingen uit jouw check">
           <div class="r-empty-state"><span class="r-empty-symbol" aria-hidden="true">✦</span><strong>Dit wordt jouw overzicht</strong><p>Kies links bijvoorbeeld zonnepanelen en thuisbatterij. Je ziet meteen welke routes er zijn en wat je vervolgens doet.</p><button type="button" class="r-empty-example" data-trigger="example">Bekijk een voorbeeld →</button></div>
@@ -76,21 +78,21 @@
       </section>
 
       <aside id="r-panel-details" class="r-surface r-details-panel" role="tabpanel" aria-labelledby="r-tab-details">
-        <div class="r-panel-heading"><div><span class="r-section-overline">STAP 3</span><h2>Dit betekent het voor jou</h2></div><span class="r-detail-icon" aria-hidden="true">↗</span></div>
+        <div class="r-panel-heading r-detail-heading"><div class="r-title-group"><span class="r-step-number" aria-hidden="true">3</span><div><span class="r-section-overline">STAP 3</span><h2>Dit betekent het voor jou</h2></div></div><img class="r-detail-art" src="/assets/images/dashboard-dossier.webp" width="88" height="88" alt="" aria-hidden="true" decoding="async"></div>
         <div id="route-detail" class="r-route-detail" aria-live="polite">
           <div class="r-detail-empty"><div class="r-detail-illustration" aria-hidden="true"><span>✓</span><i>1</i><i>2</i><i>3</i></div><h3>Van informatie naar actie</h3><p>Je ziet hier waarom een route relevant is, wat je nog moet controleren en waar je verdergaat.</p></div>
         </div>
-        <div class="r-detail-bottom"><span class="r-source-dot" aria-hidden="true"></span><div><strong>Bronnen: 14 november 2026</strong><span>Geen definitieve subsidietoekenning of belastingbesluit.</span></div><a href="/bronnen/" aria-label="Lees hoe onze bronnen worden gecontroleerd">↗</a></div>
+        <div class="r-detail-bottom"><svg class="r-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="17" rx="3"/><path d="M7 2v6m10-6v6M3 11h18m-13 5h2m4 0h2"/></svg><div><strong>Bronnen: 14 november 2026</strong><span>Geen definitieve subsidietoekenning of belastingbesluit.</span></div><a href="/bronnen/" aria-label="Lees hoe onze bronnen worden gecontroleerd">↗</a></div>
       </aside>
     </fieldset>
     <button type="submit" class="r-sr-only" id="run-check">Bekijk mijn routes</button>
   </form>
 
   <div class="r-dashboard-footer">
-    <p class="r-footer-disclaimer"><span aria-hidden="true">♢</span><span>Gratis en privacyvriendelijk. <strong>Subsidie ≠ btw ≠ lening.</strong> Lokale dekking is onvolledig. <a href="/#dossier">Warmtepompwerkbank</a>.</span></p>
+    <p class="r-footer-disclaimer"><svg class="r-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 2 8 3v7c0 5-8 10-8 10S4 17 4 12V5l8-3Z"/><path d="m8 12 3 3 5-6"/></svg><span>Gratis en privacyvriendelijk. <strong>Subsidie ≠ btw ≠ lening.</strong> Lokale dekking is onvolledig. <a href="/#dossier">Warmtepompwerkbank</a>.</span></p>
     <div class="r-footer-actions">
-      <button type="button" id="print-routes" class="r-tool-action" hidden>Afdrukken</button>
-      <button type="button" id="export" class="r-tool-action" hidden>Bewaar overzicht</button>
+      <button type="button" id="print-routes" class="r-tool-action" hidden><svg class="r-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3v12m-4-4 4 4 4-4M4 16v5h16v-5"/></svg>Afdrukken</button>
+      <button type="button" id="export" class="r-tool-action" hidden><svg class="r-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 3h12v19l-6-4-6 4V3Z"/></svg>Bewaar overzicht</button>
       <button type="button" id="use-in-plan" class="r-action-primary" disabled>Maak mijn plan <span aria-hidden="true">→</span></button>
       <p id="plan-bridge-status" class="r-bridge-status" role="status"></p>
     </div>
