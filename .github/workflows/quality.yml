@@ -21,10 +21,12 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - name: Require PHP for real backend regression tests
-        run: php -v
+        run: |
+          php -v
+          php -r 'exit(extension_loaded("sodium") && extension_loaded("fileinfo") ? 0 : 1);'
       - run: npm run build
       - run: npm test
       - run: npm run package
       - name: Generated site is committed and reproducible
-        run: git diff --exit-code -- index.html .htaccess robots.txt sitemap.xml version.json concept hulp privacy bronnen over regelingen subsidies btw financiering assets/regelingen-engine.js
+        run: git diff --exit-code -- index.html .htaccess robots.txt sitemap.xml version.json next-version.json concept hulp privacy bronnen over regelingen subsidies btw financiering mijn-plan advies sales bronbeheer assets/regelingen-engine.js
       - run: git diff --check
