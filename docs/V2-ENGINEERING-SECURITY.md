@@ -1,5 +1,8 @@
 # SubsidieReady 2.0 — Technisch ontwerp en security release-gates
 
+> **Architectuurbesluit 14 november 2026:** uitsluitend eigen salesontvangers, geen generieke partner-router. Elke aparte B.V. is een afzonderlijk te beoordelen mogelijke verantwoordelijke/ontvanger. Zie [first-party salesplan](V2-FIRST-PARTY-SALES-IMPLEMENTATION.md); geen automatische join van dossiers naar CRM.
+
+
 **Status:** ontwerpvoorstel, niet gedeployed. Lees eerst `V2-PRODUCT-ACCOUNTS-LEADS.md`. Bestaande site op `main` blijft live en guest-only totdat product, privacy en security volledig akkoord zijn.
 
 ## 0. Huidige productarchitectuur (review 14 november 2026)
