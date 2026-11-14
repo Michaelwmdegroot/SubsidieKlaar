@@ -26,7 +26,7 @@ test('homepage is prerendered and all discoverable local information links exist
  const html=read('index.html');assert.ok(html.includes('<h1>Verduurzamen?'));
  assert.ok(!html.includes('<!-- PRERENDER -->'));
  for(const route of ['hulp','hulp/factuur-warmtepomp','hulp/betaalbewijs','hulp/meldcode','privacy','bronnen','over']){
-  const file=read(route+'/index.html');assert.ok(file.includes('https://subsidieready.nl/'+route+'/'));assert.ok(file.includes('<h1>'));
+  const file=read(route+'/index.html');assert.ok(file.includes('https://subsidieready.nl/'+route+'/'));assert.match(file,/<h1\b[^>]*>/);
  }
  assert.ok(!html.includes('Backoffice concept'));
 });

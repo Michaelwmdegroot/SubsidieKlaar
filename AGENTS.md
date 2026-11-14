@@ -46,3 +46,10 @@
 - Generated optimized visuals are local assets with byte/hash provenance in `docs/DASHBOARD-ASSETS.json`. Important UI remains HTML, decorative imagery has empty alt text, no external fonts or APIs introduced.
 - Test narrow/short viewports and keyboard. Header must not squeeze CTA labels. Internal panel scroll is intentional; desktop workspace and action bar remain within viewport.
 - No production account/lead activation or storage migration is part of this visual deployment.
+
+## Approved sitewide design rollout (14 November 2026)
+- Owner approved the premium dashboard and asked to extend the same style to **all other pages immediately**. Work through a reviewed branch/PR; publish after quality/release checks and then verify the real domain.
+- `assets/site-theme.css` is the shared visual layer; `scripts/site-design.cjs` owns editorial heroes, navigation state, contents and sidebar styling markup. Preserve the approved dashboard-specific CSS and behaviour.
+- All actual content/eligibility rules, privacy settings, account/sales gates, document data and exports are unchanged. Admin's only PHP-file change is an additional local stylesheet link.
+- Keep the existing public/noindex boundaries. The new preparation help pages remain noindex; knowledge-bank links expose their existence without claiming they are full eligibility modules.
+- Build generators, offline image inlining, packaging and exact live verification must include the shared layer and the redesigned pages. See `docs/SITEWIDE-DESIGN-RELEASE.md` and `tests/site-theme.test.cjs`.

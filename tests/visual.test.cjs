@@ -12,7 +12,7 @@ test('optimized original generated images are local WebP files with a size budge
  for(const [file,max] of [['home-hero.webp',250000],['home-hero-small.webp',90000]]){
   const b=fs.readFileSync(path.join(root,'assets/images',file));assert.equal(b.subarray(0,4).toString(),'RIFF');assert.equal(b.subarray(8,12).toString(),'WEBP');assert.ok(b.length<=max);
  }
- assert.match(read('index.html'),/src="assets\/images\/home-hero.webp"[^>]*width="1440"[^>]*height="960"/);
+ assert.match(read('index.html'),/src="assets\/images\/dashboard-home.webp"[^>]*width="1648"[^>]*height="928"/);
  assert.match(read('index.html'),/fetchpriority="high"/);assert.doesNotMatch(read('index.html'),/<img[^>]+src="https?:/);
 });
 test('static pages share the branded shell and usable mobile navigation without app JS',()=>{

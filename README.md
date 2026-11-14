@@ -1,5 +1,10 @@
 > **Nieuwe ontwikkelbranch: next-level testrelease.** Nog niet naar `main` mergen. Start bij [de testhandleiding](docs/next/TESTEN.md) en [de releasegrenzen](docs/next/RELEASE-STATUS.md). De onderstaande 1.0-beschrijving betreft de bestaande productie-basis.
 
+## Eén premium stijl op alle pagina's
+
+De goedgekeurde dashboardstijl wordt gedeeld door de homepage, regelingeninformatie, kennisbank, privacy/bronnen/over, Mijn plan, voorbereidingswerkbanken, advies/sales-proefpagina's, bronbeheer, 404 en beheer. De visuele basis staat in `assets/site-theme.css`; de editorial shell in `scripts/site-design.cjs`. De regelengine, data-/privacygrenzen en niet-geactiveerde backendfuncties blijven behouden. Zie [release en QA](docs/SITEWIDE-DESIGN-RELEASE.md).
+
+
 > **3.0 proefrelease voor beoordeling:** de eigenaar heeft gevraagd de nieuwe gebruikersinterface op `main` te zetten om het als complete website te testen. `/mijn-plan/` biedt lokale plan-/werkbankfuncties. `/advies/`, `/sales/` en `/bronbeheer/` zijn noindex proefpagina's; de salesdemo is fictief. **Accounts, online bijlagen en echte adviesaanvragen zijn op `subsidieready.nl` niet geactiveerd.** De nieuwe API moet daar 503 retourneren. Zie `docs/next/RELEASE-STATUS.md` en `docs/next/SECURITY.md`. De bestaande gratis warmtepompwerkbank blijft intact.
 
 
