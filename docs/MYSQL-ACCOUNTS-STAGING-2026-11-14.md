@@ -10,6 +10,8 @@ De bestaande `server/next/service.php` bevat al OTP-authenticatie, sessies, rate
 
 **Dit is geen relationeel CRM of production-ready user database**. De bestaande capaciteit-/groottelimieten en privacybeperkingen blijven. Normalisatie, querybare account-/projecttabellen, retentie, indexering en eventuele marketing/CRM zijn latere afzonderlijke beslissingen. Een account is **geen lead**. De SQL-adapter accepteert in deze tranche géén kluis, salesleads of personeelsinbox.
 
+Hostinger-documentatie, geverifieerd op 14 november 2026: [Databasegegevens en lokale host](https://www.hostinger.com/support/1583552-how-to-find-your-mysql-database-details-in-hostinger/) en [MariaDB op Web/Cloud hosting](https://www.hostinger.com/support/1583226-which-database-management-system-is-used-at-hostinger/). De testmatrix dekt MySQL en MariaDB, maar bewijst niet automatisch de precieze Hostinger-runtime.
+
 ## Veilige reikwijdte
 
 - Alleen `mode=local` of `mode=staging`. Bestaande code weigert `subsidieready.nl` en `www.subsidieready.nl` als nieuwe backend-origin, **ook als er een geldige MySQL-database is**.
@@ -70,7 +72,7 @@ Het voorbeeld is geen deploy-instructie om SMTP zonder verificatie aan te zetten
 - `server/next/service.php`: driver wordt alleen bij expliciet `storage_driver=mysql` gekozen. Oud bestandspad blijft onveranderd voor bestaande lokale tests.
 - `server/next/schema.sql`: apart, idempotent staging-schema, één encrypted blob.
 - `scripts/next/mysql-check.php --check`: CLI-only, geen wachtwoorden/planinformatie in resultaten.
-- `tests/mysql-integration.cjs` en `.github/workflows/mysql-staging.yml`: eigen synthetische MySQL 8.4-database, echte PHP-HTTP-flow voor OTP, sessies, twee accounts, revisions, cross-user 404, encrypted SQL, process-restart, export/deletion en productieorigin-NO-GO.
+- `tests/mysql-integration.cjs` en `.github/workflows/mysql-staging.yml`: eigen synthetische MySQL 8.4- **en MariaDB 11.4**-CI-database (Hostinger Web/Cloud gebruikt MariaDB), echte PHP-HTTP-flow voor OTP, sessies, twee accounts, revisions, cross-user 404, encrypted SQL, process-restart, export/deletion en productieorigin-NO-GO.
 - `scripts/next/snapshot.php` kan de versleutelde inhoud naar een nieuwe externe map exporteren. `restore.php` maakt bewust uitsluitend een **aparte lokale bestandopslag** en verwijdert SQL-config uit het herstelresultaat, zodat een restore nooit onbedoeld terugschakelt naar de actieve database. Herstel naar MySQL is **nog niet gebouwd** en vereist een aparte gecontroleerde procedure.
 
 ## Nog vóór echte klantaccounts
