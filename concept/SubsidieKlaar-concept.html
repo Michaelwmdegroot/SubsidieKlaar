@@ -212,6 +212,17 @@ body:not(.r-dashboard-ready) .nav-actions a[aria-current="page"]{background:#e8f
 .wizard-aside .aside-cover{height:130px;position:relative;background:linear-gradient(140deg,#efffe4,#e2f5d7);border:1px solid #d2e5ca;border-bottom:0;border-radius:23px 23px 0 0;overflow:hidden;margin:0}.wizard-aside .aside-cover:after{display:none}.wizard-aside .aside-cover img{position:absolute;right:8px;top:-3px;width:145px;height:145px;object-fit:contain}.wizard-aside .aside-cover span{position:absolute;left:23px;top:43px;bottom:auto;max-width:104px;color:#1f652b;font-size:10px;letter-spacing:.09em;line-height:1.9;font-weight:800}.wizard-aside .aside-card{border-top:1px solid #d5e6cd;border-radius:0 0 23px 23px;margin-top:0}.wizard-aside .aside-help{border:1px solid #dce9d5;border-radius:16px;background:#f6fcf1;padding:20px;margin-top:18px}
 @media(max-width:800px){.wizard-aside{display:block;position:static;max-width:600px;width:100%;margin-inline:auto}.workspace>.workspace-title{gap:18px}}
 @media(max-width:600px){.workspace>.workspace-title{flex-direction:column;align-items:flex-start}.workspace-actions{width:100%;justify-content:flex-start}.workspace-actions .btn{font-size:12px}.workspace-title h1{font-size:27px}}
+
+/* Editorial comparisons: native accessible tables with clear rows, not default browser layout. */
+.reading-shell .sr-reading-section table{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0;margin:20px 0 0;border:1px solid #d8e6d8;border-radius:15px;background:#fff;overflow:hidden}
+.reading-shell .sr-reading-section table caption{caption-side:top;text-align:left;padding:0 0 12px;color:var(--sr-ink);font-weight:800;font-size:14px}
+.reading-shell .sr-reading-section table th,.reading-shell .sr-reading-section table td{padding:13px 16px;text-align:left;vertical-align:top;line-height:1.6;overflow-wrap:break-word}
+.reading-shell .sr-reading-section table thead th{background:#eef9e9;color:#1b572b;font-size:12px;font-weight:800;letter-spacing:.015em}
+.reading-shell .sr-reading-section table thead th:first-child{width:34%}
+.reading-shell .sr-reading-section table tbody th{background:#fbfef9;color:var(--sr-ink);font-weight:750;font-size:13px}
+.reading-shell .sr-reading-section table tbody td{color:var(--sr-copy);font-size:13px}
+.reading-shell .sr-reading-section table tbody tr:not(:last-child)>*{border-bottom:1px solid #e4eee2}
+@media(max-width:600px){.reading-shell .sr-reading-section table thead th:first-child{width:39%}.reading-shell .sr-reading-section table th,.reading-shell .sr-reading-section table td{padding:10px 9px;font-size:12px;line-height:1.55}.reading-shell .sr-reading-section table tbody th,.reading-shell .sr-reading-section table tbody td{font-size:12px}}
 </style>
 
 
