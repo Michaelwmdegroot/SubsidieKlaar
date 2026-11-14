@@ -18,13 +18,13 @@ test('PDF is readable, paginated and carries an explicit demo title',async()=>{
 });
 test('ZIP retains exact original bytes, uses safe paths, and stores project plus review',async()=>{
  const s=fixture(),original=Buffer.from('%PDF-1.4\nORIGINAL PRIVATE EVIDENCE\n'),d=[doc('invoice','../../bewijs.pdf',original),doc('payment','betaalbewijs.pdf',original)],r=SKCore.evaluate(s,d,{today:'2026-11-13'});
- const project={app:'SubsidieKlaar',schemaVersion:1,state:s};
+ const project={app:'SubsidieReady',schemaVersion:1,state:s};
  const z=await JSZip.loadAsync(await SKExport.zip(s,d,r,project));
  const names=Object.keys(z.files);assert.ok(names.includes('01-Documentenoverzicht.pdf'));assert.ok(names.includes('02-Documentenoverzicht.html'));
  assert.ok(!names.some(n=>n.split('/').includes('..')));
  const manifest=JSON.parse(await z.file('04-Bestandenindex.json').async('string'));assert.equal(manifest.files.length,2);
  for(const file of manifest.files)assert.deepEqual(Buffer.from(await z.file(file.archivePath).async('uint8array')),original);
- assert.equal(JSON.parse(await z.file('03-SubsidieKlaar-project.json').async('string')).state.applicantName,'Zoë van der Veen');
+ assert.equal(JSON.parse(await z.file('03-SubsidieReady-project.json').async('string')).state.applicantName,'Zoë van der Veen');
 });
 test('HTML report escapes user text and retains the full original Unicode value',()=>{
  const s=fixture();s.notes='<script>alert("x")</script> 李';
@@ -34,4 +34,13 @@ test('HTML report escapes user text and retains the full original Unicode value'
 test('no runtime code calls a remote AI/upload/analytics endpoint',()=>{
  const app=fs.readFileSync(require.resolve('../assets/app.js'),'utf8');
  assert.doesNotMatch(app,/\b(?:fetch|XMLHttpRequest|sendBeacon|WebSocket)\s*\(/);
+});
+test('ZIP snapshots data before async PDF work, retaining a consistent project and HTML',async()=>{
+ const s=fixture(),original=Buffer.from('%PDF-1.4\nSNAPSHOT\n'),d=[doc('invoice','before.pdf',original)],r=SKCore.evaluate(s,d,{today:'2026-11-14'});
+ const project={app:'SubsidieReady',schemaVersion:1,state:s};
+ const pending=SKExport.zip(s,d,r,project);s.applicantName='MUTATED AFTER START';d[0].name='after.pdf';d.push(doc('payment','extra.pdf',original));
+ const z=await JSZip.loadAsync(await pending);
+ assert.equal(JSON.parse(await z.file('03-SubsidieReady-project.json').async('string')).state.applicantName,'Zoë van der Veen');
+ const html=await z.file('02-Documentenoverzicht.html').async('string');assert.ok(!html.includes('MUTATED AFTER START'));assert.ok(html.includes('before.pdf'));assert.ok(!html.includes('after.pdf'));
+ const manifest=JSON.parse(await z.file('04-Bestandenindex.json').async('string'));assert.equal(manifest.files.length,1);assert.equal(manifest.files[0].originalName,'before.pdf');
 });

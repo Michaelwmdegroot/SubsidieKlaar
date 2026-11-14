@@ -1,0 +1,33 @@
+name: SubsidieReady release
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: php -v && npm run build && npm test && npm run package
+      - name: Verify generated files
+        run: git diff --exit-code -- index.html .htaccess robots.txt sitemap.xml version.json concept hulp privacy bronnen over
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SubsidieReady-hostinger
+          path: dist/
+          retention-days: 14
+      - name: Archive reproducible source
+        run: tar --exclude=.git --exclude=node_modules --exclude=dist -czf "$RUNNER_TEMP/subsidieready-source.tar.gz" .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: subsidieready-source
+          path: ${{ runner.temp }}/subsidieready-source.tar.gz
+          retention-days: 3

@@ -1,87 +1,52 @@
-# SubsidieKlaar
+# SubsidieReady
 
-**Werkend concept v0.1 — werknaam.** Een gratis documentenwerkbank voor Nederlandse eigenaar-bewoners met een warmtepomp. Vier stappen leiden van een situatiecheck en installatiegegevens naar originele bijlagen en een downloadbaar voorbereidingspakket.
+Gratis documentenwerkbank voor eigenaar-bewoners die een ISDE-warmtepompaanvraag voorbereiden. **Definitieve naam: SubsidieReady. Domein: `subsidieready.nl`.**
 
-De tool draait lokaal in de browser. Geen account, betaalde API, licentiesleutel, externe fontdienst of documentupload nodig. Het concept is geen subsidiebesluit of inhoudelijke controle van bewijsstukken.
+Versie **1.0.0**, 14 november 2026. De eigenaar heeft het concept goedgekeurd, `SubsidieReady.nl` gekocht en om publicatie gevraagd. De code is voorbereid voor Hostinger. **Een geslaagde build is niet hetzelfde als een bevestigde live deployment.** Zie [de actuele overdracht](docs/DEVELOPMENT-HANDOFF.md).
 
-## Meteen bekijken
+## Voor bezoekers
 
-Download **[concept/SubsidieKlaar-concept.html](concept/SubsidieKlaar-concept.html)** en open het bestand in een moderne browser. Alles wat de tool nodig heeft is in dat ene bestand opgenomen. Kies **Bekijk een voorbeeld** om de volledige flow en echte PDF/ZIP-downloads te proberen. Voorbeeldgegevens en voorbeeldbijlagen zijn expliciet fictief.
+Vier stappen: situatie → installatiegegevens → documenten → overzicht. De volledige individuele check, PDF, ZIP en projectexport blijven gratis en zonder account of e-mailadres. Originele bestanden en ingevoerde dossiergegevens blijven in de browser. Er is geen documentupload, betaalde AI-API, DigiD-koppeling of automatische subsidiegoedkeuring.
 
-De originele ontwikkelversie begint bij `index.html`. Onder **Backoffice concept** staan de werkelijke lokale gebeurtenistellingen van die browser, productstatus en officiële bronnen. De backoffice is in dit concept openbaar en bevat geen servergegevens, login of centrale statistieken.
+De website heeft een vooraf gerenderde homepage, zeven informatiepagina’s, canonicals, sitemap, social metadata en beveiligingsheaders. De broncontrole is van 14 november 2026. De voorstellen voor 2027 worden niet als definitieve voorwaarden behandeld.
 
-![Homepage van het werkende concept](docs/preview-home.jpg)
+## Beheer en optionele tellingen
 
-Zie het [testverslag](docs/QA.md) voor de 20 geslaagde tests, browsercontroles en bekende grenzen.
+`/admin/` is een echte PHP-beheeromgeving, niet het eerdere openbare conceptdashboard. Configuratie en dagtotalen staan **buiten `public_html`**. Zonder configuratie blijft beheer gesloten (HTTP 503), zijn metingen uit en werkt de documentenwerkbank gewoon.
 
-## Wat werkt
+Na configuratie: gehasht beheerderswachtwoord, beveiligde sessies, CSRF-controles, begrensde inlogpogingen, uitloggen en JSON-export. De meetroute accepteert uitsluitend vaste actietypen. Metingen starten pas na expliciete bezoekerstoestemming; demohandelingen worden niet meegestuurd. De cijfers zijn gebeurtenissen, geen unieke bezoekers of sluitende conversies.
 
-- Vier stappen: situatie, gegevens, documenten en overzicht.
-- Afzonderlijke signalering van ontbrekende informatie, eigen bevestiging, voorbereiding, uitzonderingen en situaties buiten de huidige scope.
-- Meldcode met eigen bevestiging, of productbeschrijving plus technische documentatie.
-- Meerdere betalingen en een afzonderlijke route voor een door de leverancier als betaald gemarkeerde factuur bij winkelbetaling.
-- Indicatie van 24 kalendermaanden na daadwerkelijke installatie, inclusief schrikkeldagen.
-- PDF-overzicht en ZIP met ongewijzigde originele bijlagen, HTML-overzicht, project-JSON en bestandenindex.
-- Project-JSON openen en optioneel lokaal bewaren van invulgegevens. Originele bestanden blijven alleen in het geheugen en moeten na heropenen opnieuw worden toegevoegd.
-- Veilige bestandsnamen, controle op bestandssignaturen, type- en groottelimieten, ontsnappen van gebruikersinvoer en begrensde JSON-import.
-- Lokale analytics voor bezoeken, gestarte checks, bekeken overzichten en gemaakte downloads, zonder namen, adressen of documentinhoud.
+Er is geen standaardwachtwoord, openbare registratieroute of ingebouwde beheer-API voor ChatGPT. Het beheer wijzigt geen dossiers.
 
-## Lokale ontwikkeling
+## Ontwikkelen en testen
 
-Node.js 20 of nieuwer is voldoende. Er zijn geen npm-installatiestappen.
+Node.js 22+ voor build/tests. PHP 8.2+ voor beheer; de publieke documentenwerkbank is statisch. Geen `npm install`, Composer of database vereist.
 
 ```sh
-npm run dev
-```
-
-Open de URL van de lokale server (standaard poort 5173). De server begrijpt ook `--port` voor een beheerde preview.
-
-```sh
-npm test
 npm run build
+npm test
+npm run dev
+npm run package
 ```
 
-`build` maakt het zelfstandige HTML-bestand opnieuw. Dit bestand is bewust onderdeel van de repository, zodat het concept rechtstreeks kan worden gedownload.
+`build` maakt de homepage, hulppagina’s, sitemap, headers en standalone distributie opnieuw. `package` maakt een allowlist-gebaseerd Hostinger-pakket in `dist/`. De eigen applicatiecode heeft geen algemene opensourcelicentie; de derde-partijlicenties staan in `vendor/`.
 
-## Projectindeling
+De Node-preview voert geen PHP uit en geeft PHP-broncode nooit als bestand terug. Test het beheer met PHP; de tests maken uitsluitend tijdelijke fictieve configuraties buiten de repository.
 
-| Bestand | Doel |
-| --- | --- |
-| `index.html` | Startpunt van de ontwikkelversie |
-| `assets/app.js` | Schermen, lokale invoer, bestandsselectie, bewaren en lokale analytics |
-| `assets/core.js` | Afhankelijkheidsvrije, deterministische aanwezigheid- en scopechecks |
-| `assets/export.js` | PDF, HTML, ZIP, originele bijlagen en projectuitvoer |
-| `assets/style.css` | Responsieve huisstijl en schermopmaak |
-| `vendor/` | Lokale PDF/ZIP-bibliotheken, lettertype en licentienotities |
-| `tests/` | Betekenisvolle controles van regels, import en exportintegriteit |
-| `docs/RVO-sources.md` | Geverifieerde RVO-bronnen en implementatiegrenzen |
-| `docs/NAME-OPTIONS.md` | Naamopties en de waargenomen SIDN-status |
-| `docs/PLAN.md` | Vervolg van concept naar productie |
+## Publiceren
 
-## Geautomatiseerde kwaliteitscontrole
+Volg [docs/HOSTINGER-LIVE.md](docs/HOSTINGER-LIVE.md). Publiceer de root van GitHub-branch `main` als PHP/HTML-site op de bestaande Hostinger-hosting voor `subsidieready.nl`. De benodigde webbestanden staan al in Git; op Hostinger is geen Node-build nodig. Zet automatisch deployen vanaf `main` aan na de eerste succesvolle publicatie.
 
-Bij pull requests en wijzigingen op `main` controleert [GitHub Actions](.github/workflows/quality.yml) de Node.js-tests (Node 20 en 22), het opnieuw bouwen van het zelfstandige HTML-concept en of die versie overeenkomt met de broncode. Extra tests bewaken `noindex` tijdens de conceptfase en de aanwezigheid van lokale, gebundelde assets.
+De eenmalige beheerinitialisatie verloopt via de beveiligde hostingterminal:
 
-De [ontwikkeloverdracht](docs/DEVELOPMENT-HANDOFF.md) beschrijft de actuele status en openstaande beslissingen. Gebruik de [release-gates](docs/RELEASE-GATES.md) voordat hosting, centrale analytics of indexering wordt geactiveerd.
+```sh
+php scripts/setup-admin.php
+```
 
-## Grenzen van dit concept
+De beheerder vult zelf een bereikbare contactmail, de verantwoordelijke persoon/organisatie en een uniek wachtwoord in. Die gegevens worden niet geraden of in Git opgeslagen. Beheercontactgegevens worden bij configuratie zichtbaar in de privacyuitleg. Gebruik een dagelijkse onderhoudstaak voor opruiming; zie het publicatiedocument.
 
-De bestanden worden nog niet met OCR of PDF-tekstextractie gelezen. Het systeem controleert aanwezigheid en de bevestigingen van de gebruiker. Na relevante wijzigingen vervallen eerdere bevestigingen. RVO voert de inhoudelijke beoordeling uit.
+## Zelfstandig beoordelen
 
-De eerste scope is de gewone eigenaar-bewonerroute voor warmtepompen. Andere maatregelen en routes worden niet als afgedekt gepresenteerd. Bronnen zijn handmatig gecontroleerd op **13 november 2026**; installaties vanaf 2027 krijgen een controlesignaal omdat de 2027-wijzigingen op die datum nog voorgenomen waren. Er wordt geen subsidiebedrag berekend.
+Open `concept/SubsidieReady.html` in een browser. Dit is een zelfstandige, offline distributie zonder centrale meting. Het oudere pad `concept/SubsidieKlaar-concept.html` blijft een compatibele kopie. Beide staan op noindex; de publieke website is apart geconfigureerd voor het gekozen domein.
 
-Het ingebedde PDF-lettertype ondersteunt veel Europese tekens. Als een ingevoerd teken niet wordt ondersteund, wordt geen onvolledig PDF-bestand geleverd: het ZIP-pakket bevat dan wel een volledig Unicode-HTML-overzicht met uitleg. Afdrukken vanuit de browser is eveneens beschikbaar.
-
-Het concept heeft `noindex` en een blokkerende `robots.txt`. Dit voorkomt geen toegang; het voorkomt dat we een onvoltooide productversie bewust laten indexeren. Er is nog geen definitieve domeinnaam en er is geen claim dat Hostinger al is aangesloten.
-
-## Hostinger en GitHub
-
-De repository gebruikt `main`, zoals afgesproken. Voor een custom PHP/HTML-website kan de bronversie met `index.html`, `assets/` en `vendor/` worden geplaatst. Het zelfstandige conceptbestand kan ook als `index.html` dienen. Domein, hostingplan, documentroot en automatische deploy worden na de conceptbeoordeling aangesloten en gecontroleerd.
-
-De productie-backoffice krijgt echte authenticatie, beperkte beheerrechten, centrale aggregaten, back-ups en een beveiligde integratielaag voor ChatGPT. Gebruik dit openbare backofficeconcept niet voor servergeheimen of klantbestanden.
-
-## Licenties en kosten
-
-De benodigde distributiebestanden zijn lokaal opgenomen. Zie [vendor/NOTICE.md](vendor/NOTICE.md) en de afzonderlijke licentieteksten. De gekozen afhankelijkheden en het lettertype staan commercieel gebruik toe onder hun meegeleverde voorwaarden. Het publieke product doet geen betaalde AI-aanroepen. Domein en hosting zijn de infrastructuur die de eigenaar zelf kiest; betaalverwerking heeft later mogelijk transactiekosten.
-
-De licenties van afhankelijkheden gelden voor die afhankelijkheden. Deze repository kent daarmee niet automatisch een algemene opensourcelicentie toe aan de eigen applicatiecode.
+Lees [QA v1](docs/QA-v1.md) voor testresultaten en [bronnen](docs/RVO-sources.md) voor inhoudelijke grenzen. Nooit echte klantbestanden, wachtwoorden, private configuraties of statistieken committen.
