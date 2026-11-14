@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once __DIR__.'/mysql.php';
 /* Testrelease backend: encrypted, locked single-host pilot storage. Off without private config. */
 const SRN_SCHEMA=1;
 const SRN_RULE='2026.11.14.3-beta';
@@ -18,6 +19,8 @@ function srn_config(): array {
  if(!is_string($c['controller']??null)||trim($c['controller'])===''||!filter_var($c['contact']??'',FILTER_VALIDATE_EMAIL))throw new RuntimeException('Verantwoordelijke ontbreekt.');
  if(!$local && ($c['privacy_reviewed']??false)!==true)throw new RuntimeException('Privacy-goedkeuring ontbreekt.');
  if(!in_array($c['transport']??'', ['spool','mail'],true)||(!$local && $c['transport']==='spool'))throw new RuntimeException('Mailtransport ontbreekt.');
+ if(!in_array($c['storage_driver']??'file',['file','mysql'],true))throw new RuntimeException('Opslagdriver onbekend.');
+ if(($c['storage_driver']??'file')==='mysql')srn_mysql_validate($c);
  $c['dir']=$dir;$c['keyBytes']=hex2bin($c['key']);return $c;
 }
 function srn_encrypt(string $plain,array $c): string {$n=random_bytes(SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);return 'SRN1'.$n.sodium_crypto_secretbox($plain,$n,$c['keyBytes']);}
@@ -29,6 +32,7 @@ function srn_atomic(string $path,string $bytes): void {
 }
 function srn_empty(): array {return ['schema'=>SRN_SCHEMA,'accounts'=>[],'sessions'=>[],'challenges'=>[],'projects'=>[],'files'=>[],'leads'=>[],'outbox'=>[],'limits'=>[],'audit'=>[],'reminders'=>[]];}
 function srn_tx(array $c,callable $fn): mixed {
+ if(($c['storage_driver']??'file')==='mysql')return srn_mysql_tx($c,$fn);
  $lockPath=$c['dir'].'/state.lock';if(is_link($lockPath))throw new RuntimeException('Ongeldig opslagpad.');$lock=fopen($lockPath,'c');if(!$lock)throw new RuntimeException('Opslag bezet.');chmod($lockPath,0600);$start=microtime(true);
  while(!flock($lock,LOCK_EX|LOCK_NB)){if(microtime(true)-$start>3){fclose($lock);throw new RuntimeException('Opslag bezet.');}usleep(20000);}
  try{$f=$c['dir'].'/state.bin';if(is_link($f))throw new RuntimeException('Ongeldige opslag.');if(is_file($f)&&filesize($f)>12*1024*1024)throw new RuntimeException('Opslaglimiet.');$s=is_file($f)?json_decode(srn_decrypt((string)file_get_contents($f),$c),true,64,JSON_THROW_ON_ERROR):srn_empty();if(($s['schema']??0)!==SRN_SCHEMA)throw new RuntimeException('Schemafout.');foreach(array_keys(srn_empty())as$k)if($k!=='schema'&&!is_array($s[$k]??null))throw new RuntimeException('Schemafout.');$now=time();foreach(['sessions','challenges','limits']as$k)foreach($s[$k]as$id=>$v)if(($v['expires']??0)<$now)unset($s[$k][$id]);$s['audit']=array_slice($s['audit'],-2000);$result=$fn($s);$raw=json_encode($s,JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE);if(strlen($raw)>10*1024*1024)throw new RuntimeException('Opslaglimiet.');srn_atomic($f,srn_encrypt($raw,$c));if(is_array($result)&&isset($result['_purge'])){foreach($result['_purge']as$fid)if(preg_match('/^[a-f0-9]{32}$/D',$fid))@unlink($c['dir'].'/files/'.$fid.'.bin');unset($result['_purge']);}return $result;}finally{flock($lock,LOCK_UN);fclose($lock);}
