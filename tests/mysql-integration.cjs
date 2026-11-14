@@ -199,7 +199,7 @@ test('MySQL adapter: real PHP auth, persistent encrypted plans, ownership and ac
         modify(prefix);
         assert.equal(php('require '+JSON.stringify(path.join(root,'server/next/service.php'))+';$c=srn_config();echo $c["mode"];',env),'production');
         php('require '+JSON.stringify(path.join(root,'server/next/service.php'))+';$c=srn_config();unset($c["keyBytes"]);$c["leads_enabled"]=true;file_put_contents('+JSON.stringify(config)+',"<?php return ".var_export($c,true).";");',env);
-        assert.equal(php('require '+JSON.stringify(path.join(root,'server/next/service.php'))+'try{srn_config();echo "unsafe";}catch(Throwable $e){echo "blocked";}',env),'blocked');
+        assert.equal(php('require '+JSON.stringify(path.join(root,'server/next/service.php'))+';try{srn_config();echo "unsafe";}catch(Throwable $e){echo "blocked";}',env),'blocked');
       }finally{fs.writeFileSync(config,original);}
     });
     await t.test('production origin remains blocked even with a working SQL connection', async () => {
