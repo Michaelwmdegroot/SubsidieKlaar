@@ -18,10 +18,10 @@ jobs:
         with:
           node-version: '22'
       - name: Check exact reviewed baseline
-        run: test "$(git rev-parse HEAD^)" = '14aa1d65229eead2325a1d3806049fc9d4985408'
+        run: test "$(git rev-parse HEAD^)" = '397d668d464b455e5bc24b1071ade003a65676c1'
       - name: Import hash-verified text sources only
         env:
-          SOURCE_URL: 'https://sdmntprnortheu.oaiusercontent.com/files/00000000-5410-81f4-bf69-ac2406e67718/raw?se=2026-11-14T14%3A30%3A36Z&sp=r&sv=2026-06-06&sr=b&scid=93c31c9d-9b8b-5a26-92af-01eec25759cf&skoid=a4604a88-85e4-4562-b6ab-a5622268de80&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-11-13T19%3A34%3A34Z&ske=2026-11-14T19%3A34%3A34Z&sks=b&skv=2026-06-06&sig=McK4JMy9V5iSHbzQIT6%2B1sBSN9nIP%2B9%2BM3s3ZpZjU3Y%3D'
+          SOURCE_URL: 'https://sdmntprnortheu.oaiusercontent.com/files/00000000-5218-81f4-8972-3c5a16253542/raw?se=2026-11-14T14%3A35%3A47Z&sp=r&sv=2026-06-06&sr=b&scid=7d009f7b-3b40-5fb5-b851-7868dd451586&skoid=a4604a88-85e4-4562-b6ab-a5622268de80&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-11-14T05%3A49%3A48Z&ske=2026-11-15T05%3A49%3A48Z&sks=b&skv=2026-06-06&sig=LMhu2XaX6NopbJ9Bt/gckpGlIdrlyCO06T0/4wvpvdc%3D'
         run: |
           python3 <<'PY'
           import os, urllib.request, hashlib, io, zipfile, pathlib
@@ -60,9 +60,12 @@ jobs:
                   target=root/name
                   assert target.resolve().is_relative_to(root)
                   assert not target.is_symlink()
+                  if name.startswith('.github/workflows/'):
+                      assert target.read_bytes()==data, 'Workflow must already be applied by authorized connector'
+                      continue
                   target.parent.mkdir(parents=True,exist_ok=True)
                   target.write_bytes(data)
-          print('Imported 23 reviewed source files; no private data or binary assets.')
+          print('Imported 20 application files; 3 pre-applied workflows verified unchanged.')
           PY
       - name: Build and test exact integrated release
         run: |
@@ -71,13 +74,13 @@ jobs:
           npm test
           npm run package
           node -e "if(require('./version.json').build!=='0c76f86e9de19a6d') process.exit(1)"
-          git diff --exit-code -- assets/core.js assets/export.js assets/metrics.js server api admin
+          git diff --exit-code -- assets/core.js assets/export.js assets/metrics.js server api admin .github/workflows
           git diff --check
-      - name: Commit integrated sources and generated pages, then remove this transport
+      - name: Commit only application sources and generated pages
         run: |
-          rm .github/workflows/import-regelingen-integration.yml
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add --all
+          git diff --cached --exit-code -- .github/workflows
           git commit -m 'feat: connect regelingencheck to the complete SubsidieReady website'
           git push origin HEAD:refs/heads/feat/regelingen-platform-foundation
