@@ -1,0 +1,40 @@
+name: SubsidieReady live acceptance
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - scripts/check-live.cjs
+      - .github/workflows/live-check.yml
+permissions:
+  contents: read
+concurrency:
+  group: subsidieready-live-acceptance
+  cancel-in-progress: false
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Read-only public HTTP checks
+        id: live
+        continue-on-error: true
+        run: node scripts/check-live.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: subsidieready-live-acceptance
+          path: qa/live-check.json
+          retention-days: 14
+          if-no-files-found: error
+      - name: Keep deployment acceptance separate from code quality
+        if: steps.live.outcome != 'success'
+        run: |
+          echo 'NO-GO: the exact live release has not passed HTTP acceptance. See the JSON report.'
+          exit 1
