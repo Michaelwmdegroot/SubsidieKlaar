@@ -1,8 +1,8 @@
 // Build a portable, self-contained HTML concept. No network or package install.
 const fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'..');
-const imageAssets=['assets/images/home-hero.webp','assets/images/home-hero-small.webp'];
-function inlineImages(text){for(const file of imageAssets){const uri='data:image/webp;base64,'+fs.readFileSync(path.join(root,file)).toString('base64');text=text.replaceAll(file,uri);}return text;}
+const imageAssets=['assets/images/home-hero.webp','assets/images/home-hero-small.webp','assets/images/dashboard-home.webp','assets/images/dashboard-home-small.webp','assets/images/dashboard-dossier.webp'];
+function inlineImages(text){for(const file of imageAssets){const uri='data:image/webp;base64,'+fs.readFileSync(path.join(root,file)).toString('base64');text=text.replaceAll('/'+file,uri).replaceAll(file,uri);}return text;}
 
 let html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 html=html.replace('<meta name="robots" content="index, follow">','<meta name="robots" content="noindex, nofollow">').replace('<script defer src="assets/metrics.js"></script>','').replace(/<link rel="canonical"[^>]*>/g,'').replace(/<meta property="og:[^"]+"[^>]*>/g,'').replace('<html lang="nl">','<html lang="nl" data-offline="true">');
@@ -11,6 +11,7 @@ const font=fs.readFileSync(path.join(root,'vendor/NotoSans-Regular.ttf')).toStri
 const logo=fs.readFileSync(path.join(root,'assets/mark.svg')).toString('base64');
 css=css.replace("url('../vendor/NotoSans-Regular.ttf')",`url('data:font/ttf;base64,${font}')`);
 html=html.replace('<link rel="stylesheet" href="assets/style.css">',()=>'<style>'+css+'</style>');
+html=html.replace('<link rel="stylesheet" href="assets/site-theme.css">',()=>'<style>'+fs.readFileSync(path.join(root,'assets/site-theme.css'),'utf8')+'</style>');
 const scripts=[];
 html=html.replace(/<script defer src="([^"]+)"><\/script>/g,(_,file)=>{scripts.push('<script>'+inlineImages(fs.readFileSync(path.join(root,file),'utf8')).replace(/<\/script/gi,'<\\/script').replaceAll('assets/mark.svg','data:image/svg+xml;base64,'+logo).replaceAll('href="/','href="https://subsidieready.nl/')+'</script>');return '';});
 html=html.replace(/^[\t ]+$/gm,'');
