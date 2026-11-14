@@ -32,3 +32,10 @@
 - Build generators remain authoritative: `npm run build`, `npm test`, `npm run package`, `npm run preview:next`. Do not hand-edit generated HTML. `next-version.json` is the beta build, separate from existing `version.json`.
 - Keep local files, financial/eligibility answers and dossier contents out of sales. Recipients/staff only come from approved private configuration. Fictitious demo must stay labelled and never become an actual lead.
 - Source monitor is manual CLI and never publishes content. No background schedule is activated. Checklists show preparation, not official approval; dates/source expiry remain visible.
+
+## Nieuwe expliciete publicatieopdracht — 14 november 2026
+- De eigenaar heeft na de aparte testrelease gevraagd de complete **testervaring** op de bestaande live website te beoordelen door deze branch naar `main` te brengen. De hierboven genoemde oude `do not merge` grens is voor het publiceren van de **lokaal werkende, duidelijk gemarkeerde proefpagina's** vervangen door dit besluit.
+- Dat is **geen** toestemming om echte accounts, online dossiers, documentenkluis, mailverificatie, reminders of advies/leadbackend te activeren. `SR_NEXT_CONFIG` blijft absent; de beta API weigert bovendien de echte `subsidieready.nl`-origin.
+- `/mijn-plan/`, `/advies/`, `/sales/` en `/bronbeheer/` zijn noindex proefpagina's. Op de live website kan de gebruiker de lokale planner en de fictieve salesdemo beoordelen, niet een echte cloudaccount of verkoopintake.
+- De bestaande gratis gasttool en documentdownloads blijven beschikbaar, bron-/financieringsclaims ongewijzigd. `scripts/check-live.cjs` moet niet alleen de exacte versie en proefpagina's maar ook een **503** voor de ongeconfigureerde nieuwe API bevestigen.
+- Productieaccounts en echte leads vragen afzonderlijke eigenaarstoestemming na Hostinger persistence/mail/malwarecontrole, juridische verwerkingsverantwoordelijke, bewaartermijnen, rollen/MFA en hersteltest.
