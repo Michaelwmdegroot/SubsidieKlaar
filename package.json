@@ -1,12 +1,16 @@
 {
-  "name": "subsidieklaar-concept",
-  "version": "0.1.0",
+  "name": "subsidieready",
+  "version": "1.0.0",
   "private": true,
-  "description": "Gratis, lokale ISDE-documentenwerkbank. Werkend concept voor eigenaar-bewoners met een warmtepomp.",
+  "description": "Gratis ISDE-documentenwerkbank voor eigenaar-bewoners. Lokaal, zonder account.",
   "scripts": {
     "dev": "node scripts/serve.cjs",
     "test": "node --test tests/*.test.cjs",
-    "build": "node scripts/build.cjs"
+    "build": "node scripts/build-site.cjs && node scripts/build.cjs",
+    "test:server": "node --test tests/server.test.cjs",
+    "package": "node scripts/package.cjs"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }

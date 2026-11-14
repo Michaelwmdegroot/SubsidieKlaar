@@ -1,5 +1,5 @@
-/* SubsidieKlaar — deterministic preparation checks; no eligibility decision.
- * Rules reviewed against RVO on 2026-11-13. No network requests or dependencies.
+/* SubsidieReady — deterministic preparation checks; no eligibility decision.
+ * Rules reviewed against RVO on 2026-11-14. No network requests or dependencies.
  */
 (function (root, factory) {
   'use strict';
@@ -245,7 +245,7 @@
     }
     if (installDate && installDate >= '2027-01-01') {
       forceReview = true;
-      warn('rules_2027', 'Installatie vanaf 2027: voorwaarden opnieuw controleren', 'Dit concept is gecontroleerd op 13 november 2026. De definitieve voorwaarden voor jouw installatiejaar moeten opnieuw worden gecontroleerd; het dossier krijgt daarom geen gewone gereedstatus.', 'warning');
+      warn('rules_2027', 'Installatie vanaf 2027: voorwaarden opnieuw controleren', 'Dit concept is gecontroleerd op 14 november 2026. De definitieve voorwaarden voor jouw installatiejaar moeten opnieuw worden gecontroleerd; het dossier krijgt daarom geen gewone gereedstatus.', 'warning');
     }
     if (installDate && state.installed === 'yes' && installDate <= today) {
       deadline = addMonthsISO(installDate, 24);
@@ -296,7 +296,7 @@
     if (state.productRoute === 'known_code') {
       check('meldcode', 'Meldcode', state.meldcode ? 'present' : 'missing', state.meldcode ? 'Meldcode overgenomen: ' + state.meldcode + '. De tekst is niet tegen de lijst geverifieerd.' : 'Neem de meldcode over uit de officiële RVO-lijst.', SOURCES.codes);
       check('codeConfirmed', 'Exacte match met de officiële meldcodelijst', state.codeConfirmed && state.meldcode ? 'present' : 'needs_confirmation',
-        state.codeConfirmed && state.meldcode ? 'Jij hebt bevestigd dat merk, volledig model en eventuele toestelcombinatie exact overeenkomen. Dit is geen zelfstandige verificatie door SubsidieKlaar.' : 'Open de officiële lijst en bevestig de exacte match. Alleen een ingevulde code is onvoldoende.', SOURCES.codes);
+        state.codeConfirmed && state.meldcode ? 'Jij hebt bevestigd dat merk, volledig model en eventuele toestelcombinatie exact overeenkomen. Dit is geen zelfstandige verificatie door SubsidieReady.' : 'Open de officiële lijst en bevestig de exacte match. Alleen een ingevulde code is onvoldoende.', SOURCES.codes);
     } else if (state.productRoute === 'no_code') {
       check('productDescription', 'Productomschrijving zonder meldcode', state.productDescription ? 'present' : 'missing', state.productDescription ? 'Omschrijving aanwezig; de inhoudelijke productbeoordeling blijft bij RVO.' : 'Beschrijf het exacte product, de combinatie en relevante technische kenmerken.', SOURCES.codes);
       check('technicalDocument', 'Technische productdocumentatie', has('technical') ? 'present' : 'missing', has('technical') ? 'Technisch document toegevoegd. Controleer dat het over jouw exacte toestel gaat.' : 'Voeg technische documentatie toe over het exacte toestel.', SOURCES.codes);

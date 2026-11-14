@@ -1,3 +1,5 @@
+> Besluit 14 november 2026: de eigenaar koos **SubsidieReady.nl** en heeft dit domein zelf gekocht. Onderstaande shortlist is historisch; niet opnieuw om een naamkeuze vragen.
+
 # Name options
 
 Working name: **SubsidieKlaar**. Keep it until the owner chooses a replacement.

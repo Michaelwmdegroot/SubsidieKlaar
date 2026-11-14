@@ -1,10 +1,10 @@
 # RVO-bronnen en afbakening
 
-**Handmatig gecontroleerd: 13 november 2026.** Deze notitie beschrijft de inhoudelijke basis voor het concept. Een broncontrole is geen koppeling met RVO en bewijst niet dat gegevens of documenten van een gebruiker juist zijn.
+**Handmatig opnieuw gecontroleerd: 14 november 2026.** Deze notitie beschrijft de inhoudelijke basis voor het concept. Een broncontrole is geen koppeling met RVO en bewijst niet dat gegevens of documenten van een gebruiker juist zijn.
 
 ## Doel en versie
 
-SubsidieKlaar helpt een particuliere eigenaar-bewoner om documenten voor een warmtepompaanvraag te verzamelen en te ordenen. Het concept beoordeelt aanwezigheid en door de gebruiker bevestigde gegevens. Het berekent geen subsidie, dient niets in en geeft geen garantie op toekenning.
+SubsidieReady helpt een particuliere eigenaar-bewoner om documenten voor een warmtepompaanvraag te verzamelen en te ordenen. Het concept beoordeelt aanwezigheid en door de gebruiker bevestigde gegevens. Het berekent geen subsidie, dient niets in en geeft geen garantie op toekenning.
 
 Een bruikbare eindstatus is **‘Je documentenpakket is voorbereid’**, met open aandachtspunten. Vermijd ‘goedgekeurd’, ‘recht op subsidie’, ‘RVO-gecontroleerd’ en ‘100% ISDE-proof’. Een gevonden tekstfragment of aangevinkt veld is geen inhoudelijke verificatie.
 

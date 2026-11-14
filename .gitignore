@@ -7,3 +7,5 @@ test-output/
 qa/
 .openai/
 *.log
+dist/
+subsidieready-private/

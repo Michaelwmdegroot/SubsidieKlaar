@@ -1,3 +1,5 @@
+> Update 14 november 2026: merk/domein gekozen: **SubsidieReady.nl**. De productiecode is gebouwd; daadwerkelijke Hostinger-deployment blijft apart te verifiëren. Zie `DEVELOPMENT-HANDOFF.md` en `HOSTINGER-LIVE.md`. Onderstaand conceptplan is historisch.
+
 # Van concept naar een zelfstandige tool
 
 Status: **Planning / werkend concept**, 13 november 2026. Idee gekozen: ISDE-documentenwerkbank. Repository: `Michaelwmdegroot/SubsidieKlaar`, branch `main`.

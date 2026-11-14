@@ -1,17 +1,16 @@
-# SubsidieKlaar engineering notes
+# SubsidieReady engineering notes
 
-- Working name: SubsidieKlaar. Do not assume SubsidieKlaar.nl belongs to this project.
-- The owner selected GitHub `main` and Hostinger as the eventual deployment route.
-- The current release is a working concept. Preserve the noindex status until the product launch decision.
-- Keep the complete individual tool usable for free without signup, a paid dependency or a paid runtime AI API.
-- Preserve browser-local document processing. Do not introduce remote uploads or silently persist original documents.
-- Label concept analytics as local browser data. They are not central visitor counts or unique people.
-- Read `docs/RVO-sources.md` before changing rules. Document presence is separate from subsidy eligibility or official approval.
-- An absent meldcode can use the technical-documentation route; an absent heat-pump photo alone is not a mandatory failure.
-- Invalidate relevant manual confirmations when underlying data or documents change.
-- Treat user input, filenames and imported JSON as untrusted data. Keep archive paths safe and originals byte-identical.
-- Preserve explicit demo markings in example documents and exports.
-- Keep `docs/DEVELOPMENT-HANDOFF.md` and `docs/RELEASE-GATES.md` in mind. A green CI run is not permission to launch or remove noindex.
-- After code changes run the meaningful checks with `npm test`, then regenerate the portable HTML with `npm run build`.
-- Keep third-party licence notices in `vendor/` and in the portable distribution. Do not grant an application-wide open-source licence by accident.
-- Never commit credentials, real customer documents, personal data or temporary QA downloads.
+- The owner approved the concept and bought **SubsidieReady.nl** on 14 November 2026. Working-name phase is over. Keep the existing repository `Michaelwmdegroot/SubsidieKlaar`.
+- Target: existing Hostinger PHP/HTML hosting, root of `main`, no paid dependencies or additional hosting purchases. Do not claim live status until domain/HTTPS/production checks actually succeed.
+- The public site is indexable for `https://subsidieready.nl/`. Admin/API/internal paths and standalone distribution are not indexable. Never add private dossiers to URLs, sitemap or analytics.
+- The complete individual tool stays free, without signup. Documents and dossier data stay browser-local. No remote AI, OCR, uploads or automatic DigiD submission.
+- Read `docs/RVO-sources.md` before changing rules. Presence/confirmation is not eligibility. Missing meldcode has a technical-documentation route; photo absence alone is not a mandatory failure.
+- Preserve legacy SubsidieKlaar JSON imports and explicit fictitious-demo markings. Original bytes stay unchanged. Async exports snapshot state and file descriptors before awaiting PDF work.
+- The former public local-analytics dashboard is removed. `/admin/` is PHP and fails closed until configured. Do not publish temporary QA credentials.
+- Optional analytics: default off; explicit user opt-in; respect GPC/DNT; send only one enumerated event field. Demo events are excluded. Counts are events, never unique people or guaranteed conversions.
+- Config, password hashes, rate limits, sessions and aggregate counts must remain outside the document root. No publicly reachable setup script. Do not deploy test environment flags.
+- `scripts/build-site.cjs` and `templates/index.html` generate public HTML, headers, sitemap and version. Modify the generator rather than hand-editing generated pages.
+- After changes: `npm run build`, `npm test`, `npm run package`. PHP must be present for the backend tests. Inspect generated diffs and keep the portable HTML synchronized.
+- Never expose `.git`, `.env`, source tests, templates or configuration through the Node preview or public server. Retain .htaccess on Hostinger.
+- Preserve bundled third-party notices. No global application licence is implied by dependency licences.
+- Read `docs/HOSTINGER-LIVE.md`, `docs/DEVELOPMENT-HANDOFF.md` and `docs/QA-v1.md`. Live hosting and admin activation remain separate verifiable operations.

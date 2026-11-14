@@ -1,0 +1,28 @@
+# SubsidieReady: Apache/LiteSpeed, no secrets inside the webroot.
+Options -Indexes
+DirectoryIndex index.html index.php
+ErrorDocument 404 /404.html
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule (^|/)\.(?!well-known(?:/|$)) - [F,L]
+RewriteRule ^(?:server|scripts|tests|templates|docs|concept)(?:/|$) - [F,L]
+RewriteRule ^(?:AGENTS\.md|README\.md|package(?:-lock)?\.json|composer\.(?:json|lock)|release-patch\.json|materialize-release\.cjs)$ - [F,L]
+RewriteCond %{HTTP_HOST} ^(?:www\.)?subsidieready\.nl$ [NC]
+RewriteCond %{HTTPS} !=on [OR]
+RewriteCond %{HTTP_HOST} ^www\.subsidieready\.nl$ [NC]
+RewriteRule ^ https://subsidieready.nl%{REQUEST_URI} [R=301,L]
+</IfModule>
+<IfModule mod_headers.c>
+Header always set X-Content-Type-Options "nosniff"
+Header always set X-Frame-Options "DENY"
+Header always set Referrer-Policy "no-referrer"
+Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'sha256-iFLspKzOL5zCQVl86wSmc0qfgP/xCi9T26NT8s+LLhg='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests"
+Header always set Strict-Transport-Security "max-age=31536000" "expr=%{HTTPS} == 'on'"
+<FilesMatch "\.(html|js|css)$">
+Header set Cache-Control "no-cache"
+</FilesMatch>
+</IfModule>
+<IfModule mod_deflate.c>
+AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json
+</IfModule>
