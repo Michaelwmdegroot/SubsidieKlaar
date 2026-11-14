@@ -56,9 +56,9 @@ test('site theme: subsidy engine, data, authentication and privacy logic are byt
    // The new SQL adapter is an explicitly scoped extension of the approved beta.
    // Remove ONLY the three exact integration hooks; every existing security,
    // account, ownership, consent and export instruction must remain byte-equal.
-   source=source.replace("require_once __DIR__.'/mysql.php';\\n".replace('\\n','\\n'),'');
-   source=source.replace(" if(!in_array($c['storage_driver']??'file',['file','mysql'],true))throw new RuntimeException('Opslagdriver onbekend.');\\n if(($c['storage_driver']??'file')==='mysql')srn_mysql_validate($c);\\n".replace(/\\\\n/g,'\\n'),'');
-   source=source.replace(" if(($c['storage_driver']??'file')==='mysql')return srn_mysql_tx($c,$fn);\\n".replace('\\n','\\n'),'');
+   source=source.replace("require_once __DIR__.'/mysql.php';\n",'');
+   source=source.replace(" if(!in_array($c['storage_driver']??'file',['file','mysql'],true))throw new RuntimeException('Opslagdriver onbekend.');\n if(($c['storage_driver']??'file')==='mysql')srn_mysql_validate($c);\n",'');
+   source=source.replace(" if(($c['storage_driver']??'file')==='mysql')return srn_mysql_tx($c,$fn);\n",'');
   }
   assert.equal(crypto.createHash('sha256').update(source).digest('hex'),hash,p);
  }
