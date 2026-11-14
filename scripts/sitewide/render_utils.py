@@ -19,6 +19,9 @@ def html(route):
  h=re.sub(r'<link rel="(?:icon|preload)"[^>]*>','',h)
  h=re.sub(r'<link rel="stylesheet" href="([^"]+)">',lambda m:'<style>'+inline((ROOT/m[1].lstrip('/')).read_text())+'</style>',h)
  scripts=[]
+ if route=='/':
+  vendors=['pdf-lib-1.17.1.min.js','fontkit-1.1.1.min.js','noto-sans-font.js','jszip-3.10.1.min.js']
+  h=h.replace('<script defer src="assets/export-loader.js"></script>', ''.join('<script defer src="vendor/'+f+'"></script>' for f in vendors)+'<script defer src="assets/export-loader.js"></script>')
  def script(m):
   if m[1].endswith('metrics.js'):return ''
   scripts.append(inline((ROOT/m[1].lstrip('/')).read_text()).replace('</script','<\\/script'))

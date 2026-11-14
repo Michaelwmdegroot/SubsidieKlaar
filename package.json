@@ -10,7 +10,10 @@
     "test:server": "node --test tests/server.test.cjs",
     "package": "node scripts/package.cjs",
     "preview:next": "node scripts/next/offline.cjs",
-    "test:next": "node --test tests/next-*.test.cjs"
+    "test:next": "node --test tests/next-*.test.cjs",
+    "audit:seo": "node scripts/audit-seo.cjs",
+    "audit:seo:live": "node scripts/audit-seo.cjs --live",
+    "check:lead-pilot": "node scripts/lead-pilot.cjs --check"
   },
   "engines": {
     "node": ">=20"

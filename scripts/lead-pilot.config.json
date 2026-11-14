@@ -1,0 +1,14 @@
+{
+  "enabled": false,
+  "recipient": "Thuisbatterij Team B.V.",
+  "targetUrl": "https://thuisbatterijteam.nl/contact/adviesgesprek/",
+  "privacyUrl": "https://thuisbatterijteam.nl/voorwaarden-beleid/privacybeleid/",
+  "approvals": {
+    "controller": null,
+    "relationship": null,
+    "recipient": null,
+    "formAndPrivacy": null,
+    "receipt": null,
+    "ownerPublication": null
+  }
+}

@@ -1,6 +1,7 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const S=require('../site-design.cjs');
+const reviewedRoutes=new Set(require('../seo-articles.cjs').articles.map(article=>article.route));
 const root=path.resolve(__dirname,'../..'),read=f=>fs.readFileSync(path.join(root,f),'utf8'),write=(f,s)=>{fs.mkdirSync(path.dirname(path.join(root,f)),{recursive:true});fs.writeFileSync(path.join(root,f),s);};
 const home=read('index.html'),head=home.match(/<header[\s\S]*?<\/header>/)[0],foot=home.match(/<footer[\s\S]*?<\/footer>/)[0];
 function chrome(s){return s.replace(/<button([^>]*data-action="([^"]+)"[^>]*)>([\s\S]*?)<\/button>/g,(_,a,k,l)=>`<a${a.replace(/ data-action="[^"]+"/,'')} href="${({start:'/#dossier',demo:'/#voorbeeld',privacy:'/privacy/',sources:'/bronnen/',installers:'/#installateurs'})[k]||'/'}">${l}</a>`).replace(/href="#"/g,'href="/"').replace(/href="#hoe-het-werkt"/g,'href="/#hoe-het-werkt"').replace(/href="#documenten"/g,'href="/#documenten"').replace(/ data-action="[^"]+"/g,'').replaceAll('src="assets/','src="/assets/');}
@@ -19,6 +20,8 @@ const articles=[
 ];
 for(const a of articles){
  const route='/hulp/'+a.slug+'/';
+ // Reviewed public articles are generated in build-site.cjs with metadata and source notes.
+ if(reviewedRoutes.has(route))continue;
  const cta='<a class="btn btn-primary" href="/mijn-plan/">Begin je plan →</a>';
  const content=a.sections.map(([t,b])=>`<h2>${S.escape(t)}</h2><p>${S.escape(b)}</p>`).join('')+'<p class="source-note">Broncontrole: 14 november 2026. Hercontrole uiterlijk 14 december 2026 (interne onderhoudsdatum, geen wettelijke vervaldatum).</p><p><a href="'+a.source+'" target="_blank" rel="noopener noreferrer">Officiële bron ↗</a></p>';
  const structured=S.sections(content);

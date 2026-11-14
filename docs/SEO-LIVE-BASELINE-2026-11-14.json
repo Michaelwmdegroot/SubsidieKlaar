@@ -1,0 +1,722 @@
+{
+  "checkedAt": "2026-11-14T21:19:54.157Z",
+  "mode": "live",
+  "origin": "https://subsidieready.nl",
+  "scope": "Technical crawl evidence only. No claim of actual search indexing, rankings, visitors or Core Web Vitals. GET only; no cookies, forms or off-site crawl.",
+  "limits": {
+    "maxRoutes": 60,
+    "maxResponseBytes": 2097152,
+    "timeoutMs": 10000,
+    "concurrency": 4
+  },
+  "version": {
+    "product": "SubsidieReady",
+    "version": "1.0.0",
+    "build": "a95e1539d1244098",
+    "source_checked": "2026-11-14",
+    "documents": "browser-only"
+  },
+  "sitemap": {
+    "status": 200,
+    "urlCount": 12,
+    "urls": [
+      "https://subsidieready.nl/",
+      "https://subsidieready.nl/regelingen/",
+      "https://subsidieready.nl/hulp/",
+      "https://subsidieready.nl/hulp/factuur-warmtepomp/",
+      "https://subsidieready.nl/hulp/betaalbewijs/",
+      "https://subsidieready.nl/hulp/meldcode/",
+      "https://subsidieready.nl/bronnen/",
+      "https://subsidieready.nl/privacy/",
+      "https://subsidieready.nl/over/",
+      "https://subsidieready.nl/subsidies/",
+      "https://subsidieready.nl/btw/",
+      "https://subsidieready.nl/financiering/"
+    ]
+  },
+  "robots": {
+    "status": 200,
+    "sitemapAdvertised": true,
+    "googlebotRules": [
+      {
+        "allow": true,
+        "value": "/"
+      },
+      {
+        "allow": false,
+        "value": "/admin/"
+      },
+      {
+        "allow": false,
+        "value": "/api/"
+      },
+      {
+        "allow": false,
+        "value": "/server/"
+      },
+      {
+        "allow": false,
+        "value": "/docs/"
+      },
+      {
+        "allow": false,
+        "value": "/scripts/"
+      },
+      {
+        "allow": false,
+        "value": "/templates/"
+      },
+      {
+        "allow": false,
+        "value": "/tests/"
+      },
+      {
+        "allow": false,
+        "value": "/concept/"
+      }
+    ]
+  },
+  "routes": [
+    {
+      "route": "/",
+      "inSitemap": true,
+      "expectedIndexing": "public",
+      "status": 200,
+      "finalUrl": "https://subsidieready.nl/",
+      "redirects": [],
+      "rawHTMLBytes": 22752,
+      "title": "Subsidies, btw en financiering voor je woning | SubsidieReady",
+      "titleCount": 1,
+      "description": "Verken subsidies, btw en financiering voor je verduurzaming. Controleer officiële bronnen en bereid je warmtepompdossier voor. Gratis, zonder account.",
+      "descriptionCount": 1,
+      "canonical": "https://subsidieready.nl/",
+      "canonicalCount": 1,
+      "robots": [
+        "index, follow"
+      ],
+      "xRobotsTag": "",
+      "crawlAllowed": true,
+      "noindex": false,
+      "h1Count": 2,
+      "h1": [
+        "Verduurzamen? Ontdek jouw regelingen. Simpel. Helder. Ready.",
+        "SubsidieReady"
+      ],
+      "schemaTypes": [
+        "Offer",
+        "WebApplication"
+      ],
+      "schemaBlocks": 1,
+      "missingLocalLinks": []
+    },
+    {
+      "route": "/advies/",
+      "inSitemap": false,
+      "expectedIndexing": "noindex_review",
+      "status": 200,
+      "finalUrl": "https://subsidieready.nl/advies/",
+      "redirects": [],
+      "rawHTMLBytes": 3940,
+      "title": "Vrijblijvend installatieadvies | SubsidieReady testrelease",
+      "titleCount": 1,
+      "description": "",
+      "descriptionCount": 0,
+      "canonical": "",
+      "canonicalCount": 0,
+      "robots": [
+        "noindex,nofollow"
+      ],
+      "xRobotsTag": "noindex, nofollow",
+      "crawlAllowed": true,
+      "noindex": true,
+      "h1Count": 0,
+      "h1": [],
+      "schemaTypes": [],
+      "schemaBlocks": 0,
+      "missingLocalLinks": []
+    },
+    {
+      "route": "/bronbeheer/",
+      "inSitemap": false,
+      "expectedIndexing": "noindex_review",
+      "status": 200,
+      "finalUrl": "https://subsidieready.nl/bronbeheer/",
+      "redirects": [],
+      "rawHTMLBytes": 10277,
+      "title": "Bronbeheer & dekking | SubsidieReady testrelease",
+      "titleCount": 1,
+      "description": "",
+      "descriptionCount": 0,
+      "canonical": "",
+      "canonicalCount": 0,
+      "robots": [
+        "noindex,nofollow"
+      ],
+      "xRobotsTag": "noindex, nofollow",
+      "crawlAllowed": true,
+      "noindex": true,
+      "h1Count": 1,
+      "h1": [
+        "Bronnen, zichtbaar bijgehouden."
+      ],
+      "schemaTypes": [],
+      "schemaBlocks": 0,
+      "missingLocalLinks": []
+    },
+    {
+      "route": "/bronnen/",
+      "inSitemap": true,
+      "expectedIndexing": "public",
+      "status": 200,
+      "finalUrl": "https://subsidieready.nl/bronnen/",
+      "redirects": [],
+      "rawHTMLBytes": 12285,
+      "title": "Onze bronnen en de grenzen van de checks | SubsidieReady",
+      "titleCount": 1,
+      "description": "Lees de officiële bronnen van RVO, Belastingdienst, Warmtefonds en SVn en wat de regelingencheck en warmtepompwerkbank wel en niet doen.",
+      "descriptionCount": 1,
+      "canonical": "https://subsidieready.nl/bronnen/",
+      "canonicalCount": 1,
+      "robots": [
+        "index, follow"
+      ],
+      "xRobotsTag": "",
+      "crawlAllowed": true,
+      "noindex": false,
+      "h1Count": 1,
+      "h1": [
+        "Onze bronnen en de grenzen van de checks"
+      ],
+      "schemaTypes": [],
+      "schemaBlocks": 0,
+      "missingLocalLinks": []
+    },
+    {
+      "route": "/btw/",
+      "inSitemap": true,
+      "expectedIndexing": "public",
+      "status": 200,
+      "finalUrl": "https://subsidieready.nl/btw/",
+      "redirects": [],
+      "rawHTMLBytes": 13687,
+      "title": "Btw bij verduurzamen: tarief of teruggaaf? | SubsidieReady",
+      "titleCount": 1,
+      "description": "Uitleg over 0% btw op zonnepanelen, betaalde btw terugvragen, PV-constructies, thuisbatterijen en het btw-tarief voor isolatiearbeid.",
+      "descriptionCount": 1,
+      "canonical": "https://subsidieready.nl/btw/",
+      "canonicalCount": 1,
+      "robots": [
+        "index, follow"
+      ],
+      "xRobotsTag": "",
+      "crawlAllowed": true,
+      "noindex": false,
+      "h1Count": 1,
+      "h1": [
+        "Btw bij verduurzamen: tarief of teruggaaf?"
+      ],
+      "schemaTypes": [],
+      "schemaBlocks": 0,
+      "missingLocalLinks": []
+    },
+    {
+      "route": "/financiering/",
+      "inSitemap": true,
+      "expectedIndexing": "public",
+      "status": 200,
+      "finalUrl": "https://subsidieready.nl/financiering/",
+      "redirects": [],
+      "rawHTMLBytes": 10409,
+      "title": "Financiering voor verduurzamen | SubsidieReady",
+      "titleCount": 1,
+      "description": "Algemene uitleg over Nationaal Warmtefonds en gemeentelijke financiering via SVn. Een lening is geen subsidie en moet worden terugbetaald.",
+      "descriptionCount": 1,
+      "canonical": "https://subsidieready.nl/financiering/",
+      "canonicalCount": 1,
+      "robots": [
+        "index, follow"
+      ],
+      "xRobotsTag": "",
+      "crawlAllowed": true,
+      "noindex": false,
+      "h1Count": 1,
+      "h1": [
+        "Financiering voor verduurzamen"
+      ],
+      "schemaTypes": [],
+      "schemaBlocks": 0,
+      "missingLocalLinks": []
+    },
+    {
+      "route": "/hulp/",
+      "inSitemap": true,
+      "expectedIndexing": "public",
+      "status": 200,
+      "finalUrl": "https://subsidieready.nl/hulp/",
+      "redirects": [],
+      "rawHTMLBytes": 9028,
+      "title": "Uitleg bij jouw verduurzaming | SubsidieReady",
+      "titleCount": 1,
+      "description": "Vind uitleg over subsidies, btw, financiering en de documenten voor je ISDE-warmtepompdossier.",
+      "descriptionCount": 1,
+      "canonical": "https://subsidieready.nl/hulp/",
+      "canonicalCount": 1,
+      "robots": [
+        "index, follow"
+      ],
+      "xRobotsTag": "",
+      "crawlAllowed": true,
+      "noindex": false,
+      "h1Count": 1,
+      "h1": [
+        "Uitleg bij jouw verduurzaming"
+      ],
+      "schemaTypes": [],
+      "schemaBlocks": 0,
+      "missingLocalLinks": []
+    },
+    {
+      "route": "/hulp/betaalbewijs/",
+      "inSitemap": true,
+      "expectedIndexing": "public",
+      "status": 200,
+      "finalUrl": "https://subsidieready.nl/hulp/betaalbewijs/",
+      "redirects": [],
+      "rawHTMLBytes": 8488,
+      "title": "Een betaalbewijs bij je warmtepomp | SubsidieReady",
+      "titleCount": 1,
+      "description": "Bereid een betaalbewijs voor je ISDE-dossier voor. Met uitleg over bankafschriften, meerdere betalingen en winkelbetalingen.",
+      "descriptionCount": 1,
+      "canonical": "https://subsidieready.nl/hulp/betaalbewijs/",
+      "canonicalCount": 1,
+      "robots": [
+        "index, follow"
+      ],
+      "xRobotsTag": "",
+      "crawlAllowed": true,
+      "noindex": false,
+      "h1Count": 1,
+      "h1": [
+        "Een betaalbewijs bij je warmtepomp"
+      ],
+      "schemaTypes": [],
+      "schemaBlocks": 0,
+      "missingLocalLinks": []
+    },
+    {
+      "route": "/hulp/factuur-warmtepomp/",
+      "inSitemap": true,
+      "expectedIndexing": "public",
+      "status": 200,
+      "finalUrl": "https://subsidieready.nl/hulp/factuur-warmtepomp/",
+      "redirects": [],
+      "rawHTMLBytes": 8158,
+      "title": "Je warmtepompfactuur nalopen | SubsidieReady",
+      "titleCount": 1,
+      "description": "Welke gegevens heb je bij de hand voor je ISDE-warmtepompdossier? Loop je factuur en aanvullende stukken rustig na.",
+      "descriptionCount": 1,
+      "canonical": "https://subsidieready.nl/hulp/factuur-warmtepomp/",
+      "canonicalCount": 1,
+      "robots": [
+        "index, follow"
+      ],
+      "xRobotsTag": "",
+      "crawlAllowed": true,
+      "noindex": false,
+      "h1Count": 1,
+      "h1": [
+        "Je warmtepompfactuur nalopen"
+      ],
+      "schemaTypes": [],
+      "schemaBlocks": 0,
+      "missingLocalLinks": []
+    },
+    {
+      "route": "/hulp/isolatie-checklist/",
+      "inSitemap": false,
+      "expectedIndexing": "noindex_review",
+      "status": 200,
+      "finalUrl": "https://subsidieready.nl/hulp/isolatie-checklist/",
+      "redirects": [],
+      "rawHTMLBytes": 8069,
+      "title": "Isolatie en glas: wat leg je vast? | SubsidieReady testrelease",
+      "titleCount": 1,
+      "description": "",
+      "descriptionCount": 0,
+      "canonical": "",
+      "canonicalCount": 0,
+      "robots": [
+        "noindex,nofollow"
+      ],
+      "xRobotsTag": "",
+      "crawlAllowed": true,
+      "noindex": true,
+      "h1Count": 1,
+      "h1": [
+        "Isolatie en glas: wat leg je vast?"
+      ],
+      "schemaTypes": [],
+      "schemaBlocks": 0,
+      "missingLocalLinks": []
+    },
+    {
+      "route": "/hulp/lokale-regelingen/",
+      "inSitemap": false,
+      "expectedIndexing": "noindex_review",
+      "status": 200,
+      "finalUrl": "https://subsidieready.nl/hulp/lokale-regelingen/",
+      "redirects": [],
+      "rawHTMLBytes": 7863,
+      "title": "Lokale regelingen: controleer vóór opdracht | SubsidieReady testrelease",
+      "titleCount": 1,
+      "description": "",
+      "descriptionCount": 0,
+      "canonical": "",
+      "canonicalCount": 0,
+      "robots": [
+        "noindex,nofollow"
+      ],
+      "xRobotsTag": "",
+      "crawlAllowed": true,
+      "noindex": true,
+      "h1Count": 1,
+      "h1": [
+        "Lokale regelingen: controleer vóór opdracht"
+      ],
+      "schemaTypes": [],
+      "schemaBlocks": 0,
+      "missingLocalLinks": []
+    },
+    {
+      "route": "/hulp/meldcode/",
+      "inSitemap": true,
+      "expectedIndexing": "public",
+      "status": 200,
+      "finalUrl": "https://subsidieready.nl/hulp/meldcode/",
+      "redirects": [],
+      "rawHTMLBytes": 8283,
+      "title": "De juiste meldcode bij je warmtepomp | SubsidieReady",
+      "titleCount": 1,
+      "description": "Vergelijk je exacte warmtepomp met de RVO-meldcodelijst en lees wat je kunt doen wanneer je geen meldcode vindt.",
+      "descriptionCount": 1,
+      "canonical": "https://subsidieready.nl/hulp/meldcode/",
+      "canonicalCount": 1,
+      "robots": [
+        "index, follow"
+      ],
+      "xRobotsTag": "",
+      "crawlAllowed": true,
+      "noindex": false,
+      "h1Count": 1,
+      "h1": [
+        "De juiste meldcode bij je warmtepomp"
+      ],
+      "schemaTypes": [],
+      "schemaBlocks": 0,
+      "missingLocalLinks": []
+    },
+    {
+      "route": "/hulp/thuisbatterij-btw/",
+      "inSitemap": false,
+      "expectedIndexing": "noindex_review",
+      "status": 200,
+      "finalUrl": "https://subsidieready.nl/hulp/thuisbatterij-btw/",
+      "redirects": [],
+      "rawHTMLBytes": 7984,
+      "title": "Thuisbatterij: btw én verplichtingen | SubsidieReady testrelease",
+      "titleCount": 1,
+      "description": "",
+      "descriptionCount": 0,
+      "canonical": "",
+      "canonicalCount": 0,
+      "robots": [
+        "noindex,nofollow"
+      ],
+      "xRobotsTag": "",
+      "crawlAllowed": true,
+      "noindex": true,
+      "h1Count": 1,
+      "h1": [
+        "Thuisbatterij: btw én verplichtingen"
+      ],
+      "schemaTypes": [],
+      "schemaBlocks": 0,
+      "missingLocalLinks": []
+    },
+    {
+      "route": "/hulp/zonnepanelen-btw/",
+      "inSitemap": false,
+      "expectedIndexing": "noindex_review",
+      "status": 200,
+      "finalUrl": "https://subsidieready.nl/hulp/zonnepanelen-btw/",
+      "redirects": [],
+      "rawHTMLBytes": 7981,
+      "title": "Zonnepanelen: van factuur naar btw-route | SubsidieReady testrelease",
+      "titleCount": 1,
+      "description": "",
+      "descriptionCount": 0,
+      "canonical": "",
+      "canonicalCount": 0,
+      "robots": [
+        "noindex,nofollow"
+      ],
+      "xRobotsTag": "",
+      "crawlAllowed": true,
+      "noindex": true,
+      "h1Count": 1,
+      "h1": [
+        "Zonnepanelen: van factuur naar btw-route"
+      ],
+      "schemaTypes": [],
+      "schemaBlocks": 0,
+      "missingLocalLinks": []
+    },
+    {
+      "route": "/mijn-plan/",
+      "inSitemap": false,
+      "expectedIndexing": "noindex_review",
+      "status": 200,
+      "finalUrl": "https://subsidieready.nl/mijn-plan/",
+      "redirects": [],
+      "rawHTMLBytes": 4408,
+      "title": "Mijn verduurzamingsplan | SubsidieReady testrelease",
+      "titleCount": 1,
+      "description": "",
+      "descriptionCount": 0,
+      "canonical": "",
+      "canonicalCount": 0,
+      "robots": [
+        "noindex,nofollow"
+      ],
+      "xRobotsTag": "noindex, nofollow",
+      "crawlAllowed": true,
+      "noindex": true,
+      "h1Count": 1,
+      "h1": [
+        "Mijn verduurzamingsplan"
+      ],
+      "schemaTypes": [],
+      "schemaBlocks": 0,
+      "missingLocalLinks": []
+    },
+    {
+      "route": "/over/",
+      "inSitemap": true,
+      "expectedIndexing": "public",
+      "status": 200,
+      "finalUrl": "https://subsidieready.nl/over/",
+      "redirects": [],
+      "rawHTMLBytes": 8513,
+      "title": "Meer overzicht. Minder uitzoekwerk. | SubsidieReady",
+      "titleCount": 1,
+      "description": "SubsidieReady helpt je verduurzamingsregelingen begrijpen en je volgende stap voorbereiden. Gratis regelingencheck en warmtepompwerkbank.",
+      "descriptionCount": 1,
+      "canonical": "https://subsidieready.nl/over/",
+      "canonicalCount": 1,
+      "robots": [
+        "index, follow"
+      ],
+      "xRobotsTag": "",
+      "crawlAllowed": true,
+      "noindex": false,
+      "h1Count": 1,
+      "h1": [
+        "Meer overzicht. Minder uitzoekwerk."
+      ],
+      "schemaTypes": [],
+      "schemaBlocks": 0,
+      "missingLocalLinks": []
+    },
+    {
+      "route": "/privacy/",
+      "inSitemap": true,
+      "expectedIndexing": "public",
+      "status": 200,
+      "finalUrl": "https://subsidieready.nl/privacy/",
+      "redirects": [],
+      "rawHTMLBytes": 11885,
+      "title": "Jouw gegevens. Jouw keuze. | SubsidieReady",
+      "titleCount": 1,
+      "description": "Hoe SubsidieReady omgaat met documenten, lokaal bewaren, downloads en optionele gebruikstellingen.",
+      "descriptionCount": 1,
+      "canonical": "https://subsidieready.nl/privacy/",
+      "canonicalCount": 1,
+      "robots": [
+        "index, follow"
+      ],
+      "xRobotsTag": "",
+      "crawlAllowed": true,
+      "noindex": false,
+      "h1Count": 1,
+      "h1": [
+        "Jouw gegevens. Jouw keuze."
+      ],
+      "schemaTypes": [],
+      "schemaBlocks": 0,
+      "missingLocalLinks": []
+    },
+    {
+      "route": "/regelingen/",
+      "inSitemap": true,
+      "expectedIndexing": "public",
+      "status": 200,
+      "finalUrl": "https://subsidieready.nl/regelingen/",
+      "redirects": [],
+      "rawHTMLBytes": 20713,
+      "title": "Regelingencheck voor verduurzamen | SubsidieReady",
+      "titleCount": 1,
+      "description": "Verken subsidies, btw en financieringsinformatie voor jouw maatregelen. Gratis, zonder account. Geen subsidie-, fiscaal of kredietbesluit.",
+      "descriptionCount": 1,
+      "canonical": "https://subsidieready.nl/regelingen/",
+      "canonicalCount": 1,
+      "robots": [
+        "index, follow"
+      ],
+      "xRobotsTag": "",
+      "crawlAllowed": true,
+      "noindex": false,
+      "h1Count": 1,
+      "h1": [
+        "Jouw regelingen. In één overzicht."
+      ],
+      "schemaTypes": [
+        "Offer",
+        "WebApplication"
+      ],
+      "schemaBlocks": 1,
+      "missingLocalLinks": []
+    },
+    {
+      "route": "/sales/",
+      "inSitemap": false,
+      "expectedIndexing": "noindex_review",
+      "status": 200,
+      "finalUrl": "https://subsidieready.nl/sales/",
+      "redirects": [],
+      "rawHTMLBytes": 3835,
+      "title": "Eigen sales-inbox | SubsidieReady testrelease",
+      "titleCount": 1,
+      "description": "",
+      "descriptionCount": 0,
+      "canonical": "",
+      "canonicalCount": 0,
+      "robots": [
+        "noindex,nofollow"
+      ],
+      "xRobotsTag": "noindex, nofollow",
+      "crawlAllowed": true,
+      "noindex": true,
+      "h1Count": 0,
+      "h1": [],
+      "schemaTypes": [],
+      "schemaBlocks": 0,
+      "missingLocalLinks": []
+    },
+    {
+      "route": "/subsidies/",
+      "inSitemap": true,
+      "expectedIndexing": "public",
+      "status": 200,
+      "finalUrl": "https://subsidieready.nl/subsidies/",
+      "redirects": [],
+      "rawHTMLBytes": 13145,
+      "title": "Subsidies voor jouw verduurzaming | SubsidieReady",
+      "titleCount": 1,
+      "description": "Verken landelijke subsidieroutes voor warmtepomp, isolatie en ventilatie, met aandacht voor lokale uitzonderingen en officiële voorwaarden.",
+      "descriptionCount": 1,
+      "canonical": "https://subsidieready.nl/subsidies/",
+      "canonicalCount": 1,
+      "robots": [
+        "index, follow"
+      ],
+      "xRobotsTag": "",
+      "crawlAllowed": true,
+      "noindex": false,
+      "h1Count": 1,
+      "h1": [
+        "Subsidies voor jouw verduurzaming"
+      ],
+      "schemaTypes": [],
+      "schemaBlocks": 0,
+      "missingLocalLinks": []
+    }
+  ],
+  "redirectProbes": [
+    {
+      "url": "http://subsidieready.nl/",
+      "status": null,
+      "redirectTo": null,
+      "verified": null
+    },
+    {
+      "url": "https://www.subsidieready.nl/",
+      "status": 301,
+      "redirectTo": "https://subsidieready.nl/",
+      "verified": true
+    }
+  ],
+  "errors": [
+    {
+      "route": "/",
+      "code": "h1_count_2"
+    }
+  ],
+  "warnings": [
+    {
+      "route": "/hulp/",
+      "code": "structured_data_absent"
+    },
+    {
+      "route": "/hulp/factuur-warmtepomp/",
+      "code": "structured_data_absent"
+    },
+    {
+      "route": "/hulp/betaalbewijs/",
+      "code": "structured_data_absent"
+    },
+    {
+      "route": "/hulp/meldcode/",
+      "code": "structured_data_absent"
+    },
+    {
+      "route": "/bronnen/",
+      "code": "structured_data_absent"
+    },
+    {
+      "route": "/privacy/",
+      "code": "structured_data_absent"
+    },
+    {
+      "route": "/over/",
+      "code": "structured_data_absent"
+    },
+    {
+      "route": "/subsidies/",
+      "code": "structured_data_absent"
+    },
+    {
+      "route": "/btw/",
+      "code": "structured_data_absent"
+    },
+    {
+      "route": "/financiering/",
+      "code": "structured_data_absent"
+    }
+  ],
+  "unknown": [
+    {
+      "route": "http://subsidieready.nl/",
+      "code": "network_unavailable"
+    }
+  ],
+  "ok": false,
+  "summary": {
+    "sitemapRoutes": 12,
+    "inspectedPages": 20,
+    "errors": 1,
+    "warnings": 10,
+    "unknown": 1
+  },
+  "baselineNote": "Live baseline before the SEO PR. The production response contains two H1 elements when the noscript fallback is included. Missing structured data is an improvement opportunity, not evidence of missing search indexing. HTTP redirect verification was unavailable in this execution environment; the HTTPS www redirect was observed.",
+  "statusBasis": "Observed HTTP response"
+}

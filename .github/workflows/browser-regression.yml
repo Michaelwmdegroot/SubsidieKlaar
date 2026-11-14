@@ -1,0 +1,67 @@
+name: SubsidieReady browser regression
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: browser-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  chromium:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Require PHP used by the existing rendering regression
+        run: php -v
+      - name: Install pinned browser tooling
+        run: |
+          python -m pip install playwright==1.62.0
+          python -m playwright install --with-deps chromium
+      - name: Resolve the installed Chromium executable
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          with sync_playwright() as playwright:
+              executable = playwright.chromium.executable_path
+          with Path(os.environ['GITHUB_ENV']).open('a') as output:
+              output.write('SR_CHROMIUM=' + executable + '\n')
+          PY
+      - run: npm run build
+      - name: Real HTTP, CSP, lazy exports and reviewed article regression
+        run: python scripts/seo/browser_check.py
+      - name: Existing sitewide layout regression
+        if: ${{ !cancelled() }}
+        env:
+          ONLY_LAYOUT: '1'
+        run: python scripts/sitewide/browser_check.py
+      - name: Existing guest tool and workbench regression
+        if: ${{ !cancelled() }}
+        env:
+          ONLY_FUNCTIONS: '1'
+        run: python scripts/sitewide/browser_check.py
+      - name: Preserve synthetic browser reports and screenshots
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-regression-${{ github.sha }}
+          path: |
+            qa/seo-browser/
+            qa/sitewide-layout-report.json
+            qa/sitewide-browser-report.json
+            qa/visual/
+          if-no-files-found: warn
+          retention-days: 7

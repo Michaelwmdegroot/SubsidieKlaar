@@ -5,7 +5,7 @@ const origin = 'https://subsidieready.nl';
 const expected = {product:'SubsidieReady',version:'1.0.0',build:'test-build',documents:'browser-only'};
 const nextExpected = require('../next-version.json');
 const betaPages = ['/mijn-plan/','/advies/','/sales/','/bronbeheer/'];
-const pages = ['/regelingen/','/subsidies/','/btw/','/financiering/','/hulp/','/hulp/factuur-warmtepomp/','/hulp/betaalbewijs/','/hulp/meldcode/','/privacy/','/bronnen/','/over/'];
+const pages = ['/regelingen/','/subsidies/','/btw/','/financiering/','/hulp/','/hulp/factuur-warmtepomp/','/hulp/betaalbewijs/','/hulp/meldcode/','/hulp/zonnepanelen-btw/','/hulp/thuisbatterij-btw/','/privacy/','/bronnen/','/over/'];
 function fixture(overrides = {}) {
   const calls = [];
   function response(url) {

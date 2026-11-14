@@ -5,7 +5,7 @@ routes=['/','/regelingen/','/subsidies/','/btw/','/financiering/','/hulp/','/hul
 viewports=[(1440,960),(1280,800),(1024,768),(768,1024),(390,844),(320,740)]
 report={'method':'Generated HTML and actual JS/CSS rendered in-memory with offline flag. Browser HTTP navigation blocked by environment. Real PHP functionality is tested separately by npm tests.','screens':[],'errors':[],'network':[],'checks':[]}
 with sync_playwright() as pw:
- b=pw.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox'])
+ b=pw.chromium.launch(executable_path=__import__('os').getenv('SR_CHROMIUM','/usr/bin/chromium'),headless=True,args=['--no-sandbox'])
  page=b.new_page(viewport={'width':1440,'height':960},accept_downloads=True)
  page.on('pageerror',lambda e:report['errors'].append(str(e)))
  page.on('request',lambda r:report['network'].append(r.url[:120]))

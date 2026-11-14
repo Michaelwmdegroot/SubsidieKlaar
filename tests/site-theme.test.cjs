@@ -32,8 +32,10 @@ test('site theme: decoration never replaces meaningful interface text or governm
  const h=read('subsidies/index.html');assert.match(h,/Jij bereidt voor\. De uitvoerder beslist/);assert.match(h,/<img[^>]+dashboard-dossier.webp[^>]+alt=""/);assert.doesNotMatch(h,/100% ISDE-proof|gegarandeerde subsidie|voorkomen afwijzing/i);
  const mod=read('scripts/site-design.cjs');assert.doesNotMatch(mod,/\b(?:fetch|XMLHttpRequest|sendBeacon|localStorage|sessionStorage|eval)\s*\(/);
 });
-test('site theme: indexability and production backend gates remain unchanged',()=>{
- for(const p of next)assert.match(read(p),/name="robots" content="noindex,nofollow"/);
+test('site theme: reviewed articles are public while all other preview and backend gates stay closed',()=>{
+ const reviewed=['hulp/zonnepanelen-btw/index.html','hulp/thuisbatterij-btw/index.html'];
+ for(const p of next.filter(p=>!reviewed.includes(p)))assert.match(read(p),/name="robots" content="noindex,nofollow"/);
+ for(const p of reviewed)assert.match(read(p),/name="robots" content="index, follow"/);
  for(const p of standard.filter(x=>x!=='404.html'))assert.match(read(p),/name="robots" content="index, follow"/);
  const service=read('server/next/service.php');assert.match(service,/Productiedomein niet toegestaan/);assert.match(read('api/next/index.php'),/configured.*false/);assert.equal(JSON.parse(read('next-version.json')).cloudDefault,'disabled');
 });

@@ -10,7 +10,8 @@ test('portable HTML preserves executable modules and keeps license text outside 
   execFileSync(process.execPath,['scripts/build.cjs'],{cwd:root});
   const html=fs.readFileSync(path.join(root,'concept/SubsidieKlaar-concept.html'),'utf8');
   const scripts=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m=>m[1]);
-  assert.equal(scripts.length,7);
+  assert.equal(scripts.length,8);
+  assert.ok(scripts.some(code=>code.includes('window.SRExportLoader = Object.freeze')));
   for(const [i,code] of scripts.entries())assert.doesNotThrow(()=>new vm.Script(code),`Embedded module ${i} must parse`);
   assert.ok(scripts.some(code=>code.includes('window.SKExport=Object.freeze')));
   assert.ok(scripts.every(code=>!code.includes('Third-party license notices')));
