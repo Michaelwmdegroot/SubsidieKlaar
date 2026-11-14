@@ -1,5 +1,8 @@
 # SubsidieReady 2.0 — Productstrategie: accounts, dossierbehoud en vrijwillige leads
 
+> **Eigenaarsbesluit 14 november 2026:** commerciële opvolging uitsluitend door eigen bedrijven; geen leadverkoop aan externe partijen. Thuisbatterij Team B.V. is de voorgestelde eerste salesbestemming, na bevestiging juridische rol en werkelijk aanbod. Het [first-party implementatieplan](V2-FIRST-PARTY-SALES-IMPLEMENTATION.md) is vanaf nu leidend voor leadrouting. De oorspronkelijke partnerscenario's hieronder zijn alleen historische opties.
+
+
 **Status:** voorstel voor review, geen toestemming om het product aan te passen of persoonsgegevens te verzamelen. Opgesteld 14 november 2026. Basis: bestaande 1.0 code op `main`, visuele release en PHP-backoffice. De volledige anonieme documentencheck blijft gratis.
 
 ## 1. Productmissie en spanningsveld
