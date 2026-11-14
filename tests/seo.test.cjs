@@ -12,7 +12,7 @@ const publicRoutes=[
   '/','/regelingen/','/subsidies/','/btw/','/financiering/','/hulp/',
   '/hulp/factuur-warmtepomp/','/hulp/betaalbewijs/','/hulp/meldcode/',
   '/hulp/zonnepanelen-btw/','/hulp/thuisbatterij-btw/',
-  '/bronnen/','/privacy/','/over/'
+  '/bronnen/','/privacy/','/voorwaarden/','/over/'
 ];
 const privateRoutes=['/mijn-plan/','/advies/','/sales/','/bronbeheer/'];
 const unreviewedRoutes=['/hulp/isolatie-checklist/','/hulp/lokale-regelingen/'];
@@ -211,4 +211,15 @@ test('SEO: reviewed VAT articles expose their sources, editorial check and usefu
     assert.equal(page.lastReviewed,'2026-11-14');
     for(const source of requiredSources[route])assert.ok(page.citation.includes(source),route+' schema reflects visible official sources');
   }
+});
+
+test('NIVO accountvoorwaarden and privacy links are public and separate from optional marketing',()=>{
+ const terms=read('voorwaarden/index.html'),privacy=read('privacy/index.html'),app=read('assets/plan-app.js');
+ assert.match(terms,/NIVO Groep Holland B\.V\./);assert.match(terms,/95227768/);
+ assert.match(privacy,/info@nivogroepholland\.nl/);assert.match(privacy,/niet.*automatisch/);
+ assert.ok(app.includes('name="marketingEmail"'));
+ assert.ok(app.includes('name="terms"'));
+ assert.match(app,/marketing-email-set/);
+ assert.ok(!app.includes('name="marketingEmail" required'));
+ assert.match(read('sitemap.xml'),/<loc>https:\/\/subsidieready\.nl\/voorwaarden\/<\/loc>/);
 });

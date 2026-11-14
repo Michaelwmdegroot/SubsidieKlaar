@@ -73,7 +73,7 @@ async function checkLive({fetchImpl = globalThis.fetch, expected} = {}) {
     Object.keys(s).every(k => ['service','version','analytics','operator','contact'].includes(k)) && noindex(settings);
   check('Publieke instellingen bevatten alleen toegestane velden', settingsOK);
   if (settingsOK && s.analytics === false) report.warnings.push('Gebruikstellingen staan uit; dit blokkeert de documentenwerkbank niet.');
-  const pages = ['/regelingen/','/subsidies/','/btw/','/financiering/','/hulp/','/hulp/factuur-warmtepomp/','/hulp/betaalbewijs/','/hulp/meldcode/','/hulp/zonnepanelen-btw/','/hulp/thuisbatterij-btw/','/privacy/','/bronnen/','/over/'];
+  const pages = ['/regelingen/','/subsidies/','/btw/','/financiering/','/hulp/','/hulp/factuur-warmtepomp/','/hulp/betaalbewijs/','/hulp/meldcode/','/hulp/zonnepanelen-btw/','/hulp/thuisbatterij-btw/','/privacy/','/voorwaarden/','/bronnen/','/over/'];
   for (const page of pages) {
     const r = await request(ORIGIN + page);
     check('Pagina ' + page, status200(r) && /SubsidieReady/.test(r.text) && /<h1\b/.test(r.text));
@@ -97,10 +97,19 @@ async function checkLive({fetchImpl = globalThis.fetch, expected} = {}) {
     onlineNext?.build === expectedNext.build && onlineNext?.mode === 'review-only' && onlineNext?.cloudDefault === 'disabled');
   const betaApi = await request(ORIGIN + '/api/next/?action=bootstrap');
   const betaSettings = parse(betaApi);
-  check('Account- en sales-API standaard veilig afgesloten', betaApi?.status === 503 &&
-    betaSettings?.configured === false && noindex(betaApi) &&
-    /no-store/.test(betaApi?.headers.get('cache-control') || '') &&
-    !betaApi?.headers.get('set-cookie'));
+  const accountUnavailable = betaApi?.status === 503 && betaSettings?.configured === false &&
+    !betaApi?.headers.get('set-cookie');
+  const accountConfigured = betaApi?.status === 200 && betaSettings?.mode === 'production' &&
+    betaSettings?.accounts === true && betaSettings?.vault === false && betaSettings?.leads === false &&
+    betaSettings?.controller === 'NIVO Groep Holland B.V.' && betaSettings?.contact === 'info@nivogroepholland.nl' &&
+    betaSettings?.user === null && typeof betaSettings?.csrf === 'string' && betaSettings.csrf.length === 64 &&
+    /^__Host-SRNext=/.test(betaApi.headers.get('set-cookie')||'') &&
+    /;\s*Secure/.test(betaApi.headers.get('set-cookie')||'') &&
+    /;\s*HttpOnly/.test(betaApi.headers.get('set-cookie')||'') &&
+    /SameSite=Strict/.test(betaApi.headers.get('set-cookie')||'');
+  check('Accountservice veilig gesloten of expliciet NIVO-account-only', (accountUnavailable||accountConfigured) &&
+    noindex(betaApi) && /no-store/.test(betaApi?.headers.get('cache-control') || ''));
+  if(accountConfigured) report.warnings.push('Publieke NIVO-accountdienst actief; sales en kluis blijven uit. Individuele account-, mailbox- en DB-privacy blijven afzonderlijk te beoordelen.');
   const robots = await request(ORIGIN + '/robots.txt');
   check('Robots beschermt beheer, niet de hele site', status200(robots) && /Disallow:\s*\/admin\//.test(robots.text) &&
     !/^Disallow:\s*\/\s*$/m.test(robots.text) && robots.text.includes(ORIGIN + '/sitemap.xml'));

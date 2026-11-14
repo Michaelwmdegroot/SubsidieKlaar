@@ -1,0 +1,72 @@
+name: SubsidieReady MySQL account staging regression
+
+on:
+  pull_request:
+    paths:
+      - 'server/next/**'
+      - 'scripts/next/mysql-check.php'
+      - 'scripts/next/restore.php'
+      - 'tests/mysql-integration.cjs'
+      - '.github/workflows/mysql-staging.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mysql-account-pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - database_image: 'mysql:8.4'
+            health_command: 'mysqladmin ping -h 127.0.0.1 -uroot -pci-root-synthetic'
+          - database_image: 'mariadb:11.4'
+            health_command: 'mariadb-admin ping -h 127.0.0.1 -uroot -pci-root-synthetic'
+    services:
+      mysql:
+        image: ${{ matrix.database_image }}
+        env:
+          MYSQL_ROOT_PASSWORD: ci-root-synthetic
+          MYSQL_DATABASE: sr_synthetic
+          MYSQL_USER: sr_synthetic
+          MYSQL_PASSWORD: ci-only-synthetic
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="${{ matrix.health_command }}"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+    env:
+      SR_MYSQL_TEST: '1'
+      SR_MYSQL_HOST: 127.0.0.1
+      SR_MYSQL_PORT: '3306'
+      SR_MYSQL_DATABASE: sr_synthetic
+      SR_MYSQL_USER: sr_synthetic
+      SR_MYSQL_PASSWORD: ci-only-synthetic
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Require PHP with PDO MySQL, sodium and fileinfo
+        run: |
+          php -v
+          if ! php -r 'exit(extension_loaded("pdo_mysql") ? 0 : 1);'; then
+            sudo apt-get update -qq
+            sudo apt-get install -y php-mysql
+          fi
+          php -r 'exit(extension_loaded("pdo_mysql") && extension_loaded("sodium") && extension_loaded("fileinfo") ? 0 : 1);'
+      - name: Rebuild existing tools and run real SQL account regression
+        run: |
+          npm run build
+          node --test tests/mysql-integration.cjs
+      - name: Confirm pilot remains separate from production
+        run: |
+          node scripts/lead-pilot.cjs --check
+          git diff --exit-code -- index.html version.json next-version.json .htaccess
