@@ -120,6 +120,26 @@ test('MySQL adapter: real PHP auth, persistent encrypted plans, ownership and ac
     }));
     assert.equal(check.status, 'database_ready');
     assert.equal(check.production_enabled, false);
+    await t.test('database-only preflight checks SQL with every production activation flag off', () => {
+      const original = fs.readFileSync(config);
+      try {
+        php(prefix +
+          'unset($c["keyBytes"]);$c["mode"]="production";$c["origin"]="https://subsidieready.nl";' +
+          '$c["privacy_reviewed"]=false;$c["legal_reviewed"]=false;$c["mail_ready"]=false;' +
+          '$c["accounts_enabled"]=false;' +
+          'file_put_contents(' + JSON.stringify(config) + ', "<?php return ".var_export($c,true).";");', env);
+        const preflight = JSON.parse(execFileSync('php',
+          ['scripts/next/mysql-check.php', '--db-only'], {cwd: root, env, encoding: 'utf8'}));
+        assert.equal(preflight.status, 'database_ready');
+        assert.equal(preflight.production_enabled, false);
+        assert.equal(preflight.accounts_flag, false);
+        assert.equal(preflight.activation_checks, 'not_performed');
+        assert.throws(() => execFileSync('php',
+          ['scripts/next/mysql-check.php', '--check'], {cwd: root, env, stdio: 'pipe'}));
+      } finally {
+        fs.writeFileSync(config, original);
+      }
+    });
     await start();
     await t.test('staging pilot presents accounts but no vault or sales', async () => {
       const guest = new Client();
