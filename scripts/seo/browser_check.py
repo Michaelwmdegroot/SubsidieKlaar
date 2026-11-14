@@ -92,6 +92,16 @@ def pdf_info(page, data):
     }""", base64.b64encode(data).decode())
 
 
+def wait_for_page_state(page, predicate, label, timeout_ms=8000):
+    """Poll in Playwright's isolated execution context, never with CSP-blocked wait_for_function()."""
+    deadline = time.monotonic() + timeout_ms / 1000
+    while time.monotonic() < deadline:
+        if page.evaluate(predicate):
+            return
+        page.wait_for_timeout(75)
+    raise AssertionError("Timed out waiting for " + label)
+
+
 def overview(page):
     page.locator('[data-action="step"][data-step="3"]').click()
 
@@ -194,8 +204,8 @@ def run(browser, base):
     with page.expect_popup() as popup_event:
         page.locator('[data-action="print"]').click()
     popup = popup_event.value
-    popup.wait_for_function("document.body && document.body.textContent.includes('Synthetische Browser Test')")
-    popup.wait_for_function("window.__printCalled === true")
+    popup.get_by_text("Synthetische Browser Test", exact=False).first.wait_for()
+    wait_for_page_state(popup, "() => window.__printCalled === true", "print callback")
     check(popup.locator("h1").inner_text() == "Mijn warmtepompdossier", "print opens the real dossier HTML")
     popup.close()
     check(not vendor_counts(requests), "editing, project JSON and printing request no export vendors")
@@ -249,8 +259,9 @@ def run(browser, base):
     downloads = []
     page.on("download", lambda download: downloads.append(download.suggested_filename))
     page.locator('[data-action="download-pdf"]').click()
-    page.wait_for_function("document.getElementById('toast').textContent.includes('Je gegevens blijven behouden')")
-    page.wait_for_function("!!window.PDFLib && !!window.SK_FONT_BASE64")
+    page.locator("#toast").filter(has_text="Je gegevens blijven behouden").wait_for(state="visible")
+    wait_for_page_state(page, "() => !!window.PDFLib && !!window.SK_FONT_BASE64",
+                        "remaining PDF dependencies after the intentionally failed font")
     check(not downloads, "failed dependency produces no broken download")
     REPORT["expectedFailures"].append({"scenario": "dependency-retry", "path": VENDORS["font"], "kind": "one intentional network abort"})
     page.locator('[data-action="step"][data-step="1"]').click()
