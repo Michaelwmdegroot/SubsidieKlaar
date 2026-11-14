@@ -1,0 +1,83 @@
+name: Import verified regelingen integration
+on:
+  push:
+    branches: [feat/regelingen-platform-foundation]
+    paths: [.github/workflows/import-regelingen-integration.yml]
+permissions:
+  contents: write
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check exact reviewed baseline
+        run: test "$(git rev-parse HEAD^)" = '14aa1d65229eead2325a1d3806049fc9d4985408'
+      - name: Import hash-verified text sources only
+        env:
+          SOURCE_URL: 'https://sdmntprnortheu.oaiusercontent.com/files/00000000-5410-81f4-bf69-ac2406e67718/raw?se=2026-11-14T14%3A30%3A36Z&sp=r&sv=2026-06-06&sr=b&scid=93c31c9d-9b8b-5a26-92af-01eec25759cf&skoid=a4604a88-85e4-4562-b6ab-a5622268de80&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-11-13T19%3A34%3A34Z&ske=2026-11-14T19%3A34%3A34Z&sks=b&skv=2026-06-06&sig=McK4JMy9V5iSHbzQIT6%2B1sBSN9nIP%2B9%2BM3s3ZpZjU3Y%3D'
+        run: |
+          python3 <<'PY'
+          import os, urllib.request, hashlib, io, zipfile, pathlib
+          raw=urllib.request.urlopen(os.environ['SOURCE_URL'],timeout=30).read(200000)
+          assert len(raw)==94876
+          assert hashlib.sha256(raw).hexdigest()=='bee565d849bc1a5169cc345931d81226dbaad858e27f8c061b06c518ba5f3f94'
+          allowed=set('''.github/workflows/live-check.yml
+          .github/workflows/quality.yml
+          .github/workflows/release.yml
+          AGENTS.md
+          README.md
+          assets/app.js
+          assets/regelingen-app.js
+          assets/regelingen.css
+          assets/style.css
+          docs/DEVELOPMENT-HANDOFF.md
+          docs/REGELINGEN-LIVE-INTEGRATION.md
+          docs/V2-REGELINGEN-PLATFORM.md
+          scripts/build-site.cjs
+          scripts/check-live.cjs
+          scripts/package.cjs
+          scripts/regeling-pages.cjs
+          scripts/regelingen-engine.cjs
+          templates/index.html
+          templates/regelingen-page.html
+          tests/integration-regelingen.test.cjs
+          tests/live-check.test.cjs
+          tests/release-gates.test.cjs
+          tests/visual.test.cjs'''.splitlines())
+          root=pathlib.Path.cwd()
+          with zipfile.ZipFile(io.BytesIO(raw)) as z:
+              assert set(z.namelist())==allowed and len(z.infolist())==len(allowed)
+              assert sum(x.file_size for x in z.infolist())<1000000
+              for name in sorted(allowed):
+                  data=z.read(name);data.decode('utf8')
+                  target=root/name
+                  assert target.resolve().is_relative_to(root)
+                  assert not target.is_symlink()
+                  target.parent.mkdir(parents=True,exist_ok=True)
+                  target.write_bytes(data)
+          print('Imported 23 reviewed source files; no private data or binary assets.')
+          PY
+      - name: Build and test exact integrated release
+        run: |
+          php -v
+          npm run build
+          npm test
+          npm run package
+          node -e "if(require('./version.json').build!=='0c76f86e9de19a6d') process.exit(1)"
+          git diff --exit-code -- assets/core.js assets/export.js assets/metrics.js server api admin
+          git diff --check
+      - name: Commit integrated sources and generated pages, then remove this transport
+        run: |
+          rm .github/workflows/import-regelingen-integration.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add --all
+          git commit -m 'feat: connect regelingencheck to the complete SubsidieReady website'
+          git push origin HEAD:refs/heads/feat/regelingen-platform-foundation
