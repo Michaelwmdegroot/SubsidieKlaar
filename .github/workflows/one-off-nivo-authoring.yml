@@ -42,6 +42,10 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # GitHub's workflow token cannot modify workflow YAML files. The
+          # reviewed workflow changes will be committed via the authorized
+          # GitHub connector after the application code has landed.
+          git restore --source=HEAD -- .github/workflows/live-check.yml .github/workflows/quality.yml .github/workflows/release.yml
           git add -A
           git diff --cached --check
           git commit -m "feat: NIVO operator, account terms, explicit marketing consent, safe MySQL production gates"
