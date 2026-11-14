@@ -22,3 +22,13 @@
 - Preserve subsidy/VAT/loan distinctions, incomplete local coverage, date/source warnings, unknown answers and guest document export. No loan or money-total recommendations.
 - Regelingen answers stay in the page; no storage, URL parameters, CRM or telemetry. Accounts/uploads/first-party leads in PR #11 remain separate and inactive.
 - New public pages/assets must stay in packaging, sitemap and exact live acceptance. Update generators rather than generated HTML.
+
+## Next-level testrelease — owner instruction (14 November 2026)
+- The owner explicitly wants to test the whole integrated next-level experience BEFORE any new merge to main. Work on `feat/nextlevel-testrelease`; do not merge or switch Hostinger's live branch.
+- Read `docs/next/TESTEN.md`, `docs/next/SECURITY.md`, `docs/next/STAGING.md` and `docs/next/RELEASE-STATUS.md`. This is beta functionality, not an activated production account platform.
+- New online API requires private configuration outside every webroot; only loopback/staging accepted. No real messages, leads, credentials, new subscriptions or cloud data are authorized by merely opening the preview.
+- Preserve the free local guest flow. One-time scanner handoff requires an explicit click. Online account/plan/file choices remain separate; account != sales permission.
+- The beta uses encrypted single-host file storage, NOT SQL. Do not hide the capacity/locking/production-readiness limits. SMTP delivery, malware infrastructure, legal controller, retention, staff MFA and real hosting restore remain go/no-go decisions.
+- Build generators remain authoritative: `npm run build`, `npm test`, `npm run package`, `npm run preview:next`. Do not hand-edit generated HTML. `next-version.json` is the beta build, separate from existing `version.json`.
+- Keep local files, financial/eligibility answers and dossier contents out of sales. Recipients/staff only come from approved private configuration. Fictitious demo must stay labelled and never become an actual lead.
+- Source monitor is manual CLI and never publishes content. No background schedule is activated. Checklists show preparation, not official approval; dates/source expiry remain visible.

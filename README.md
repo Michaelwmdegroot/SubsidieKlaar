@@ -1,3 +1,5 @@
+> **Nieuwe ontwikkelbranch: next-level testrelease.** Nog niet naar `main` mergen. Start bij [de testhandleiding](docs/next/TESTEN.md) en [de releasegrenzen](docs/next/RELEASE-STATUS.md). De onderstaande 1.0-beschrijving betreft de bestaande productie-basis.
+
 # SubsidieReady
 
 Gratis regelingenverkenner voor verduurzaming, met een aparte documentenwerkbank voor eigenaar-bewoners die een ISDE-warmtepompaanvraag voorbereiden. **Definitieve naam: SubsidieReady. Domein: `subsidieready.nl`.**

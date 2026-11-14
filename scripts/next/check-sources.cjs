@@ -1,0 +1,12 @@
+'use strict';
+// Fixed official sources only. Never edit rule source files or publish content automatically.
+const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');const registry=require('../regelingen-engine.cjs');
+const hosts=new Set(['www.rvo.nl','www.belastingdienst.nl','www.warmtefonds.nl','www.svn.nl']);
+async function run({fetchImpl=fetch,previous={},now=new Date().toISOString()}={}){
+ const items=[];for(const s of registry.listSources()){
+  const url=new URL(s.url);if(!hosts.has(url.hostname)||url.protocol!=='https:')throw Error('Non-allowlisted source');let item={id:s.id,title:s.title,url:s.url,checkedAt:now,status:'error',needsReview:true};
+  try{const r=await fetchImpl(s.url,{redirect:'manual',credentials:'omit',signal:AbortSignal.timeout(12000),headers:{'User-Agent':'SubsidieReady-source-review/0.1'}});if(r.status!==200||!r.headers.get('content-type')?.includes('text/html'))throw Error('Source needs manual review');let n=0;const chunks=[];for await(const c of r.body){n+=c.length;if(n>2000000)throw Error('Source too large');chunks.push(c);}const text=Buffer.concat(chunks).toString('utf8').replace(/<script[\s\S]*?<\/script>/gi,'').replace(/<style[\s\S]*?<\/style>/gi,'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();const hash=crypto.createHash('sha256').update(text).digest('hex');item={...item,hash,status:previous[s.url]===hash?'unchanged':previous[s.url]?'changed':'baseline_required',needsReview:previous[s.url]!==hash};}catch{item.status='error';}items.push(item);
+ }return {generatedAt:now,action:'review_only',automaticPublication:false,items};
+}
+module.exports={run};
+if(require.main===module){const dest=process.argv[2];if(!dest){console.error('Pass a PRIVATE output directory outside the public repository.');process.exitCode=1;}else{const root=path.resolve(__dirname,'../..'),out=path.resolve(dest);if(out===root||out.startsWith(root+path.sep)){console.error('Output must be private, outside webroot.');process.exitCode=1;}else{let prev={};try{const old=JSON.parse(fs.readFileSync(path.join(out,'sources.json')));for(const i of old.items||[])if(i.hash)prev[i.url]=i.hash;}catch{}run({previous:prev}).then(report=>{fs.mkdirSync(out,{recursive:true,mode:0o700});fs.writeFileSync(path.join(out,'sources.json'),JSON.stringify(report,null,2),{mode:0o600});console.log(report.items.map(i=>i.status+' '+i.title).join('\n'));if(report.items.some(i=>i.status==='error'))process.exitCode=1;}).catch(()=>{console.error('Source check failed.');process.exitCode=1;});}}}

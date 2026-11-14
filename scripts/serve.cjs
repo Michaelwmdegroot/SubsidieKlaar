@@ -7,6 +7,7 @@ const csp=fs.readFileSync(path.join(root,'.htaccess'),'utf8').match(/Content-Sec
 http.createServer((req,res)=>{
  const headers={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','X-Robots-Tag':'noindex, nofollow','Content-Security-Policy':csp||"default-src 'self'"};
  let p;try{p=decodeURIComponent(new URL(req.url,'http://localhost').pathname);}catch{res.writeHead(400,headers).end();return;}
+ if(p==='/api/next/'||p==='/api/next/index.php'){res.writeHead(503,{...headers,'Content-Type':'application/json'}).end(JSON.stringify({error:'Online functies vereisen de geconfigureerde PHP-testserver.',configured:false}));return;}
  if(p==='/api/settings.php'){res.writeHead(200,{...headers,'Content-Type':'application/json'}).end('{"service":"SubsidieReady","analytics":false}');return;}
  if(p.startsWith('/api/')||p.startsWith('/admin/')){res.writeHead(503,{...headers,'Content-Type':'text/plain; charset=utf-8'}).end('PHP-beheer is alleen beschikbaar op PHP-hosting.');return;}
  if(p.split('/').some(x=>x.startsWith('.'))||/^\/(?:server|scripts|tests|templates|docs|concept)(?:\/|$)/.test(p)||/\.(?:php|cjs|md|yml)$/.test(p)){res.writeHead(404,headers).end();return;}
