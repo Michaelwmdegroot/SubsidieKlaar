@@ -27,3 +27,7 @@ Er is in deze chat geen werkende Hostinger-hosting/DNS/SSH-verbinding gevonden. 
 Koppel de repository-root van `main` als PHP/HTML-site aan `subsidieready.nl` op de bestaande Hostinger-hosting. Geen buildcommand op Hostinger nodig. Volg `HOSTINGER-LIVE.md`, verifieer het echte domein, en activeer beheer via `php scripts/setup-admin.php` wanneer de operator/contactgegevens beschikbaar zijn. Nooit om een wachtwoord in de chat vragen of het in Git plaatsen.
 
 Inhoudelijke verdere uitbreiding (isolatie, live meldcodes, OCR, subsidiebedragen) is bewust niet in deze release gepropt. De gehele individuele tool blijft gratis en zonder registratie.
+
+## Visuele release — 14 november 2026
+
+De eigenaar vroeg na livegang om een volledige wit/donkerblauw/groene redesign op basis van twee screenshots. Zie `VISUAL-REFRESH.md`: echte responsive UI, gegenereerde lokale woningvisual, vernieuwde werkbank/informatiepagina’s/beheer, 57 geautomatiseerde tests en 51 browser-schermcombinaties. Visuele build `5dafe5e90928c9e8`. Kernregels, documentexport, privacy en authenticatie niet inhoudelijk gewijzigd. De bestaande live-status van build `f2b88f1ca008499e` is geen bewijs dat deze nieuwe visuele build al gedeployd is; controleer het domein en de laatste PR/reactie voor dat bewijs.

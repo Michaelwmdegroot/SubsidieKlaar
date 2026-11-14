@@ -1,6 +1,9 @@
 // Build a portable, self-contained HTML concept. No network or package install.
 const fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'..');
+const imageAssets=['assets/images/home-hero.webp','assets/images/home-hero-small.webp'];
+function inlineImages(text){for(const file of imageAssets){const uri='data:image/webp;base64,'+fs.readFileSync(path.join(root,file)).toString('base64');text=text.replaceAll(file,uri);}return text;}
+
 let html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 html=html.replace('<meta name="robots" content="index, follow">','<meta name="robots" content="noindex, nofollow">').replace('<script defer src="assets/metrics.js"></script>','').replace(/<link rel="canonical"[^>]*>/g,'').replace(/<meta property="og:[^"]+"[^>]*>/g,'').replace('<html lang="nl">','<html lang="nl" data-offline="true">');
 let css=fs.readFileSync(path.join(root,'assets/style.css'),'utf8');
@@ -9,7 +12,7 @@ const logo=fs.readFileSync(path.join(root,'assets/mark.svg')).toString('base64')
 css=css.replace("url('../vendor/NotoSans-Regular.ttf')",`url('data:font/ttf;base64,${font}')`);
 html=html.replace('<link rel="stylesheet" href="assets/style.css">',()=>'<style>'+css+'</style>');
 const scripts=[];
-html=html.replace(/<script defer src="([^"]+)"><\/script>/g,(_,file)=>{scripts.push('<script>'+fs.readFileSync(path.join(root,file),'utf8').replace(/<\/script/gi,'<\\/script').replaceAll('assets/mark.svg','data:image/svg+xml;base64,'+logo).replaceAll('href="/','href="https://subsidieready.nl/')+'</script>');return '';});
+html=html.replace(/<script defer src="([^"]+)"><\/script>/g,(_,file)=>{scripts.push('<script>'+inlineImages(fs.readFileSync(path.join(root,file),'utf8')).replace(/<\/script/gi,'<\\/script').replaceAll('assets/mark.svg','data:image/svg+xml;base64,'+logo).replaceAll('href="/','href="https://subsidieready.nl/')+'</script>');return '';});
 html=html.replace(/^[\t ]+$/gm,'');
 html=html.replaceAll('href="assets/mark.svg"','href="data:image/svg+xml;base64,'+logo+'"');
 html=html.replaceAll('src="assets/mark.svg"','src="data:image/svg+xml;base64,'+logo+'"');
@@ -19,6 +22,7 @@ const notices=['NOTICE.md','pdf-lib.LICENSE.md','jszip.LICENSE.md','fontkit.LICE
 html=html.replace('</html>',()=>'<!-- Third-party license notices\n'+notices.replaceAll('-->','--&gt;')+'\n-->\n</html>');
 // A replacement callback preserves literal $ sequences inside embedded JavaScript.
 // Insert code last: its HTML export templates contain their own closing tags.
+html=inlineImages(html);
 html=html.replace('</body>',()=>scripts.join('\n')+'\n</body>');
 fs.mkdirSync(path.join(root,'concept'),{recursive:true});
 fs.writeFileSync(path.join(root,'concept/SubsidieKlaar-concept.html'),html);
