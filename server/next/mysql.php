@@ -52,6 +52,10 @@ function srn_mysql_connect(array $c): PDO {
         PDO::ATTR_TIMEOUT => 5,
         PDO::ATTR_PERSISTENT => false
     ]);
+    $engine = $pdo->query("SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'sr_next_state'")->fetchColumn();
+    if (!is_string($engine) || strcasecmp($engine, 'InnoDB') !== 0) {
+        throw new RuntimeException('Alleen een InnoDB-opslagtabel is toegestaan.');
+    }
     $pdo->exec('SET SESSION innodb_lock_wait_timeout = 3');
     return $pdo;
 }
