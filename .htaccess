@@ -17,7 +17,7 @@ Header always set X-Content-Type-Options "nosniff"
 Header always set X-Frame-Options "DENY"
 Header always set Referrer-Policy "no-referrer"
 Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
-Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'sha256-iFLspKzOL5zCQVl86wSmc0qfgP/xCi9T26NT8s+LLhg='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests"
+Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'sha256-pZA+dQjqRbbilcWIvRdoci5lUyM0zBj7T//E6+wmzSQ=' 'sha256-yRQsXuwSL+gmaZPSuBDBMpuCeh7LWI7pgwnEWINgGCE='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests"
 Header always set Strict-Transport-Security "max-age=31536000" "expr=%{HTTPS} == 'on'"
 <FilesMatch "\.(html|js|css)$">
 Header set Cache-Control "no-cache"

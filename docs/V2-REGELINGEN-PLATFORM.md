@@ -1,3 +1,5 @@
+> **Update:** de eigenaar heeft na beoordeling expliciet publicatie en integratie in de bestaande site geautoriseerd. Zie `REGELINGEN-LIVE-INTEGRATION.md`. De hieronder beschreven oorspronkelijke status als lokaal prototype is historisch; inhoudelijke grenzen blijven gelden.
+
 # SubsidieReady 2.0 — platform voor verduurzamingsregelingen
 
 **Eigenaarbesluit 14 november 2026:** de volgende versie wordt breder dan een warmtepomp-documentenplanner: één startpunt voor verduurzamingssubsidies, btw-regelingen, belastingteruggaaf waar toepasselijk en financiering, waaronder Nationaal Warmtefonds. Het eigen leadmodel uit ontwerp-PR #11 blijft gelden. Geen externe leadverkoop.

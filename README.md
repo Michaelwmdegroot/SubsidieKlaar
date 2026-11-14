@@ -1,8 +1,14 @@
 # SubsidieReady
 
-Gratis documentenwerkbank voor eigenaar-bewoners die een ISDE-warmtepompaanvraag voorbereiden. **Definitieve naam: SubsidieReady. Domein: `subsidieready.nl`.**
+Gratis regelingenverkenner voor verduurzaming, met een aparte documentenwerkbank voor eigenaar-bewoners die een ISDE-warmtepompaanvraag voorbereiden. **Definitieve naam: SubsidieReady. Domein: `subsidieready.nl`.**
 
 Versie **1.0.0**, 14 november 2026. De eigenaar heeft het concept goedgekeurd, `SubsidieReady.nl` gekocht en om publicatie gevraagd. De code is voorbereid voor Hostinger. **Een geslaagde build is niet hetzelfde als een bevestigde live deployment.** Zie [de actuele overdracht](docs/DEVELOPMENT-HANDOFF.md).
+
+## Geïntegreerde regelingenomgeving
+
+De publieke site heeft een brede ingang naar `/regelingen/`, `/subsidies/`, `/btw/` en `/financiering/`. De bestaande warmtepompwerkbank op `/#dossier`, oude helpartikelen en PDF/ZIP blijven behouden. De regelingencheck bevat twaalf informatieroutes, geen recht-op-geldberekening of kredietadvies. De persoonsgegevensvrije check, gedeelde navigatie en publicatiechecks zijn beschreven in [de integratienotitie](docs/REGELINGEN-LIVE-INTEGRATION.md).
+
+Accounts en eigen sales uit ontwerp-PR #11 zijn hiermee niet geactiveerd.
 
 ## Voor bezoekers
 

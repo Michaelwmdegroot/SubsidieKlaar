@@ -37,7 +37,7 @@
     {id:'insulation-vat',kind:'btw',title:'Isolatie: 9% btw op passende arbeid',measures:['isolatie'],sources:['vatInsulation'],summary:'Bij energiebesparend isoleren van een woning ouder dan twee jaar kan het 9%-tarief gelden voor de arbeid. Materialen blijven 21%.',action:'Laat arbeid, materiaal en overige werkzaamheden apart beoordelen. Dit is niet 9% op de complete verbouwing.'},
     {id:'warmth',kind:'financiering',title:'Nationaal Warmtefonds',measures:[],sources:['warmth','warmth0','warmthBattery'],summary:'Algemene informatie: een Energiebespaarlening moet worden terugbetaald. Voor eigenaar-bewoners met gezamenlijk verzamelinkomen onder € 60.000 kan 0% rente gelden, met overige voorwaarden.',action:'Lees de voorwaarden rechtstreeks bij Warmtefonds. De aanbieder beoordeelt de aanvraag. We vragen hier geen inkomen, BKR-gegevens of loonstroken en adviseren geen specifiek krediet.'},
     {id:'svn',kind:'financiering',title:'Gemeentelijke financiering via SVn',measures:[],sources:['svn'],summary:'Het gemeentelijke aanbod verschilt. Voor een Duurzaamheidslening is een toewijzing nodig; SVn beoordeelt daarna de aanvraag.',action:'Controleer beschikbaarheid bij de gemeente en SVn. Een toewijzing is geen kredietgoedkeuring; een lening is geen subsidie.'},
-    {id:'local',kind:'lokaal',title:'Lokale en regionale regelingen',measures:[],sources:['region'],summary:'De lokale dekking van dit prototype is onvolledig. Niet gevonden betekent niet dat er geen regeling bestaat.',action:'Controleer je gemeente of provincie vóór opdrachtverlening. Voor Groningen en Aa en Hunze, Noordenveld en Tynaarlo kan Maatregel 29 relevant zijn.'}
+    {id:'local',kind:'lokaal',title:'Lokale en regionale regelingen',measures:[],sources:['region'],summary:'De lokale dekking van deze verkenner is onvolledig. Niet gevonden betekent niet dat er geen regeling bestaat.',action:'Controleer je gemeente of provincie vóór opdrachtverlening. Voor Groningen en Aa en Hunze, Noordenveld en Tynaarlo kan Maatregel 29 relevant zijn.'}
   ];
   const enums = {
     role:['owner','vve','landlord','tenant','business','unknown'],
@@ -54,7 +54,7 @@
     return out;
   }
   function validDate(value) {if(typeof value!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(value))return false;const d=new Date(value+'T12:00:00Z');return Number.isFinite(d.getTime())&&d.toISOString().slice(0,10)===value;}
-  function evaluate(input, today=new Date().toISOString().slice(0,10)) {
+  function evaluate(input, today=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Amsterdam',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())) {
     if(!validDate(today))throw new Error('Ongeldige controledatum');
     const profile=sanitize(input), notices=[];
     const outdated=today<checked||today>reviewBy;
@@ -84,7 +84,9 @@
     if(profile.role==='vve')referrals.push({title:'Bekijk de afzonderlijke SVVE-route voor VvE’s',url:sources.vve[1]});
     if(profile.role==='business')referrals.push({title:'Zakelijke regelingen hebben een eigen route, bijvoorbeeld EIA',url:sources.business[1]});
     if(['landlord','tenant','unknown'].includes(profile.role))referrals.push({title:'Controleer de passende aanvragersroute bij RVO; verhuur en huurders zijn niet hetzelfde',url:'https://www.rvo.nl/subsidies-financiering'});
-    return {schemaVersion:1,ruleVersion:'2026.11.14-preview.1',profile,routes,referrals,notices,coverage:'partial',eligibilityAssessed:false,creditAdvice:false,totalBenefit:null};
+    return {schemaVersion:1,ruleVersion:'2026.11.14-public.1',profile,routes,referrals,notices,coverage:'partial',eligibilityAssessed:false,creditAdvice:false,totalBenefit:null};
   }
-  return Object.freeze({checked,reviewBy,sanitize,evaluate,measures:Object.freeze(measures),catalogueSize:catalogue.length});
+  function listSources(){return Object.entries(sources).map(([id,[title,url]])=>({id,title,url,checked,reviewBy}));}
+  function listRoutes(){return catalogue.map(r=>({...r,measures:[...r.measures],sources:r.sources.map(id=>({id,title:sources[id][0],url:sources[id][1],checked,reviewBy}))}));}
+  return Object.freeze({checked,reviewBy,sanitize,evaluate,listSources,listRoutes,measures:Object.freeze(measures),catalogueSize:catalogue.length});
 });

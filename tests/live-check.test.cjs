@@ -3,7 +3,7 @@ const test = require('node:test'), assert = require('node:assert/strict');
 const {checkLive, bodyText} = require('../scripts/check-live.cjs');
 const origin = 'https://subsidieready.nl';
 const expected = {product:'SubsidieReady',version:'1.0.0',build:'test-build',documents:'browser-only'};
-const pages = ['/hulp/','/hulp/factuur-warmtepomp/','/hulp/betaalbewijs/','/hulp/meldcode/','/privacy/','/bronnen/','/over/'];
+const pages = ['/regelingen/','/subsidies/','/btw/','/financiering/','/hulp/','/hulp/factuur-warmtepomp/','/hulp/betaalbewijs/','/hulp/meldcode/','/privacy/','/bronnen/','/over/'];
 function fixture(overrides = {}) {
   const calls = [];
   function response(url) {

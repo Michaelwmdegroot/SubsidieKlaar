@@ -1,7 +1,7 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),JSZip=require('../vendor/jszip-3.10.1.min.js');
 const root=path.resolve(__dirname,'..'),dest=path.join(root,'dist');
-const selected=['index.html','404.html','robots.txt','sitemap.xml','.htaccess','version.json','assets','vendor','api','admin','server','hulp','privacy','bronnen','over','scripts/setup-admin.php','scripts/maintenance.php'];
+const selected=['index.html','404.html','robots.txt','sitemap.xml','.htaccess','version.json','assets','vendor','api','admin','server','hulp','regelingen','subsidies','btw','financiering','privacy','bronnen','over','scripts/setup-admin.php','scripts/maintenance.php'];
 async function main(){
  fs.rmSync(dest,{recursive:true,force:true});fs.mkdirSync(dest,{recursive:true});const zip=new JSZip(),manifest=[];
  function add(relative){

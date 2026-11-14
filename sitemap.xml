@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://subsidieready.nl/</loc></url>
+  <url><loc>https://subsidieready.nl/regelingen/</loc></url>
   <url><loc>https://subsidieready.nl/hulp/</loc></url>
   <url><loc>https://subsidieready.nl/hulp/factuur-warmtepomp/</loc></url>
   <url><loc>https://subsidieready.nl/hulp/betaalbewijs/</loc></url>
@@ -8,4 +9,7 @@
   <url><loc>https://subsidieready.nl/bronnen/</loc></url>
   <url><loc>https://subsidieready.nl/privacy/</loc></url>
   <url><loc>https://subsidieready.nl/over/</loc></url>
+  <url><loc>https://subsidieready.nl/subsidies/</loc></url>
+  <url><loc>https://subsidieready.nl/btw/</loc></url>
+  <url><loc>https://subsidieready.nl/financiering/</loc></url>
 </urlset>
