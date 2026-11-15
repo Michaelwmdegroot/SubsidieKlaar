@@ -22,6 +22,23 @@ test('next: real PHP API privacy, authentication, cloud isolation, vault and sal
   await t.test('bootstrap exposes only permitted service metadata and secure local test distinction',async()=>{a=new Client();const {r,d}=await a.boot();assert.equal(d.mode,'local');assert.equal(d.accounts,true);assert.equal(d.user,null);assert.equal(r.headers.get('cache-control'),'no-store, private');assert.match(r.headers.get('x-robots-tag'),/noindex/);assert.match(r.headers.get('set-cookie'),/HttpOnly/i);assert.match(r.headers.get('set-cookie'),/SameSite=Strict/i);assert.ok(!JSON.stringify(d).includes(state().schema+'key'));assert.equal(d.key,undefined);assert.equal(d.dir,undefined);});
   await t.test('method, origin, CSRF, content-type and request-size boundaries',async()=>{let r=await fetch(base+'/api/next/?action=project-save');assert.equal(r.status,405);assert.equal((await a.post('projects-list',{}, {Origin:'https://evil.invalid'})).r.status,403);assert.equal((await a.post('projects-list',{}, {'X-CSRF-Token':'bad'})).r.status,403);assert.equal((await a.post('projects-list',{}, {'Content-Type':'text/plain'})).r.status,415);assert.equal((await a.post('projects-list',{payload:'x'.repeat(200001)})).r.status,413);});
   await t.test('OTP is private, single-use, session-bound and rotates cookie on login',async()=>{const email='alice@example.invalid';const start=await a.post('auth-start',{email,serviceAccepted:true});assert.ok(start.d.challenge);assert.equal(start.d.code,undefined);const code=codeFor(email,start.d.challenge),oldCookie=a.cookie;const foreign=new Client();await foreign.boot();assert.equal((await foreign.post('auth-verify',{challenge:start.d.challenge,code})).r.status,401);const r=await a.post('auth-verify',{challenge:start.d.challenge,code});assert.equal(r.r.status,200);assert.notEqual(a.cookie,oldCookie);assert.equal(a.user.email,email);assert.equal((await a.post('auth-verify',{challenge:start.d.challenge,code})).r.status,401);});
+  await t.test('re-requesting an OTP cancels the old queued email before cron delivery',async()=>{
+    const email='retry-otp@example.invalid',client=new Client();await client.boot();
+    const first=await client.post('auth-start',{email,serviceAccepted:true});
+    assert.equal(first.r.status,200);
+    const firstCode=codeFor(email,first.d.challenge);
+    const second=await client.post('auth-start',{email,serviceAccepted:true});
+    assert.equal(second.r.status,200);
+    const stored=state();
+    const oldMail=Object.values(stored.outbox).find(x=>x.key==='otp:'+first.d.challenge);
+    assert.equal(stored.challenges[first.d.challenge],undefined,'replaced challenge is no longer valid');
+    assert.equal(oldMail.state,'superseded','old code will not be picked up by mail worker');
+    assert.equal(oldMail.text,'','stale code is erased from the pending queue');
+    assert.equal(Object.values(stored.outbox).filter(x=>x.to===email&&x.state==='queued').length,1);
+    assert.equal((await client.post('auth-verify',{challenge:first.d.challenge,code:firstCode})).r.status,401);
+    const latestCode=codeFor(email,second.d.challenge);
+    assert.equal((await client.post('auth-verify',{challenge:second.d.challenge,code:latestCode})).r.status,200);
+   });
   await t.test('marketing email must be independently enabled, revocable and retained as consent evidence',async()=>{
    assert.equal(a.user.marketingEmail,false,'an account starts without marketing consent');
    let res=await a.post('marketing-email-set',{enabled:true,version:'2026-11-14-nivo-email-v1'});

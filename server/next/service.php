@@ -119,7 +119,17 @@ function srn_handle(array $c,string $action,array $in,string $token,string $csrf
    if($purpose==='account'&&array_key_exists('marketingEmailOptIn',$in)&&!is_bool($in['marketingEmailOptIn']))return srn_error('Ongeldige commerciële voorkeur.',400);
    if($purpose==='requests'&&($c['leads_enabled']??false)!==true)return srn_error('Aanvragen niet beschikbaar.',503);
    $h=srn_hash($email,$c);$allowed=srn_limit($s,'mail:'.$h,3,900)&&srn_limit($s,'mailip:'.$ipKey,12,900);$id=srn_id();
-   if($allowed){foreach($s['challenges']as$k=>$ch)if($ch['emailHash']===$h&&$ch['purpose']===$purpose)unset($s['challenges'][$k]);$code=(string)random_int(10000000,99999999);$s['challenges'][$id]=['email'=>$email,'emailHash'=>$h,'code'=>srn_hash($id.'|'.$code,$c),'purpose'=>$purpose,'session'=>$sessionKey,'attempts'=>0,'expires'=>time()+600,'termsVersion'=>$purpose==='account'?(($in['termsAccepted']??false)===true?SRN_TERMS_VERSION:'legacy-local'):'','marketingEmailOptIn'=>$purpose==='account'&&($in['marketingEmailOptIn']??false)===true];srn_queue($s,$email,'otp',"Je SubsidieReady-code is: $code\nGeldig voor 10 minuten. Alleen gebruiken voor je eigen verzoek. Geen account of nieuwsbrief aangevraagd? Negeer dit bericht.",'otp:'.$id);}
+   if($allowed){foreach($s['challenges'] as $k=>$ch){
+    if($ch['emailHash']!==$h||$ch['purpose']!==$purpose)continue;
+    unset($s['challenges'][$k]);
+    // A replaced challenge must never leave an obsolete code queued for the cron worker.
+    foreach($s['outbox'] as $mailId=>$mail){
+     if(($mail['key']??'')==='otp:'.$k&&($mail['state']??'')==='queued'){
+      $s['outbox'][$mailId]['state']='superseded';
+      $s['outbox'][$mailId]['text']='';
+     }
+    }
+   }$code=(string)random_int(10000000,99999999);$s['challenges'][$id]=['email'=>$email,'emailHash'=>$h,'code'=>srn_hash($id.'|'.$code,$c),'purpose'=>$purpose,'session'=>$sessionKey,'attempts'=>0,'expires'=>time()+600,'termsVersion'=>$purpose==='account'?(($in['termsAccepted']??false)===true?SRN_TERMS_VERSION:'legacy-local'):'','marketingEmailOptIn'=>$purpose==='account'&&($in['marketingEmailOptIn']??false)===true];srn_queue($s,$email,'otp',"Je SubsidieReady-code is: $code\nGeldig voor 10 minuten. Alleen gebruiken voor je eigen verzoek. Geen account of nieuwsbrief aangevraagd? Negeer dit bericht.",'otp:'.$id);}
    return ['accepted'=>true,'challenge'=>$id,'message'=>'Een code is aangevraagd. Controleer je inbox; bij teveel verzoeken wordt geen nieuwe mail verstuurd.'];
   }
   if($action==='auth-verify'){
