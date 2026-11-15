@@ -94,6 +94,20 @@ test('read-only live check accepts explicitly configured NIVO account-only boots
   assert.ok(r.checks.some(x=>x.name.includes('Accountinterface')&&x.pass));
   assert.ok(f.calls.every(x=>x.options.method==='GET'&&!x.options.body&&!x.options.headers.Cookie));
 });
+test('production cookie contract accepts lowercase attributes but never a missing Secure flag',async()=>{
+  const csrf='a'.repeat(64);
+  const payload=JSON.stringify({mode:'production',accounts:true,vault:false,leads:false,controller:'NIVO Groep Holland B.V.',contact:'info@nivogroepholland.nl',user:null,csrf});
+  const lower=fixture({'/api/next/':{status:200,headers:{'Set-Cookie':'__Host-SRNext=fake; Path=/; secure; httponly; samesite=strict'},text:payload}});
+  const allowed=await checkLive({expected,fetchImpl:lower.fetchImpl});
+  assert.equal(allowed.ok,true);
+  assert.equal(allowed.accountBootstrap,'enabled');
+  assert.deepEqual(allowed.accountDiagnostics.failedContractChecks,[]);
+  const insecure=fixture({'/api/next/':{status:200,headers:{'Set-Cookie':'__Host-SRNext=fake; Path=/; SecureExtra; HttpOnly; SameSite=Strict'},text:payload}});
+  const denied=await checkLive({expected,fetchImpl:insecure.fetchImpl});
+  assert.equal(denied.accountBootstrap,'unknown');
+  assert.ok(failed(denied,'Accountservice veilig gesloten'));
+  assert.ok(denied.accountDiagnostics.failedContractChecks.includes('secureCookie'));
+});
 test('live account UI is not accepted when required opt-in controls disappear',async()=>{
   const f=fixture({'/assets/plan-app.js':{text:'Inloggen & bewaren name="terms" required'}});
   const r=await checkLive({expected,fetchImpl:f.fetchImpl});
