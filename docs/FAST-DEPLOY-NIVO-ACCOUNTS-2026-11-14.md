@@ -33,12 +33,12 @@ Na GitHub-main-deploy: vanuit `public_html` uitsluitend `php scripts/next/mysql-
 ## Eén publicatietraject op de bestaande Hostinger-hosting
 
 1. Merge de geteste PR op `main`. Hostinger publiceert de statische pagina's en de nieuwe PHP-code via de bestaande GitHub-koppeling. **Zonder private configuratie blijft de API gesloten met HTTP 503**; de bestaande gratis site blijft bereikbaar.
-2. Controleer in hPanel dat deze webhosting PHP 8.2+ met `pdo_mysql`, `sodium`, `fileinfo` ondersteunt, en dat het bestaande databaseaccount toegang heeft tot de **bedoelde** database. Gebruik in hPanel/phpMyAdmin alleen deze eigen database, geen andere projecten.
+2. Controleer de PHP-runtime met `pdo_mysql`, `fileinfo` en OpenSSL AES-256-GCM (Sodium is niet verplicht), en dat het bestaande databaseaccount toegang heeft tot de **bedoelde** database. Gebruik in hPanel/phpMyAdmin alleen deze eigen database, geen andere projecten.
 3. Importeer `server/next/schema.sql` met phpMyAdmin. Dit maakt alleen `sr_next_state` met één versleutelde opslagrij. Er worden geen andere tabellen aangeraakt.
 4. Maak een privémap **naast `public_html`**, bijvoorbeeld `subsidieready-private`, en plaats daarin `next-config.php`. Dit bestand is niet via de website opvraagbaar en wordt niet in GitHub opgeslagen. Gebruik de op de host gegenereerde 32-byte sleutel (64 hexkarakters); houd de sleutel buiten code, publieke configuraties en tickets.
 5. Stel in die private configuratie uitsluitend de bestaande Hostinger-DB-verbindingsgegevens in, de NIVO-contactgegevens, de daadwerkelijk beoordeelde privacyvoorwaarden en de accountflags. Geen FTP/DB-wachtwoord in ChatGPT, GitHub-issues, scripts of screenshots. Het systeem leest bij voorkeur `SR_NEXT_CONFIG` of, zonder environmentvariabele, automatisch `../subsidieready-private/next-config.php` relatief aan de repositoryroot.
    **Databasecheck vóór activering:** voer in de Hostinger-terminal, vanuit `public_html`, `php scripts/next/mysql-check.php --db-only` uit. Deze read-only preflight gebruikt de bestaande private `.env`/`next-config.php`, controleert PDO-MySQL, InnoDB en encryptiesleutel, en werkt met `privacy_reviewed=false`, `legal_reviewed=false`, `mail_ready=false` en `accounts_enabled=false`. Een succes toont `status: database_ready` en `activation_checks: not_performed` — dit is **geen** goedkeuring om accounts of mail aan te zetten. De volledige `--check` blijft pas ná echte juridische- en mailacceptatie bruikbaar.
-6. Configureer het **bestaande** account voor uitgaande transactionele e-mail en controleer dat een echte eenmalige code aankomt (vanaf een geautoriseerde afzender, met correcte SPF/DKIM/DMARC). De huidige mail-worker gebruikt PHP `mail()`, niet een bevestigde SMTP-adapter. Plan de mail-worker via de bestaande Hostinger Cron-voorziening zodra bezorging werkt. **Een queue zonder uitvoerende worker bezorgt geen OTP**.
+6. Configureer het **bestaande** account voor uitgaande transactionele e-mail en controleer dat een echte eenmalige code aankomt (vanaf een geautoriseerde afzender, met correcte SPF/DKIM/DMARC). De mailworker ondersteunt sinds 15 november 2026 ook geauthenticeerde SMTP met verplicht TLS. Gebruik voor productie `SR_NEXT_TRANSPORT=smtp` en test de echte bezorging voordat `SR_NEXT_MAIL_READY` op `true` gaat. Plan de mail-worker via de bestaande Hostinger Cron-voorziening zodra bezorging werkt. **Een queue zonder uitvoerende worker bezorgt geen OTP**.
 7. Activeer pas dan de flags `privacy_reviewed=true`, `legal_reviewed=true`, `mail_ready=true`, `accounts_enabled=true`. Deze booleans registreren echte beslissingen; ze zijn niet zelf de beoordeling. `vault_enabled=false`, `leads_enabled=false`, `staff_enabled=false` blijven verplicht bij SQL.
 8. Controleer één nieuwe fictieve accountregistratie op de echte site en één opgeslagen fictief plan: code ontvangen, inloggen, uitloggen, op een andere browser openen, marketingmail uit/aan/intrekken, exporteren en verwijderen. Gebruik daarna `php scripts/next/mysql-check.php --check` voor read-only DB/sleutel/schemavalidatie en de read-only liveacceptatie. Doe het zonder echte klantdossiers te exporteren.
 
@@ -57,9 +57,9 @@ return [
   'contact' => 'info@nivogroepholland.nl',
   'privacy_reviewed' => false, // pas true na inhoudelijke controle
   'legal_reviewed' => false,   // pas true na inhoudelijke controle
-  'transport' => 'mail',
+  'transport' => 'smtp',
   'mail_ready' => false,
-  'mail_from' => 'info@nivogroepholland.nl',
+  'mail_from' => 'info@subsidieready.nl',
   'accounts_enabled' => false,
   'vault_enabled' => false,
   'leads_enabled' => false,
@@ -76,6 +76,39 @@ return [
 ```
 
 Een verborgen configuratiebestand moet buiten elke webroot en deploydirectory liggen. Als deze privémap ontbreekt of niet klopt, blijft de API gesloten en gaan accountgegevens niet naar een onbedoelde plek.
+
+## SMTP uit dezelfde private .env — GitHub-first (15 november 2026)
+
+De nieuwe PHP SMTP-adapter in `server/next/smtp.php` leest de volgende sleutels uit de **bestaande private** `subsidieready-private/.env`. De bestaande `next-config.php` hoeft **niet** te worden aangepast of vervangen wanneer deze het `SR_NEXT_TRANSPORT`-veld al uitleest.
+
+```dotenv
+SR_NEXT_TRANSPORT=smtp
+SR_NEXT_MAIL_FROM=info@subsidieready.nl
+SMTP_HOST=smtp.hostinger.com
+SMTP_PORT=465
+SMTP_ENCRYPTION=ssl
+SMTP_USERNAME=info@subsidieready.nl
+SMTP_PASSWORD=VUL_HIER_UITSLUITEND_PRIVÉ_JE_MAILBOXWACHTWOORD_IN
+# Alle flags blijven false tot de feitelijke tests/voorwaarden zijn gecontroleerd:
+SR_NEXT_ACCOUNTS_ENABLED=false
+SR_NEXT_MAIL_READY=false
+```
+
+De hostnaam hierboven is uitsluitend de standaard voor **Hostinger Email**; bij een andere mailprovider moet de werkelijke server worden gekozen. De SMTP-adapter accepteert alleen TLS op poort 465 of STARTTLS op poort 587, controleert het servercertificaat, en doet pas daarna SMTP AUTH. De SMTP-credentials verlaten de private configuratie niet via JSON, logging of GitHub.
+
+**Twee handmatige hostchecks, zonder wijzigingen aan de database:**
+
+```bash
+cd public_html
+php scripts/next/mail-check.php --check
+php scripts/next/mail-check.php --send-test=info@subsidieready.nl
+```
+
+`smtp_configured` = instellingen geldig, **nog geen netwerkverbinding getest**. `accepted_by_smtp` = mailserver heeft het bericht geaccepteerd, **nog geen bewijs dat het bericht in de inbox is ontvangen**. Controleer inbox/spam en het afzenderdomein (SPF/DKIM/DMARC). De testmail aan jezelf is geen marketingverzending en maakt geen account of lead aan.
+
+Na echte ontvangst en juridische/privacyacceptatie mogen de flags voor de eerste gecontroleerde accountpilot privé worden aangezet. De **outbox-worker** vereist vervolgens een Hostinger-cronjob die `php /ABSOLUUT-PAD-NAAR/public_html/scripts/next/mail-worker.php --send` uitvoert (bij voorkeur elke minuut; houd rekening met de 10-minuten-geldigheid van OTP). Geen extra betaalde mailservice. De worker houdt maximaal drie afleverpogingen per bericht en stuurt uitsluitend berichten die gebruikers expliciet hebben aangevraagd.
+
+Bij `NO-GO` eerst de vaste foutfase en de private instellingen controleren; nooit de ingevulde `.env`, wachtwoorden, e-mailcodes of sleutels doorsturen. Laat de database- of gebruikersgegevens niet vallen om alleen de SMTP-test te laten slagen.
 
 ## Portal-vervolg (los van deze release)
 

@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__.'/mysql.php';
+require_once __DIR__.'/smtp.php';
 /* Testrelease backend: encrypted, locked single-host pilot storage. Off without private config. */
 const SRN_SCHEMA=1;
 const SRN_TERMS_VERSION='2026-11-14-account-v1';
@@ -27,7 +28,8 @@ function srn_config(): array {
  if(!srn_crypto_ready()||!is_string($c['key']??null)||!preg_match('/^[a-f0-9]{64}$/D',$c['key']))throw new RuntimeException('Versleuteling of sleutel ontbreekt.');
  if(!is_string($c['controller']??null)||trim($c['controller'])===''||!filter_var($c['contact']??'',FILTER_VALIDATE_EMAIL))throw new RuntimeException('Verantwoordelijke ontbreekt.');
  if(!$local && ($c['privacy_reviewed']??false)!==true)throw new RuntimeException('Privacy-goedkeuring ontbreekt.');
- if(!in_array($c['transport']??'', ['spool','mail'],true)||(!$local && $c['transport']==='spool'))throw new RuntimeException('Mailtransport ontbreekt.');
+ if(!in_array($c['transport']??'', ['spool','mail','smtp'],true)||(!$local && $c['transport']==='spool'))throw new RuntimeException('Mailtransport ontbreekt.');
+ if($c['transport']==='smtp')srn_smtp_profile($c);
  if($c['mode']==='production' && ($c['mail_ready']??false)!==true)throw new RuntimeException('Productie vereist werkende verificatiemail.');
  if(!in_array($c['storage_driver']??'file',['file','mysql'],true))throw new RuntimeException('Opslagdriver onbekend.');
  if(($c['storage_driver']??'file')==='mysql')srn_mysql_validate($c);
