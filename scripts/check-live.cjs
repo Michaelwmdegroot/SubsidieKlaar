@@ -141,8 +141,8 @@ async function checkLive({fetchImpl = globalThis.fetch, expected} = {}) {
     anonymousUser: betaSettings?.user === null,
     csrfShapeValid: typeof betaSettings?.csrf === 'string' && betaSettings.csrf.length === 64,
     hostCookie: /^__Host-SRNext=/.test(accountCookie),
-    secureCookie: /;\\s*Secure/.test(accountCookie),
-    httpOnlyCookie: /;\\s*HttpOnly/.test(accountCookie),
+    secureCookie: /;\s*Secure/.test(accountCookie),
+    httpOnlyCookie: /;\s*HttpOnly/.test(accountCookie),
     strictCookie: /SameSite=Strict/.test(accountCookie),
     noindex: noindex(betaApi),
     noStore: /no-store/.test(betaApi?.headers.get('cache-control') || '')
