@@ -88,6 +88,8 @@ test('read-only live check accepts explicitly configured NIVO account-only boots
   const r=await checkLive({expected,fetchImpl:f.fetchImpl});
   assert.equal(r.ok,true);
   assert.equal(r.accountBootstrap,'enabled');
+  assert.equal(r.accountDiagnostics.httpStatus,200);
+  assert.deepEqual(r.accountDiagnostics.failedContractChecks,[]);
   assert.equal(JSON.stringify(r).includes(csrf),false,'never store CSRF token in report');
   assert.ok(r.checks.some(x=>x.name.includes('Accountinterface')&&x.pass));
   assert.ok(f.calls.every(x=>x.options.method==='GET'&&!x.options.body&&!x.options.headers.Cookie));
@@ -97,6 +99,22 @@ test('live account UI is not accepted when required opt-in controls disappear',a
   const r=await checkLive({expected,fetchImpl:f.fetchImpl});
   assert.ok(failed(r,'Accountinterface'));
   assert.equal(r.accountBootstrap,'disabled');
+});
+test('bootstrap failure report exposes HTTP status and failed field names only',async()=>{
+  const denied=fixture(),d=await checkLive({expected,fetchImpl:denied.fetchImpl});
+  assert.equal(d.accountBootstrap,'disabled');
+  assert.equal(d.accountDiagnostics.httpStatus,503);
+  assert.equal(d.accountDiagnostics.validJson,true);
+  assert.equal(d.accountDiagnostics.failedContractChecks.includes('accountsEnabled'),true);
+  const secretCookie='opaque-private-cookie-value',secretCsrf='secret-token-not-for-logs';
+  const partial=fixture({'/api/next/':{status:200,headers:{'Set-Cookie':'__Host-SRNext='+secretCookie+'; Path=/; Secure; HttpOnly; SameSite=Strict'},text:JSON.stringify({mode:'production',accounts:true,csrf:secretCsrf})}});
+  const p=await checkLive({expected,fetchImpl:partial.fetchImpl});
+  assert.equal(p.accountBootstrap,'unknown');
+  assert.ok(p.accountDiagnostics.failedContractChecks.includes('vaultDisabled'));
+  assert.ok(p.accountDiagnostics.failedContractChecks.includes('csrfShapeValid'));
+  assert.equal(JSON.stringify(p).includes(secretCookie),false);
+  assert.equal(JSON.stringify(p).includes(secretCsrf),false);
+  assert.equal(JSON.stringify(p).includes('cookie-value'),false);
 });
 test('beta pages must be reachable and not indexable',async()=>{
   const f=fixture({'/sales/':{headers:{'X-Robots-Tag':''}}}),r=await checkLive({expected,fetchImpl:f.fetchImpl});
