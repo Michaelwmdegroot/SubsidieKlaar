@@ -191,6 +191,7 @@ if (require.main === module) {
     fs.mkdirSync(path.dirname(output), {recursive: true});
     fs.writeFileSync(output, JSON.stringify(report, null, 2) + '\n');
     for (const c of report.checks) console.log((c.pass ? 'PASS ' : 'FAIL ') + c.name + (c.detail ? ' — ' + c.detail : ''));
+    if (report.accountDiagnostics) console.log('ACCOUNT_BOOTSTRAP_DIAGNOSTIC ' + JSON.stringify(report.accountDiagnostics));
     for (const warning of report.warnings) console.log('NOTE ' + warning);
     console.log(report.ok ? 'HTTP smoke checks passed. Browser and hosting acceptance still required.' : 'NO-GO: live HTTP acceptance not confirmed.');
     process.exitCode = report.ok ? 0 : 1;
