@@ -128,6 +128,30 @@ async function checkLive({fetchImpl = globalThis.fetch, expected} = {}) {
   check('Accountservice veilig gesloten of expliciet NIVO-account-only', (accountUnavailable||accountConfigured) &&
     noindex(betaApi) && /no-store/.test(betaApi?.headers.get('cache-control') || ''));
   report.accountBootstrap = accountConfigured ? 'enabled' : accountUnavailable ? 'disabled' : 'unknown';
+  // Safe production diagnostics: only booleans and HTTP status; never save
+  // response JSON, Set-Cookie, CSRF token, code, emails, or a user identifier.
+  const accountCookie = betaApi?.headers.get('set-cookie') || '';
+  const accountContract = {
+    productionMode: betaSettings?.mode === 'production',
+    accountsEnabled: betaSettings?.accounts === true,
+    vaultDisabled: betaSettings?.vault === false,
+    leadsDisabled: betaSettings?.leads === false,
+    controllerMatches: betaSettings?.controller === 'NIVO Groep Holland B.V.',
+    contactMatches: betaSettings?.contact === 'info@nivogroepholland.nl',
+    anonymousUser: betaSettings?.user === null,
+    csrfShapeValid: typeof betaSettings?.csrf === 'string' && betaSettings.csrf.length === 64,
+    hostCookie: /^__Host-SRNext=/.test(accountCookie),
+    secureCookie: /;\\s*Secure/.test(accountCookie),
+    httpOnlyCookie: /;\\s*HttpOnly/.test(accountCookie),
+    strictCookie: /SameSite=Strict/.test(accountCookie),
+    noindex: noindex(betaApi),
+    noStore: /no-store/.test(betaApi?.headers.get('cache-control') || '')
+  };
+  report.accountDiagnostics = {
+    httpStatus: Number.isInteger(betaApi?.status) ? betaApi.status : null,
+    validJson: !!betaSettings,
+    failedContractChecks: Object.entries(accountContract).filter(([,ok])=>!ok).map(([key])=>key)
+  };
   if(accountConfigured) report.warnings.push('Publieke NIVO-accountdienst actief; sales en kluis blijven uit. Individuele account-, mailbox- en DB-privacy blijven afzonderlijk te beoordelen.');
   const robots = await request(ORIGIN + '/robots.txt');
   check('Robots beschermt beheer, niet de hele site', status200(robots) && /Disallow:\s*\/admin\//.test(robots.text) &&
