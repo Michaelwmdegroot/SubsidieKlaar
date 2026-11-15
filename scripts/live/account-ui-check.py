@@ -46,6 +46,9 @@ try:
             network.append((request.method, parsed.scheme, parsed.netloc))
 
         page.on("request", record)
+        # The site's opt-in fictional demo may ask for confirmation before
+        # replacing the current local draft. Only synthetic QA data is used.
+        page.on("dialog", lambda dialog: dialog.accept())
 
         stage = "production_plan_page"
         response = page.goto(ORIGIN + "/mijn-plan/", wait_until="domcontentloaded", timeout=30000)
@@ -103,6 +106,7 @@ try:
             stage = "home_navigation"
             response = page.goto(ORIGIN + "/", wait_until="load", timeout=30000)
             assert response and response.status == 200
+            page.wait_for_timeout(150)  # Match the proven local browser fixture's startup guard.
             stage = "home_start_demo"
             page.locator('[data-action="demo"]:visible').first.click(timeout=15000)
             stage = "home_demo_banner"
