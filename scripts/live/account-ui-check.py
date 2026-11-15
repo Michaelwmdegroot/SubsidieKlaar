@@ -100,14 +100,20 @@ try:
                 assert "plan.json" in z.namelist()
             verified("Guest plan ZIP integrity and expected plan.json")
 
-            stage = "home_guest_pdf"
-            response = page.goto(ORIGIN + "/", wait_until="domcontentloaded", timeout=30000)
+            stage = "home_navigation"
+            response = page.goto(ORIGIN + "/", wait_until="load", timeout=30000)
             assert response and response.status == 200
-            page.locator('[data-action="demo"]').first.click()
+            stage = "home_start_demo"
+            page.locator('[data-action="demo"]:visible').first.click(timeout=15000)
+            stage = "home_demo_banner"
             page.locator(".demo-banner").wait_for(timeout=15000)
-            page.locator('[data-action="step"][data-step="3"]').first.click()
+            stage = "home_step_three"
+            page.locator('[data-action="step"][data-step="3"]:visible').first.click(timeout=15000)
+            stage = "home_pdf_button"
+            assert page.locator('[data-action="download-pdf"]:visible').count() > 0
+            stage = "home_pdf_download"
             with page.expect_download(timeout=60000) as dl:
-                page.locator('[data-action="download-pdf"]').first.click()
+                page.locator('[data-action="download-pdf"]:visible').first.click()
             dl.value.save_as(str(tmp / "warmtepomp.pdf"))
             assert (tmp / "warmtepomp.pdf").read_bytes().startswith(b"%PDF")
             verified("Original free warmtepomp workspace PDF export is valid")
@@ -137,9 +143,10 @@ try:
         context.close()
         browser.close()
         report["result"] = "passed"
-except Exception:
-    # Never print page content, session cookie, CSRF token, user input or URLs.
+except Exception as exc:
+    # Only the exception class, not its message (which could contain a URL/token).
     report["failed_stage"] = stage
+    report["failure_kind"] = type(exc).__name__
 finally:
     (REPORT_DIR / "report.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
