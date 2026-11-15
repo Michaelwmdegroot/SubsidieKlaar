@@ -93,9 +93,9 @@ function srn_smtp_message(string $from,string $to,string $subject,string $body):
         $subject===''||strlen($subject)>180||!preg_match('/^[\x20-\x7e]+$/D',$subject)||
         strlen($body)>30000)throw new RuntimeException('Ongeldige SMTP-berichtinhoud.');
     // Quoted printable preserves UTF-8; SMTP dot-stuffing protects lines beginning with '.'.
-    $encoded=quoted_printable_encode(str_replace(["\r\n","\r"],"\n",$body));
-    $normalized=str_replace(["\r\n","\r"],"\n",$encoded);
-    $lines=explode("\n",$normalized);
+    $normalized=str_replace(["\r\n","\r"],"\n",$body);
+    $encoded=quoted_printable_encode(str_replace("\n","\r\n",$normalized));
+    $lines=explode("\r\n",$encoded);
     foreach($lines as &$line)if(str_starts_with($line,'.'))$line='.'.$line;
     unset($line);
     $domain=substr($from,strrpos($from,'@')+1);
