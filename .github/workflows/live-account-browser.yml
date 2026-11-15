@@ -1,0 +1,51 @@
+name: SubsidieReady production account UI and guest export acceptance
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/live/account-ui-check.py'
+      - '.github/workflows/live-account-browser.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: subsidieready-production-ui-guest-acceptance
+  cancel-in-progress: false
+
+jobs:
+  real-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned Chromium automation
+        run: |
+          python -m pip install playwright==1.62.0
+          python -m playwright install --with-deps chromium
+      - name: Public production browser — synthetic guest only
+        id: accept
+        continue-on-error: true
+        run: python scripts/live/account-ui-check.py
+      - name: Preserve sanitized evidence and empty signup screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: subsidieready-production-guest-browser
+          path: |
+            qa/live-account-browser/report.json
+            qa/live-account-browser/account-dialog-empty.png
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Keep real OTP and cross-browser cloud acceptance separately OPEN
+        if: steps.accept.outcome != 'success'
+        run: |
+          echo 'NO-GO: production account UI / guest export browser probe failed. Inspect the sanitized stage report.'
+          exit 1
