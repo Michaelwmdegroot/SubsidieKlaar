@@ -162,7 +162,7 @@ test('MySQL adapter: real PHP auth, persistent encrypted plans, ownership and ac
         env
       );
       const ciphertext = Buffer.from(q, 'base64');
-      assert.equal(ciphertext.subarray(0, 4).toString(), 'SRN1');
+      assert.equal(ciphertext.subarray(0, 4).toString(), 'SRN2');
       assert.equal(ciphertext.includes(Buffer.from('alice@example.invalid')), false);
     });
     const plan = Plan.newProject('Fictief SQL-testplan', ['isolatie']);

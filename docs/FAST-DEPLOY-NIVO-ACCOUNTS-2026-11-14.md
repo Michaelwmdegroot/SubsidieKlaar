@@ -22,6 +22,14 @@ Gepubliceerde stukken:
 - `/voorwaarden/` — optionele accountdienst, gratis toegang, beperkingen, wijzigingen en aparte commerciële toestemming;
 - `/over/` — NIVO als exploiterende onderneming.
 
+## Hostinger shared hosting: geen Sodium-installatie nodig
+
+De standaardversleuteling voor nieuwe opgeslagen accounts/plannen is **OpenSSL AES-256-GCM** met authenticatietag en willekeurige nonce. De bestaande 64-tekens hexsleutel blijft ongewijzigd. Eerdere `SRN1`-Sodiumdata kunnen nog worden gelezen wanneer Sodium aanwezig is; ontbreekt Sodium bij bestaande SRN1-data, dan weigert de applicatie die data te lezen in plaats van stilzwijgend te overschrijven.
+
+Geen handmatige PHP-module-installatie of nieuwe hostingomgeving vereist **als** de gebruikte PHP-runtime `openssl` met `aes-256-gcm` aanbiedt. De reeds bekende terminal-PHP's missen Sodium; de productiecheck controleert OpenSSL automatisch.
+
+Na GitHub-main-deploy: vanuit `public_html` uitsluitend `php scripts/next/mysql-check.php --db-only` draaien. Het resultaat geeft bij fout een **vaste fasecode** (private-config, crypto-and-key, mysql-driver, mysql-connect of mysql-schema) maar geen wachtwoorden, bestandspaden of SQL-uitzonderingen. Bij succes blijven de account- en marketingflags onveranderd. Dit is één korte operationele test in plaats van losse hostingconfiguratiestappen.
+
 ## Eén publicatietraject op de bestaande Hostinger-hosting
 
 1. Merge de geteste PR op `main`. Hostinger publiceert de statische pagina's en de nieuwe PHP-code via de bestaande GitHub-koppeling. **Zonder private configuratie blijft de API gesloten met HTTP 503**; de bestaande gratis site blijft bereikbaar.

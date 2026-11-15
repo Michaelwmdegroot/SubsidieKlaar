@@ -12,6 +12,7 @@ if ($argc !== 2 || !in_array($argv[1], ['--check', '--db-only'], true)) {
     exit(2);
 }
 try {
+    $stage = 'private-config';
     $dbOnly = $argv[1] === '--db-only';
     if ($dbOnly) {
         // This database check works BEFORE account/legal/mail activation.
@@ -37,19 +38,23 @@ try {
             $privateDir === $root || str_starts_with($privateDir, $root.DIRECTORY_SEPARATOR)) {
             throw new RuntimeException('Private opslag is ongeldig.');
         }
-        if (!extension_loaded('sodium') || !is_string($config['key'] ?? null) ||
+        $stage = 'crypto-and-key';
+        if (!srn_crypto_ready() || !is_string($config['key'] ?? null) ||
             !preg_match('/^[a-f0-9]{64}$/D', $config['key'])) {
-            throw new RuntimeException('Versleutelingssleutel ontbreekt of is ongeldig.');
+            throw new RuntimeException('Versleuteling of sleutel ontbreekt.');
         }
         $config['keyBytes'] = hex2bin($config['key']);
     } else {
         // Full acceptance enforces every existing legal, mail and account gate.
         $config = srn_config();
     }
+    $stage = 'mysql-driver';
     if (($config['storage_driver'] ?? 'file') !== 'mysql') {
         throw new RuntimeException('MySQL-driver is niet ingeschakeld.');
     }
+    $stage = 'mysql-connect';
     $db = srn_mysql_connect($config);
+    $stage = 'mysql-schema';
     $db->beginTransaction();
     try {
         // Validate the InnoDB schema and key without altering a record.
@@ -72,6 +77,9 @@ try {
     ], JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)."\n";
 } catch (Throwable $error) {
     // Never print exception strings; they may contain secrets or private paths.
-    fwrite(STDERR, "NO-GO: databasecontrole niet geslaagd. Controleer private configuratie, sleutel, PDO-MySQL en schema.\n");
+    // Stage labels are fixed strings; no SQL exception, path or secret escapes.
+    $safeStages = ['private-config', 'crypto-and-key', 'mysql-driver', 'mysql-connect', 'mysql-schema'];
+    $label = in_array($stage ?? '', $safeStages, true) ? $stage : 'service-config';
+    fwrite(STDERR, "NO-GO [$label]: controleer de private Hostinger-instellingen; er zijn geen gegevens aangepast.\n");
     exit(1);
 }
