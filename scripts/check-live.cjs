@@ -122,9 +122,9 @@ async function checkLive({fetchImpl = globalThis.fetch, expected} = {}) {
     betaSettings?.controller === 'NIVO Groep Holland B.V.' && betaSettings?.contact === 'info@nivogroepholland.nl' &&
     betaSettings?.user === null && typeof betaSettings?.csrf === 'string' && betaSettings.csrf.length === 64 &&
     /^__Host-SRNext=/.test(betaApi.headers.get('set-cookie')||'') &&
-    /;\s*Secure/.test(betaApi.headers.get('set-cookie')||'') &&
-    /;\s*HttpOnly/.test(betaApi.headers.get('set-cookie')||'') &&
-    /SameSite=Strict/.test(betaApi.headers.get('set-cookie')||'');
+    /;\s*Secure(?:;|$)/i.test(betaApi.headers.get('set-cookie')||'') &&
+    /;\s*HttpOnly(?:;|$)/i.test(betaApi.headers.get('set-cookie')||'') &&
+    /;\s*SameSite=Strict(?:;|$)/i.test(betaApi.headers.get('set-cookie')||'');
   check('Accountservice veilig gesloten of expliciet NIVO-account-only', (accountUnavailable||accountConfigured) &&
     noindex(betaApi) && /no-store/.test(betaApi?.headers.get('cache-control') || ''));
   report.accountBootstrap = accountConfigured ? 'enabled' : accountUnavailable ? 'disabled' : 'unknown';
@@ -141,9 +141,9 @@ async function checkLive({fetchImpl = globalThis.fetch, expected} = {}) {
     anonymousUser: betaSettings?.user === null,
     csrfShapeValid: typeof betaSettings?.csrf === 'string' && betaSettings.csrf.length === 64,
     hostCookie: /^__Host-SRNext=/.test(accountCookie),
-    secureCookie: /;\s*Secure/.test(accountCookie),
-    httpOnlyCookie: /;\s*HttpOnly/.test(accountCookie),
-    strictCookie: /SameSite=Strict/.test(accountCookie),
+    secureCookie: /;\s*Secure(?:;|$)/i.test(accountCookie),
+    httpOnlyCookie: /;\s*HttpOnly(?:;|$)/i.test(accountCookie),
+    strictCookie: /;\s*SameSite=Strict(?:;|$)/i.test(accountCookie),
     noindex: noindex(betaApi),
     noStore: /no-store/.test(betaApi?.headers.get('cache-control') || '')
   };
