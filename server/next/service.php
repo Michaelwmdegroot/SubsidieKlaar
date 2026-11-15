@@ -7,6 +7,11 @@ const SRN_TERMS_VERSION='2026-11-14-account-v1';
 const SRN_PRIVACY_VERSION='2026-11-14-privacy-v1';
 const SRN_EMAIL_MARKETING_VERSION='2026-11-14-nivo-email-v1';
 const SRN_RULE='2026.11.14.3-beta';
+// PHP/OpenSSL is supported on ordinary shared hosting; sodium is optional for legacy data.
+function srn_openssl_ready(): bool {
+ return extension_loaded('openssl') && in_array('aes-256-gcm',openssl_get_cipher_methods(),true);
+}
+function srn_crypto_ready(): bool {return srn_openssl_ready()||extension_loaded('sodium');}
 function srn_id(): string { return bin2hex(random_bytes(16)); }
 function srn_error(string $message,int $status=400): array {return ['_status'=>$status,'error'=>$message];}
 function srn_config(): array {
@@ -19,7 +24,7 @@ function srn_config(): array {
  $local=$c['mode']==='local';if($local && !preg_match('~^http://127\.0\.0\.1:[0-9]{2,5}$~D',$origin))throw new RuntimeException('Loopback vereist.');
  if(!$local && ($u['scheme']!=='https'||($c['mode']==='staging'&&in_array(strtolower($u['host']),['subsidieready.nl','www.subsidieready.nl'],true))))throw new RuntimeException('Productiedomein niet toegestaan in deze testrelease.');
  if($c['mode']==='production' && ($origin!=='https://subsidieready.nl'||($c['storage_driver']??'')!=='mysql'||($c['controller']??'')!=='NIVO Groep Holland B.V.'||($c['contact']??'')!=='info@nivogroepholland.nl'||($c['legal_reviewed']??false)!==true||($c['vault_enabled']??false)!==false||($c['leads_enabled']??false)!==false||($c['staff_enabled']??false)!==false))throw new RuntimeException('Productievoorwaarden voor uitsluitend accounts ontbreken.');
- if(!extension_loaded('sodium')||!is_string($c['key']??null)||!preg_match('/^[a-f0-9]{64}$/D',$c['key']))throw new RuntimeException('Sleutel ontbreekt.');
+ if(!srn_crypto_ready()||!is_string($c['key']??null)||!preg_match('/^[a-f0-9]{64}$/D',$c['key']))throw new RuntimeException('Versleuteling of sleutel ontbreekt.');
  if(!is_string($c['controller']??null)||trim($c['controller'])===''||!filter_var($c['contact']??'',FILTER_VALIDATE_EMAIL))throw new RuntimeException('Verantwoordelijke ontbreekt.');
  if(!$local && ($c['privacy_reviewed']??false)!==true)throw new RuntimeException('Privacy-goedkeuring ontbreekt.');
  if(!in_array($c['transport']??'', ['spool','mail'],true)||(!$local && $c['transport']==='spool'))throw new RuntimeException('Mailtransport ontbreekt.');
@@ -28,8 +33,34 @@ function srn_config(): array {
  if(($c['storage_driver']??'file')==='mysql')srn_mysql_validate($c);
  $c['dir']=$dir;$c['keyBytes']=hex2bin($c['key']);return $c;
 }
-function srn_encrypt(string $plain,array $c): string {$n=random_bytes(SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);return 'SRN1'.$n.sodium_crypto_secretbox($plain,$n,$c['keyBytes']);}
-function srn_decrypt(string $raw,array $c): string {if(substr($raw,0,4)!=='SRN1')throw new RuntimeException('Ongeldige opslag.');$v=sodium_crypto_secretbox_open(substr($raw,28),substr($raw,4,24),$c['keyBytes']);if($v===false)throw new RuntimeException('Opslag niet leesbaar.');return $v;}
+function srn_encrypt(string $plain,array $c): string {
+ if(srn_openssl_ready()){
+  // SRN2: authenticated AES-256-GCM (12-byte nonce, 16-byte tag).
+  $nonce=random_bytes(12);$tag='';
+  $cipher=openssl_encrypt($plain,'aes-256-gcm',$c['keyBytes'],OPENSSL_RAW_DATA,$nonce,$tag,'SRN2',16);
+  if($cipher===false||strlen($tag)!==16)throw new RuntimeException('Encryptie mislukt.');
+  return 'SRN2'.$nonce.$tag.$cipher;
+ }
+ // Read/write compatibility for existing sodium-only deployments.
+ if(extension_loaded('sodium')){$n=random_bytes(SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);return 'SRN1'.$n.sodium_crypto_secretbox($plain,$n,$c['keyBytes']);}
+ throw new RuntimeException('Veilige encryptie niet beschikbaar.');
+}
+function srn_decrypt(string $raw,array $c): string {
+ $version=substr($raw,0,4);
+ if($version==='SRN2'){
+  if(!srn_openssl_ready()||strlen($raw)<32)throw new RuntimeException('Opslag niet leesbaar.');
+  $plain=openssl_decrypt(substr($raw,32),'aes-256-gcm',$c['keyBytes'],OPENSSL_RAW_DATA,substr($raw,4,12),substr($raw,16,16),'SRN2');
+  if($plain===false)throw new RuntimeException('Opslag niet leesbaar.');
+  return $plain;
+ }
+ if($version==='SRN1'){
+  if(!extension_loaded('sodium')||strlen($raw)<44)throw new RuntimeException('Oude opslag vereist libsodium.');
+  $plain=sodium_crypto_secretbox_open(substr($raw,28),substr($raw,4,24),$c['keyBytes']);
+  if($plain===false)throw new RuntimeException('Opslag niet leesbaar.');
+  return $plain;
+ }
+ throw new RuntimeException('Onbekend opslagformaat.');
+}
 function srn_atomic(string $path,string $bytes): void {
  if(is_link($path)||!is_dir(dirname($path)))throw new RuntimeException('Ongeldig opslagpad.');
  $tmp=tempnam(dirname($path),'.srn-');if($tmp===false)throw new RuntimeException('Opslagfout.');
