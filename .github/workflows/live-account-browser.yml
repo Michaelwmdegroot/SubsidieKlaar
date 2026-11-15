@@ -2,6 +2,10 @@ name: SubsidieReady production account UI and guest export acceptance
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - 'scripts/live/account-ui-check.py'
+      - '.github/workflows/live-account-browser.yml'
   push:
     branches: [main]
     paths:
