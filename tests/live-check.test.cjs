@@ -25,9 +25,9 @@ function fixture(overrides = {}) {
       headers['Content-Type']='application/json';headers['X-Robots-Tag']='noindex, nofollow';
       if (p === '/api/next/') {status=503;headers['Cache-Control']='no-store, private';text=JSON.stringify({configured:false,error:'Online functies zijn niet geconfigureerd.'});}
       else text=JSON.stringify(p.endsWith('health.php')?{service:'SubsidieReady',version:'1.0.0',status:'ok',document_processing:'browser-only'}:{service:'SubsidieReady',analytics:false});
-    } else if (betaPages.includes(p)) {text='<title>SubsidieReady testrelease</title><meta name="robots" content="noindex,nofollow"><h1>Mijn plan</h1>';headers['X-Robots-Tag']='noindex, nofollow';}
+    } else if (betaPages.includes(p)) {text='<title>SubsidieReady testrelease</title><meta name="robots" content="noindex,nofollow"><h1>Mijn plan</h1>'+(p==='/mijn-plan/'?'<script defer src="/assets/next-api.js"></script><script defer src="/assets/plan-app.js"></script>':'');headers['X-Robots-Tag']='noindex, nofollow';}
     else if (pages.includes(p)) text='<h1>SubsidieReady uitleg</h1>';
-    else if (p.startsWith('/assets/')) {headers['Content-Type']=p.endsWith('.css')?'text/css':'application/javascript';text='x'.repeat(1001);}
+    else if (p.startsWith('/assets/')) {headers['Content-Type']=p.endsWith('.css')?'text/css':'application/javascript';text=p==='/assets/plan-app.js'?'Inloggen & bewaren name="terms" required name="marketingEmail"':p==='/assets/next-api.js'?"/api/next/?action=bootstrap credentials:'same-origin'":'x'.repeat(1001);}
     else if (p === '/robots.txt') text='User-agent: *\nDisallow: /admin/\nSitemap: '+origin+'/sitemap.xml\n';
     else if (p === '/sitemap.xml') text=['/',...pages].map(p=>'<loc>'+origin+p+'</loc>').join('');
     else if (p === '/admin/') {status=503;text='Beheer is nog niet geactiveerd.';headers['X-Robots-Tag']='noindex';headers['Cache-Control']='no-store, private';}
@@ -81,6 +81,22 @@ test('response bytes are bounded and release identity is required',async()=>{
 test('beta release is not accepted if an account service is active on production',async()=>{
   const f=fixture({'/api/next/':{status:200,text:JSON.stringify({configured:true,accounts:true})}}),r=await checkLive({expected,fetchImpl:f.fetchImpl});
   assert.ok(failed(r,'Accountservice veilig gesloten'));
+});
+test('read-only live check accepts explicitly configured NIVO account-only bootstrap',async()=>{
+  const csrf='a'.repeat(64);
+  const f=fixture({'/api/next/':{status:200,headers:{'Set-Cookie':'__Host-SRNext=fake; Path=/; Secure; HttpOnly; SameSite=Strict'},text:JSON.stringify({mode:'production',accounts:true,vault:false,leads:false,controller:'NIVO Groep Holland B.V.',contact:'info@nivogroepholland.nl',user:null,csrf})}});
+  const r=await checkLive({expected,fetchImpl:f.fetchImpl});
+  assert.equal(r.ok,true);
+  assert.equal(r.accountBootstrap,'enabled');
+  assert.equal(JSON.stringify(r).includes(csrf),false,'never store CSRF token in report');
+  assert.ok(r.checks.some(x=>x.name.includes('Accountinterface')&&x.pass));
+  assert.ok(f.calls.every(x=>x.options.method==='GET'&&!x.options.body&&!x.options.headers.Cookie));
+});
+test('live account UI is not accepted when required opt-in controls disappear',async()=>{
+  const f=fixture({'/assets/plan-app.js':{text:'Inloggen & bewaren name="terms" required'}});
+  const r=await checkLive({expected,fetchImpl:f.fetchImpl});
+  assert.ok(failed(r,'Accountinterface'));
+  assert.equal(r.accountBootstrap,'disabled');
 });
 test('beta pages must be reachable and not indexable',async()=>{
   const f=fixture({'/sales/':{headers:{'X-Robots-Tag':''}}}),r=await checkLive({expected,fetchImpl:f.fetchImpl});

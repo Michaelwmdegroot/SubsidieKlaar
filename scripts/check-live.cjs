@@ -84,12 +84,30 @@ async function checkLive({fetchImpl = globalThis.fetch, expected} = {}) {
   }
   // Review-only additions are public for owner assessment, never account-ready in production.
   const betaPages = ['/mijn-plan/','/advies/','/sales/','/bronbeheer/'];
+  let planPage = null;
   for (const page of betaPages) {
     const r = await request(ORIGIN + page);
+    if (page === '/mijn-plan/') planPage = r;
     const metaNoindex = /<meta\s+name=["']robots["']\s+content=["'][^"']*noindex/i.test(r?.text || '');
     check('Proefpagina bereikbaar en noindex: ' + page,
       status200(r) && /SubsidieReady/.test(r.text) && metaNoindex && noindex(r));
   }
+  // Prove the deployed HTML/JS offers the account controls without invoking the UI,
+  // creating a session on the account backend, or submitting test customer data.
+  // Actual button rendering, email delivery and plan sync remain separate browser tests.
+  const planApp = await request(ORIGIN + '/assets/plan-app.js');
+  const cloudClient = await request(ORIGIN + '/assets/next-api.js');
+  check('Accountinterface en aparte optionele marketingkeuze in live bestanden',
+    status200(planPage) &&
+    planPage.text.includes('src="/assets/next-api.js"') &&
+    planPage.text.includes('src="/assets/plan-app.js"') &&
+    status200(planApp) &&
+    planApp.text.includes('Inloggen & bewaren') &&
+    planApp.text.includes('name="terms" required') &&
+    planApp.text.includes('name="marketingEmail"') &&
+    status200(cloudClient) &&
+    cloudClient.text.includes('/api/next/?action=bootstrap') &&
+    cloudClient.text.includes("credentials:'same-origin'"));
   const nextVersion = await request(ORIGIN + '/next-version.json');
   const expectedNext = JSON.parse(fs.readFileSync(path.join(__dirname, '../next-version.json'), 'utf8'));
   const onlineNext = parse(nextVersion);
@@ -109,6 +127,7 @@ async function checkLive({fetchImpl = globalThis.fetch, expected} = {}) {
     /SameSite=Strict/.test(betaApi.headers.get('set-cookie')||'');
   check('Accountservice veilig gesloten of expliciet NIVO-account-only', (accountUnavailable||accountConfigured) &&
     noindex(betaApi) && /no-store/.test(betaApi?.headers.get('cache-control') || ''));
+  report.accountBootstrap = accountConfigured ? 'enabled' : accountUnavailable ? 'disabled' : 'unknown';
   if(accountConfigured) report.warnings.push('Publieke NIVO-accountdienst actief; sales en kluis blijven uit. Individuele account-, mailbox- en DB-privacy blijven afzonderlijk te beoordelen.');
   const robots = await request(ORIGIN + '/robots.txt');
   check('Robots beschermt beheer, niet de hele site', status200(robots) && /Disallow:\s*\/admin\//.test(robots.text) &&
