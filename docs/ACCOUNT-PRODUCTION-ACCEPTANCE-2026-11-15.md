@@ -2,10 +2,10 @@
 
 **Start:** 15 november 2026 (Europe/Amsterdam)  
 **Status:** OPEN — echte productieaccount-E2E nog niet bewezen  
-**Basis:** main dc514c9b6ec609d9ba55f635be45a614a7279094, PR #28 afgerond.  
+**Basis:** startcommit `dc514c9` (PR #28); actuele account-/browsercontrole op `main` na PRs #29–#34, laatst `f64e932`.  
 **Scope:** https://subsidieready.nl/mijn-plan/; testmailbox onder beheer eigenaar; uitsluitend fictieve planinhoud.
 
-Dit document onderscheidt controle van broncode/CI van werkelijke browser-, cron-, mailbox- en databaseacceptatie. Een geslaagde SMTP-test of unit test is geen bewijs van volledige registratie.
+Dit document onderscheidt controle van broncode/CI, de **uitgevoerde echte productie-Chromiumtest** en nog niet uitgevoerde mailbox-, cron- en geregistreerde-accountacceptatie. Een geslaagde SMTP-test of browserknop is geen bewijs van werkelijke registratie.
 
 ## 1. Bevestigd op basis van code
 
@@ -17,21 +17,28 @@ Dit document onderscheidt controle van broncode/CI van werkelijke browser-, cron
 - Productiecode eist vault_enabled=false, leads_enabled=false, staff_enabled=false. Accounts betekenen geen salesverzoek.
 - Quality/release/browser CI op basiscommit zijn groen, maar de echte productiemail via cron is nog niet getest.
 
-**Codeverbetering in deze PR:** Wanneer een nieuwe OTP de vorige vervangt, krijgt een nog niet verzonden oud bericht de status superseded en wordt de oude code uit de wachtrij gewist. De mailworker verwerkt alleen queued. Een PHP API-regressietest verifieert dit gedrag en de nieuwe geldige code.
+**Codeverbetering in PR #29:** Wanneer een nieuwe OTP de vorige vervangt, krijgt een nog niet verzonden oud bericht de status superseded en wordt de oude code uit de wachtrij gewist. De mailworker verwerkt alleen queued. Een PHP API-regressietest verifieert dit gedrag en de nieuwe geldige code.
+
+### Productiebewijs 16 november 2026
+
+- **PR #32**, commit `1faebff`: slechts de te strenge case-sensitive Secure-cookiecontrole in de audit gecorrigeerd; echte Secure-vlag blijft verplicht. [Live acceptance](https://github.com/Michaelwmdegroot/SubsidieKlaar/actions/runs/43773670176) was groen: bootstrap HTTP 200, geldig JSON, 0 afgekeurde contractvoorwaarden.
+- **PR #34**, commit `f64e932`: echte productie-Chromiumtest met acht geslaagde controles in [PR-run 43774473213](https://github.com/Michaelwmdegroot/SubsidieKlaar/actions/runs/43774473213), uitsluitend fictieve browser-lokale gegevens: accountknop en toestemmingvelden zichtbaar, JSON- en ZIP-download van plan, PDF/ZIP van warmtepompwerkbank; **0 POST-verzoeken, 0 externe domeinen**. Een geplande worker of mailbox is niet gebruikt. Screenshots en geanonimiseerd QA-rapport zijn als GitHub Actions-artifact vastgelegd.
+- **Technische SEO afzonderlijk:** [wekelijkse siteaudit](https://github.com/Michaelwmdegroot/SubsidieKlaar/actions/runs/43774333587) controleerde 15 sitemap-URL's en 21 routes zonder fouten/waarschuwingen; geen bewijs van Google-indexering.
+- **Nog geen PASS voor productieaccount-E2E:** echte 8-cijferige OTP-bezorging via cron, login/logout, expliciete plancloudopslag, tweede sessie, accountexport en accountverwijdering. De eigenaar beheert de testmailbox en voert de code zelf in.
 
 ## 2. Live acceptatie — uitsluitend PASS invullen met waarnemingsbewijs
 
 | Stap | Te bewijzen | Status |
 | --- | --- | --- |
-| Bootstrap en zichtbare knop | /mijn-plan/ geladen, registratieknop; /api/next/?action=bootstrap HTTP 200, mode production, accounts true, leads/vault false | OPEN — agent heeft geen werkende directe live-HTTP/browsertoegang |
+| Bootstrap en zichtbare knop | /mijn-plan/ geladen, registratieknop; /api/next/?action=bootstrap HTTP 200, mode production, accounts true, leads/vault false | **PASS** — live HTTP [run 43773670176](https://github.com/Michaelwmdegroot/SubsidieKlaar/actions/runs/43773670176), cookiecontract 0 fouten; echte Chromium [run 43774473213](https://github.com/Michaelwmdegroot/SubsidieKlaar/actions/runs/43774473213) bevestigt zichtbaar formulier en aparte uitgevinkte marketingkeuze |
 | Aanmaken | Registratie met eigen testmailbox, voorwaarden aangevinkt, marketing uit | OPEN |
 | OTP via cron | Achtcijferige mail daadwerkelijk binnen tien minuten ontvangen zonder handmatige workeractie | OPEN |
 | Login/logout | Correcte code, login, uitloggen en opnieuw aanmelden | OPEN |
 | Online opslaan | Zelfbewuste bevestiging op fictief niet-demo project, revisie teruggekoppeld | OPEN |
 | Cross-browser | Nieuwe privé-/browsersessie na login toont exact hetzelfde serverplan | OPEN |
 | Export en verwijderen | Eigen export-JSON, daarna serveraccount en plan definitief weg | OPEN |
-| Gastregressie | Regelingencheck, lokale import/export, PDF-print en dossier-ZIP zonder account | OPEN — bestaande CI-dekking; productie handmatig nog te bewijzen |
-| Privacy | Geen automatische verkoopdata, marketing of dossierdeling | Codegate gecontroleerd; live gedrag OPEN |
+| Gastregressie | Regelingencheck, lokale import/export, PDF-print en dossier-ZIP zonder account | **DEELS PASS:** echte Chromium op productie bevestigt fictief gastproject, JSON-plan en dossier-ZIP, en originele gratis warmtepomp-PDF en ZIP. Lokale herimport en cross-browser persistente gastdata nog niet op echte productie met eigenaar geaccepteerd |
+| Privacy | Geen automatische verkoopdata, marketing of dossierdeling | **PASS voor beperkte read-only/gastscope:** Chromium zag 0 niet-GET en 0 off-site verzoeken; vault/leads/staff bleven uit in servergate. Marketinginstelling na echte accountverificatie blijft OPEN |
 
 ## 3. Eenvoudig stappenprotocol voor eigenaar
 
