@@ -103,17 +103,17 @@ try:
                 assert "plan.json" in z.namelist()
             verified("Guest plan ZIP integrity and expected plan.json")
 
-            stage = "home_navigation"
-            response = page.goto(ORIGIN + "/", wait_until="load", timeout=30000)
+            # Open a separate tab so a guest draft's beforeunload prompt cannot
+            # interfere with the unrelated warmtepomp export acceptance. Its
+            # public #dossier route initializes the real workbench directly.
+            stage = "workbench_new_tab"
+            page = context.new_page()
+            page.on("request", record)
+            page.on("dialog", lambda dialog: dialog.accept())
+            response = page.goto(ORIGIN + "/#dossier", wait_until="load", timeout=30000)
             assert response and response.status == 200
-            page.wait_for_timeout(150)  # Match the proven local browser fixture's startup guard.
-            # Export a normal, incomplete fictional guest dossier. Unlike the
-            # expensive showcase demo, this path does not generate three PDFs
-            # up front, and checks the actual public export controls directly.
-            stage = "home_start_workbench"
-            page.locator('[data-action="start"]:visible').first.click(timeout=15000)
-            stage = "home_workbench"
-            page.locator('[data-action="step"][data-step="3"]:visible').wait_for(timeout=15000)
+            stage = "workbench_loaded"
+            page.locator('[data-action="step"][data-step="3"]:visible').wait_for(timeout=20000)
             stage = "home_step_three"
             page.locator('[data-action="step"][data-step="3"]:visible').first.click(timeout=15000)
             stage = "home_pdf_button"
