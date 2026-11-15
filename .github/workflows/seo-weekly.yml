@@ -1,0 +1,49 @@
+name: SubsidieReady weekly technical SEO monitor
+
+on:
+  schedule:
+    # Every Monday at 06:17 UTC; 07:17 CET / 08:17 CEST.
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: subsidieready-weekly-seo-audit
+  cancel-in-progress: false
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Read-only crawl of public sitemap, robots and canonical routes
+        id: crawl
+        continue-on-error: true
+        run: |
+          # A bounded GET-only audit; retry transient network errors once.
+          for attempt in 1 2; do
+            if node scripts/audit-seo.cjs --live; then exit 0; fi
+            if [ "$attempt" != 2 ]; then sleep 20; fi
+          done
+          exit 1
+      - name: Preserve inspectable SEO evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: subsidieready-weekly-seo
+          path: qa/seo-live.json
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Flag persistent crawl or network regressions
+        if: steps.crawl.outcome != 'success'
+        run: |
+          echo 'Technical SEO monitor NO-GO or UNKNOWN; review the JSON artifact. Do not infer Google indexation or change source rules automatically.'
+          exit 1
