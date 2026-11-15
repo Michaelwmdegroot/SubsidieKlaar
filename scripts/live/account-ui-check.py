@@ -46,6 +46,9 @@ try:
             network.append((request.method, parsed.scheme, parsed.netloc))
 
         page.on("request", record)
+        # The site's opt-in fictional demo may ask for confirmation before
+        # replacing the current local draft. Only synthetic QA data is used.
+        page.on("dialog", lambda dialog: dialog.accept())
 
         stage = "production_plan_page"
         response = page.goto(ORIGIN + "/mijn-plan/", wait_until="domcontentloaded", timeout=30000)
@@ -103,10 +106,14 @@ try:
             stage = "home_navigation"
             response = page.goto(ORIGIN + "/", wait_until="load", timeout=30000)
             assert response and response.status == 200
-            stage = "home_start_demo"
-            page.locator('[data-action="demo"]:visible').first.click(timeout=15000)
-            stage = "home_demo_banner"
-            page.locator(".demo-banner").wait_for(timeout=15000)
+            page.wait_for_timeout(150)  # Match the proven local browser fixture's startup guard.
+            # Export a normal, incomplete fictional guest dossier. Unlike the
+            # expensive showcase demo, this path does not generate three PDFs
+            # up front, and checks the actual public export controls directly.
+            stage = "home_start_workbench"
+            page.locator('[data-action="start"]:visible').first.click(timeout=15000)
+            stage = "home_workbench"
+            page.locator('[data-action="step"][data-step="3"]:visible').wait_for(timeout=15000)
             stage = "home_step_three"
             page.locator('[data-action="step"][data-step="3"]:visible').first.click(timeout=15000)
             stage = "home_pdf_button"
