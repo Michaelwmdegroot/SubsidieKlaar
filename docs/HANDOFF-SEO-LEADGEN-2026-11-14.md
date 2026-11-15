@@ -1,5 +1,8 @@
 # PROJECTOVERDRACHT — SubsidieReady → SEO en automatische eigen leadgeneratie
 
+> **HISTORISCHE OVERDRACHT VAN 14 NOVEMBER — STATUS VERVANGEN OP 15 NOVEMBER 2026.** Voor een nieuwe agent eerst [HANDOFF-NIVO-LEADGEN-2026-11-15.md](HANDOFF-NIVO-LEADGEN-2026-11-15.md) lezen. De vroegere 'accounts/SQL/SMTP nog uit/ontbrekend'-claims gelden inmiddels niet meer: productieconfig is aangezet en MySQL en SMTP zijn echt getest, maar registratie/OTP via cron, planopslag en alle eigen lead- en salesfunctionaliteit wachten nog op acceptatie. Dit historische document blijft nuttig voor design/SEO-besluiten uit de vorige fase.
+
+
 **Canoniek overdrachtsdocument, vastgelegd op 14 november 2026.** Dit document is het startpunt voor de volgende ChatGPT-agent. Het beschrijft de toestand vóór de documentatie-PR; haal bij elke nieuwe werkronde eerst de *actuele* main op. De historische README/oudere handoffs bevatten nog teksten die bij vroegere fasen hoorden. **Deze overdracht gaat bij tegenstrijdigheid over de actuele status; de code en actuele live-controles blijven uiteindelijk leidend.**
 
 ## 1. Opdracht en gesloten fase

@@ -1,5 +1,8 @@
 # STARTPROMPT — NIEUWE GPT-6 PRO AGENT — SubsidieReady SEO & first-party leads
 
+> **VERVANGEN OP 15-11-2026.** Gebruik voor de volgende sessie de bijgewerkte [STARTPROMPT-NEXT-AGENT-LEADGEN-2026-11-15.md](STARTPROMPT-NEXT-AGENT-LEADGEN-2026-11-15.md) en de [nieuwe canonieke overdracht](HANDOFF-NIVO-LEADGEN-2026-11-15.md). Deze tekst hieronder is historisch: de eigenaar heeft intussen MySQL, versleuteling, SMTP, een minuut-cron en productieaccountflags ingesteld; de echte account-E2E schuift door naar de volgende agent, terwijl sales/leads uit blijven.
+
+
 Kopieer de volledige tekst hieronder als eerste bericht van de nieuwe ChatGPT-agent. Het is een operationele opdracht, geen verzoek om de al afgeronde premium visuele fase opnieuw te onderzoeken.
 
 ---
