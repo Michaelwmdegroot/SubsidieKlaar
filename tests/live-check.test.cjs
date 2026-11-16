@@ -95,10 +95,12 @@ test('beta release is not accepted if an account service is active on production
 });
 test('read-only live check accepts explicitly configured NIVO account-only bootstrap',async()=>{
   const csrf='a'.repeat(64);
-  const f=fixture({'/api/next/':{status:200,headers:{'Set-Cookie':'__Host-SRNext=fake; Path=/; Secure; HttpOnly; SameSite=Strict'},text:JSON.stringify({mode:'production',accounts:true,vault:false,leads:false,controller:'NIVO Groep Holland B.V.',contact:'info@nivogroepholland.nl',user:null,csrf})}});
+  const f=fixture({'/api/next/':{status:200,headers:{'Set-Cookie':'__Host-SRNext=fake; Path=/; Secure; HttpOnly; SameSite=Strict'},text:JSON.stringify({mode:'production',accounts:true,vault:false,leads:false,portalAdvice:true,controller:'NIVO Groep Holland B.V.',contact:'info@nivogroepholland.nl',user:null,csrf})}});
   const r=await checkLive({expected,fetchImpl:f.fetchImpl});
   assert.equal(r.ok,true);
   assert.equal(r.accountBootstrap,'enabled');
+  assert.equal(r.portalAdvice,'enabled');
+  assert.ok(r.checks.some(x=>x.name.includes('NIVO Portal-advies') && x.pass));
   assert.equal(r.accountDiagnostics.httpStatus,200);
   assert.deepEqual(r.accountDiagnostics.failedContractChecks,[]);
   assert.equal(JSON.stringify(r).includes(csrf),false,'never store CSRF token in report');
@@ -107,7 +109,7 @@ test('read-only live check accepts explicitly configured NIVO account-only boots
 });
 test('production cookie contract accepts lowercase attributes but never a missing Secure flag',async()=>{
   const csrf='a'.repeat(64);
-  const payload=JSON.stringify({mode:'production',accounts:true,vault:false,leads:false,controller:'NIVO Groep Holland B.V.',contact:'info@nivogroepholland.nl',user:null,csrf});
+  const payload=JSON.stringify({mode:'production',accounts:true,vault:false,leads:false,portalAdvice:true,controller:'NIVO Groep Holland B.V.',contact:'info@nivogroepholland.nl',user:null,csrf});
   const lower=fixture({'/api/next/':{status:200,headers:{'Set-Cookie':'__Host-SRNext=fake; Path=/; secure; httponly; samesite=strict'},text:payload}});
   const allowed=await checkLive({expected,fetchImpl:lower.fetchImpl});
   assert.equal(allowed.ok,true);
@@ -124,6 +126,14 @@ test('live account UI is not accepted when required opt-in controls disappear',a
   const r=await checkLive({expected,fetchImpl:f.fetchImpl});
   assert.ok(failed(r,'Accountinterface'));
   assert.equal(r.accountBootstrap,'disabled');
+});
+test('configured account-only production must expose separate Portal advice readiness',async()=>{
+  const csrf='a'.repeat(64);
+  const f=fixture({'/api/next/':{status:200,headers:{'Set-Cookie':'__Host-SRNext=fake; Path=/; Secure; HttpOnly; SameSite=Strict'},text:JSON.stringify({mode:'production',accounts:true,vault:false,leads:false,controller:'NIVO Groep Holland B.V.',contact:'info@nivogroepholland.nl',user:null,csrf})}});
+  const r=await checkLive({expected,fetchImpl:f.fetchImpl});
+  assert.ok(failed(r,'NIVO Portal-advies'));
+  assert.equal(r.portalAdvice,'unknown');
+  assert.ok(f.calls.every(x=>x.options.method==='GET'&&!x.options.body));
 });
 test('bootstrap failure report exposes HTTP status and failed field names only',async()=>{
   const denied=fixture(),d=await checkLive({expected,fetchImpl:denied.fetchImpl});

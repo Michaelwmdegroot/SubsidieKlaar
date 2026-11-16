@@ -164,6 +164,30 @@ try:
                 assert z.testzip() is None
             verified("Original free warmtepomp workspace ZIP downloads intact")
 
+        # Inspect the deployed NIVO advice form without ever filling or
+        # submitting contact details or triggering a verification email.
+        stage = "production_nivo_advice"
+        page = context.new_page()
+        page.on("request", record)
+        response = page.goto(ORIGIN + "/advies/", wait_until="domcontentloaded", timeout=30000)
+        assert response and response.status == 200
+        form = page.locator("#portal-advice-form")
+        form.wait_for(state="visible", timeout=20000)
+        assert form.locator('input[name="contactRequested"][required]').count() == 1
+        assert not form.locator('input[name="contactRequested"]').is_checked()
+        assert "NIVO Groep Holland B.V." in page.locator("#advice-app").inner_text()
+        assert form.locator('input[name="email"][required]').count() == 1
+        assert form.locator('input[name="name"][required]').count() == 1
+        assert form.locator('select[name="topic"]').count() == 1
+        assert form.locator('#portal-phone-field').is_hidden()
+        verified("Live NIVO advice form: explicit, voluntary, unchecked contact request")
+        form.locator('#portal-channel').select_option("phone")
+        assert form.locator('#portal-phone-field input[name="phone"]').is_visible()
+        assert form.locator('#portal-phone-field input[name="phone"]').get_attribute("required") is not None
+        form.locator('#portal-channel').select_option("email")
+        assert form.locator('#portal-phone-field').is_hidden()
+        verified("Live NIVO contact method: callback phone only when voluntarily selected")
+
         # No user-generated requests. The allowed bootstrap is a GET that starts
         # an anonymous session and returns no customer data.
         stage = "network_privacy"

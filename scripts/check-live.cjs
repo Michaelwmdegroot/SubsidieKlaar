@@ -143,6 +143,15 @@ async function checkLive({fetchImpl = globalThis.fetch, expected} = {}) {
     /;\s*SameSite=Strict(?:;|$)/i.test(betaApi.headers.get('set-cookie')||'');
   check('Accountservice veilig gesloten of expliciet NIVO-account-only', (accountUnavailable||accountConfigured) &&
     noindex(betaApi) && /no-store/.test(betaApi?.headers.get('cache-control') || ''));
+  // Portal advice is a separate, explicitly requested email flow.
+  // It must be available in configured production without activating
+  // the native sales or document vault gates.
+  check('NIVO Portal-advies onafhankelijk van native leads beschikbaar',
+    accountUnavailable ? betaSettings?.portalAdvice !== true :
+    accountConfigured && betaSettings?.portalAdvice === true &&
+    betaSettings?.leads === false && betaSettings?.vault === false);
+  report.portalAdvice = accountConfigured && betaSettings?.portalAdvice===true ? 'enabled' :
+    accountUnavailable ? 'disabled' : 'unknown';
   report.accountBootstrap = accountConfigured ? 'enabled' : accountUnavailable ? 'disabled' : 'unknown';
   // Safe production diagnostics: only booleans and HTTP status; never save
   // response JSON, Set-Cookie, CSRF token, code, emails, or a user identifier.
