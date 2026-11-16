@@ -1,3 +1,5 @@
+> **Vervolgproductbesluit 16 november 2026:** deze mijlpaal blijft een **historisch bewijs- en statussnapshot**. De toekomststrategie is nu vastgelegd in [PRODUCT-STRATEGY-2026-11-16.md](./PRODUCT-STRATEGY-2026-11-16.md), [DELIVERY-ROADMAP-2026-11-16.md](./DELIVERY-ROADMAP-2026-11-16.md) en [AGENT-START-HERE-2026-11-16.md](./AGENT-START-HERE-2026-11-16.md). Die documenten hebben voorrang voor toekomstige productprioriteiten; onderstaande echte bewijsgrenzen blijven relevant. Nieuwe productfuncties zijn in deze documentatiefase **niet** gebouwd.
+
 # SubsidieReady — milestone en growth roadmap (16 november 2026)
 
 **Doel:** SubsidieReady is een gratis en betrouwbaar verduurzamingsplatform dat vanuit nuttige, controleerbare tools en SEO-content zelfstandige, kwalitatieve **first-party adviesaanvragen voor NIVO Groep Holland B.V.** genereert. De online regelingencheck blijft bruikbaar zonder account; ingevulde plan-, fiscale, inkomens- en documentgegevens worden niet stilzwijgend aan sales doorgegeven.

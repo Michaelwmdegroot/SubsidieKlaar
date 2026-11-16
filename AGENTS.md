@@ -1,3 +1,13 @@
+> **PRODUCTBESLUIT / AGENTINSTRUCTIE V16-11-2026 — VERPLICHT EERST LEZEN**
+>
+> [docs/AGENT-START-HERE-2026-11-16.md](docs/AGENT-START-HERE-2026-11-16.md) is voortaan de enige **canonieke ingang** voor nieuwe agents. Lees in volgorde de gelinkte [productstrategie](docs/PRODUCT-STRATEGY-2026-11-16.md), [gebruikersreizen](docs/JOURNEYS-ACCOUNT-ADVICE-2026-11-16.md), [roadmap met releasegates](docs/DELIVERY-ROADMAP-2026-11-16.md), [SEO-/KPI-/vertrouwensregels](docs/METRICS-SEO-TRUST-2026-11-16.md) en [beslisregister](docs/DECISION-REGISTER-2026-11-16.md). Bestaande oudere handoffs hieronder zijn **historisch** en zijn niet meer leidend waar ze met het latere eigenaarbesluit of de actuele code botsen.
+>
+> **Geen productherbouw.** Gratis kernfuncties en PDF/ZIP blijven zonder account; optioneel gratis account wordt een persoonlijke verduurzamingsassistent; NIVO biedt alleen op zelfstandig verzoek passend installatieadvies. Geen account→lead, geen automatische dossier-/fiscale data naar sales, geen advertenties/aanmeldmuur/pop-ups, geen onbevestigde subsidies. Huidig V2-adviesformulier naar `portal@nivogroepholland.nl` blijft intact, net als account-OTP; alleen één echte Portal-mailontvangst is bewezen. Echte account-E2E, GSC-baseline, geautomatiseerde Portal-opvolging en conversies staan OPEN. Geen vault/leads/staff/trackingactivatie zonder eigen gate.
+>
+> **Deze 16-november-opdracht is 100% documentatie en strategische richting. Niets implementeren of liveconfig aanpassen totdat een toekomstige gebruikersopdracht een afgebakende roadmap-slice autoriseert.** Alle bestaande engineering-, security-, bron-, release- en privacyregels blijven gelden. Actuele `main`, CI en live HTTP zijn altijd de technische feitenbron.
+
+---
+
 # SubsidieReady engineering notes
 
 > **NIEUWE CANONIEKE AGENTOVERDRACHT (15-11-2026):** lees eerst [docs/HANDOFF-NIVO-LEADGEN-2026-11-15.md](docs/HANDOFF-NIVO-LEADGEN-2026-11-15.md) en [docs/STARTPROMPT-NEXT-AGENT-LEADGEN-2026-11-15.md](docs/STARTPROMPT-NEXT-AGENT-LEADGEN-2026-11-15.md). De oudere 14-november-instructies en hieronder genoemde cloud-API-503-status zijn op onderdelen **achterhaald**: NIVO is nu de vastgelegde exploitant, database en SMTP zijn geconfigureerd, echte SMTP-testmail is aangekomen, Hostinger-cron is ingesteld, en de productieaccountflags zijn door eigenaar ingeschakeld en met `--check` gecontroleerd. **Een echte OTP-/registratie-/cross-browser-plannenaccounttest is NOG NIET uitgevoerd.** Vault/leads/staff blijven uit; consent, privacy, gratis gastflow en geen automatische cross-B.V.-deling zijn harde grenzen. Code-first via geteste GitHub-PR's, main → Hostinger; geen extra kosten of onnodige staging.
