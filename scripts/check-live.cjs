@@ -80,18 +80,16 @@ async function checkLive({fetchImpl = globalThis.fetch, expected} = {}) {
     if(page === '/hulp/thuisbatterij-btw/') batteryArticle = r;
     check('Pagina ' + page, status200(r) && /SubsidieReady/.test(r.text) && /<h1\b/.test(r.text));
   }
-  // Production referral is now same-origin to a separately requested NIVO advice form.
-  // Never follow or submit any link during live acceptance.
+  // The only active referral is a same-origin, explicitly chosen NIVO advice form.
   const referralHtml = batteryArticle?.text || '';
-  const portalLinks = (referralHtml.match(/<a\\b[^>]*href="\\/advies\\/"[^>]*>/g)||[]);
-  const privacyLinks = (referralHtml.match(/<a\\b[^>]*href="\\/privacy\\/"[^>]*>/g)||[]);
-  const legacyTbt = referralHtml.includes('https://thuisbatterijteam.nl/contact/adviesgesprek/');
+  const portalCount=referralHtml.split('href="/advies/"').length-1;
+  const privacyCount=referralHtml.split('href="/privacy/"').length-1;
   check('Vrijwillige NIVO-advieskaart verwijst intern zonder dossierdata',
     status200(batteryArticle) && referralHtml.includes('id="lead-pilot-title"') &&
     referralHtml.includes('NIVO Groep Holland B.V.') &&
-    portalLinks.length===1 && privacyLinks.length>=1 && !legacyTbt &&
-    !portalLinks[0].includes('utm_') && !portalLinks[0].includes('?') &&
-    !portalLinks[0].includes('#'));
+    portalCount===1 && privacyCount>=1 &&
+    !referralHtml.includes('href="/advies/?') &&
+    !referralHtml.includes('https://thuisbatterijteam.nl/contact/adviesgesprek/'));
   for (const [file, type] of [['assets/app.js', /(?:javascript|ecmascript)/i], ['assets/style.css', /text\/css/i]]) {
     const r = await request(ORIGIN + '/' + file);
     check('Asset ' + file, status200(r) && type.test(r.headers.get('content-type') || '') && r.text.length > 1000 && !/^\s*<!doctype/i.test(r.text));
