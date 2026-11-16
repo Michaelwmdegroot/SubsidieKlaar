@@ -227,7 +227,7 @@ function srn_handle(array $c,string $action,array $in,string $token,string $csrf
     // The verified email is the only sender identity; the destination is fixed server-side.
     srn_queue($s,SRN_PORTAL_MAILBOX,'portal',srn_portal_message($id,$ch['portal']),'portal:'.$id,['request'=>$id,'schema'=>'subsidieready.nivo.portal.request.v1']);
     srn_audit($s,'portal_advice_queued','verified_request',$id);
-    $new=srn_new_session($s);
+    $new=srn_new_session($s,$u['id']??null);
     unset($s['sessions'][$sessionKey]);
     return ['ok'=>true,'portalQueued'=>true,'reference'=>'SR-'.strtoupper(substr($id,0,16)),'csrf'=>$new['csrf'],'_cookie'=>$new['token']];
    }
