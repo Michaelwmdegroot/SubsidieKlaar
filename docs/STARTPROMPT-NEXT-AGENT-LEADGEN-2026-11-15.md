@@ -1,3 +1,7 @@
+> **LET OP — VERVANGEN DOOR DEFINITIEVE EIGENAARSTRATEGIE VAN 16 NOVEMBER 2026.** Dit oudere start-/overdrachtsdocument is uitsluitend **historische context**. Gebruik voor een nieuwe agent **niet** de uitvoeringstekst hieronder als primaire opdracht: lees eerst [AGENT-START-HERE-2026-11-16.md](AGENT-START-HERE-2026-11-16.md), daarna de [productstrategie](PRODUCT-STRATEGY-2026-11-16.md), [roadmap](DELIVERY-ROADMAP-2026-11-16.md) en [beslisregister](DECISION-REGISTER-2026-11-16.md). Bestaande gasttool blijft zonder account gratis; een account is geen lead; NIVO-advies is vrijwillig. Directe V2-leads zijn intussen live, met één aangetoonde mailontvangst. Laat nieuwe functionaliteit pas ontwikkelen na de eigen toekomstgerichte gebruikersopdracht; de 16-november-strategiefase is documentatie-only.
+
+---
+
 # STARTPROMPT — volgende GPT-6 Pro-agent — SubsidieReady → zelfstandige NIVO-leadmachine
 
 **Deze prompt is opgesteld op 15 november 2026 en vervangt de eerdere startprompt van 14 november.** Kopieer de tekst na de scheidingslijn integraal naar een nieuwe ChatGPT-sessie.

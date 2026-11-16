@@ -1,3 +1,7 @@
+> **LET OP — VERVANGEN DOOR DEFINITIEVE EIGENAARSTRATEGIE VAN 16 NOVEMBER 2026.** Dit oudere start-/overdrachtsdocument is uitsluitend **historische context**. Gebruik voor een nieuwe agent **niet** de uitvoeringstekst hieronder als primaire opdracht: lees eerst [AGENT-START-HERE-2026-11-16.md](AGENT-START-HERE-2026-11-16.md), daarna de [productstrategie](PRODUCT-STRATEGY-2026-11-16.md), [roadmap](DELIVERY-ROADMAP-2026-11-16.md) en [beslisregister](DECISION-REGISTER-2026-11-16.md). Bestaande gasttool blijft zonder account gratis; een account is geen lead; NIVO-advies is vrijwillig. Directe V2-leads zijn intussen live, met één aangetoonde mailontvangst. Laat nieuwe functionaliteit pas ontwikkelen na de eigen toekomstgerichte gebruikersopdracht; de 16-november-strategiefase is documentatie-only.
+
+---
+
 # STARTPROMPT — NIEUWE GPT-6 PRO AGENT — SubsidieReady SEO & first-party leads
 
 > **VERVANGEN OP 15-11-2026.** Gebruik voor de volgende sessie de bijgewerkte [STARTPROMPT-NEXT-AGENT-LEADGEN-2026-11-15.md](STARTPROMPT-NEXT-AGENT-LEADGEN-2026-11-15.md) en de [nieuwe canonieke overdracht](HANDOFF-NIVO-LEADGEN-2026-11-15.md). Deze tekst hieronder is historisch: de eigenaar heeft intussen MySQL, versleuteling, SMTP, een minuut-cron en productieaccountflags ingesteld; de echte account-E2E schuift door naar de volgende agent, terwijl sales/leads uit blijven.

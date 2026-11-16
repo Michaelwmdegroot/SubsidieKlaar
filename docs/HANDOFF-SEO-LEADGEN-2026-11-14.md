@@ -1,3 +1,7 @@
+> **LET OP — VERVANGEN DOOR DEFINITIEVE EIGENAARSTRATEGIE VAN 16 NOVEMBER 2026.** Dit oudere start-/overdrachtsdocument is uitsluitend **historische context**. Gebruik voor een nieuwe agent **niet** de uitvoeringstekst hieronder als primaire opdracht: lees eerst [AGENT-START-HERE-2026-11-16.md](AGENT-START-HERE-2026-11-16.md), daarna de [productstrategie](PRODUCT-STRATEGY-2026-11-16.md), [roadmap](DELIVERY-ROADMAP-2026-11-16.md) en [beslisregister](DECISION-REGISTER-2026-11-16.md). Bestaande gasttool blijft zonder account gratis; een account is geen lead; NIVO-advies is vrijwillig. Directe V2-leads zijn intussen live, met één aangetoonde mailontvangst. Laat nieuwe functionaliteit pas ontwikkelen na de eigen toekomstgerichte gebruikersopdracht; de 16-november-strategiefase is documentatie-only.
+
+---
+
 # PROJECTOVERDRACHT — SubsidieReady → SEO en automatische eigen leadgeneratie
 
 > **HISTORISCHE OVERDRACHT VAN 14 NOVEMBER — STATUS VERVANGEN OP 15 NOVEMBER 2026.** Voor een nieuwe agent eerst [HANDOFF-NIVO-LEADGEN-2026-11-15.md](HANDOFF-NIVO-LEADGEN-2026-11-15.md) lezen. De vroegere 'accounts/SQL/SMTP nog uit/ontbrekend'-claims gelden inmiddels niet meer: productieconfig is aangezet en MySQL en SMTP zijn echt getest, maar registratie/OTP via cron, planopslag en alle eigen lead- en salesfunctionaliteit wachten nog op acceptatie. Dit historische document blijft nuttig voor design/SEO-besluiten uit de vorige fase.
