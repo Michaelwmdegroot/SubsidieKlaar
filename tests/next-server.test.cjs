@@ -111,6 +111,9 @@ test('next: real PHP API privacy, authentication, cloud isolation, vault and sal
    assert.equal(exported.d.projects.some(x=>x.projects?.[0]?.id===pv.id&&x.projects[0].measures[0].details.specialConstruction==='yes'),true);
    assert.equal((await otherBrowser.post('project-delete',{id:pv.id,confirm:'VERWIJDER'})).r.status,200);
    assert.equal((await a.post('project-get',{id:pv.id})).r.status,404);
+   assert.equal((await otherBrowser.post('logout')).r.status,200);
+   assert.equal((await otherBrowser.post('projects-list')).r.status,403,'logout must revoke only the current session');
+   assert.equal((await a.post('projects-list')).r.status,200,'other authenticated sessions stay valid');
   });
   await t.test('two real test accounts cannot read change or delete each other’s plans',async()=>{b=new Client();await b.login('bob@example.invalid');for(const action of ['project-get','project-delete','files-list'])assert.equal((await b.post(action,{id:projectId,confirm:'VERWIJDER'})).r.status,404);const q=P.newProject('attack',['isolatie']);q.id=projectId;assert.equal((await b.post('project-save',{data:{app:'SubsidieReadyPlan',schemaVersion:3,projects:[q]},revision:1})).r.status,404);assert.equal((await b.post('projects-list')).d.projects.length,0);});
   await t.test('demo plans cannot silently become real cloud dossiers',async()=>{assert.equal((await a.post('project-save',{data:{app:'SubsidieReadyPlan',schemaVersion:3,projects:[P.sample()]},revision:0})).r.status,400);});
