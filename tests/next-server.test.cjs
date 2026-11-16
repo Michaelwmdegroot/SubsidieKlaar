@@ -84,6 +84,37 @@ test('next: real PHP API privacy, authentication, cloud isolation, vault and sal
   });
   await t.test('wrong codes and expired challenges fail without exposing account existence',async()=>{const c=new Client();await c.boot();const r=await c.post('auth-start',{email:'wrong@example.invalid',serviceAccepted:true});for(let i=0;i<5;i++)assert.equal((await c.post('auth-verify',{challenge:r.d.challenge,code:'00000000'})).r.status,401);assert.equal((await c.post('auth-verify',{challenge:r.d.challenge,code:codeFor('wrong@example.invalid',r.d.challenge)})).r.status,401);const ex=await c.post('auth-start',{email:'expired@example.invalid',serviceAccepted:true});alter(`$s['challenges']['${ex.d.challenge}']['expires']=time()-1;`);assert.equal((await c.post('auth-verify',{challenge:ex.d.challenge,code:'12345678'})).r.status,401);});
   await t.test('cloud plans are server-whitelisted and optimistic revisions prevent overwrite',async()=>{const q=P.newProject('Private plan',['isolatie']);projectId=q.id;q.email='MUST_NOT_SURVIVE';q.income=90000;q.measures[0].details.bsn='MUST_NOT_SURVIVE';const r=await a.post('project-save',{data:{app:'SubsidieReadyPlan',schemaVersion:3,projects:[q]},revision:0});assert.equal(r.r.status,200);assert.equal(r.d.revision,1);assert.ok(!JSON.stringify(r.d).includes('MUST_NOT_SURVIVE'));assert.equal((await a.post('project-save',{data:{app:'SubsidieReadyPlan',schemaVersion:3,projects:[q]},revision:0})).r.status,409);const read=await a.post('project-get',{id:projectId});assert.equal(read.d.revision,1);});
+  await t.test('G1: PV construction and completed checks survive cloud save and another browser session',async()=>{
+   const pv=P.newProject('Fictieve PV-woning',['zonnepanelen']);
+   pv.measures[0]=P.measure({...pv.measures[0],details:{...pv.measures[0].details,specialConstruction:'yes'}});
+   P.setCheck(pv,pv.measures[0],'own_review',true);
+   assert.equal(P.checked(pv,pv.measures[0],'own_review'),true);
+   const payload=data=>({app:'SubsidieReadyPlan',schemaVersion:3,projects:[data]});
+   const saved=await a.post('project-save',{data:payload(pv),revision:0});
+   assert.equal(saved.r.status,200,JSON.stringify(saved.d));
+   assert.equal(saved.d.data.projects[0].measures[0].details.specialConstruction,'yes','PV answer must not disappear on server');
+   // Isolate the additional synthetic second-device OTP from shared-IP mail rate limits.
+   // OTP limits are tested independently; later fixture accounts must remain testable.
+   alter("foreach(array_keys($s['limits']) as $k)if(str_starts_with($k,'mailip:'))unset($s['limits'][$k]);");
+   const otherBrowser=new Client();await otherBrowser.login('alice@example.invalid');
+   const reopened=await otherBrowser.post('project-get',{id:pv.id});
+   assert.equal(reopened.r.status,200);
+   const restored=P.envelope(reopened.d.data).projects[0];
+   assert.deepEqual(restored.measures[0].details,pv.measures[0].details,'server must keep canonical browser detail fields');
+   assert.equal(P.checked(restored,restored.measures[0],'own_review'),true,'unchanged checklist must stay checked');
+   restored.title='Fictieve PV-woning — vervolg';
+   const changed=await otherBrowser.post('project-save',{data:payload(restored),revision:reopened.d.revision});
+   assert.equal(changed.r.status,200);
+   assert.equal(changed.d.revision,2);
+   assert.equal((await a.post('project-save',{data:payload(pv),revision:1})).r.status,409,'old browser cannot overwrite a newer revision');
+   const exported=await otherBrowser.post('account-export');
+   assert.equal(exported.d.projects.some(x=>x.projects?.[0]?.id===pv.id&&x.projects[0].measures[0].details.specialConstruction==='yes'),true);
+   assert.equal((await otherBrowser.post('project-delete',{id:pv.id,confirm:'VERWIJDER'})).r.status,200);
+   assert.equal((await a.post('project-get',{id:pv.id})).r.status,404);
+   assert.equal((await otherBrowser.post('logout')).r.status,200);
+   assert.equal((await otherBrowser.post('projects-list')).r.status,403,'logout must revoke only the current session');
+   assert.equal((await a.post('projects-list')).r.status,200,'other authenticated sessions stay valid');
+  });
   await t.test('two real test accounts cannot read change or delete each other’s plans',async()=>{b=new Client();await b.login('bob@example.invalid');for(const action of ['project-get','project-delete','files-list'])assert.equal((await b.post(action,{id:projectId,confirm:'VERWIJDER'})).r.status,404);const q=P.newProject('attack',['isolatie']);q.id=projectId;assert.equal((await b.post('project-save',{data:{app:'SubsidieReadyPlan',schemaVersion:3,projects:[q]},revision:1})).r.status,404);assert.equal((await b.post('projects-list')).d.projects.length,0);});
   await t.test('demo plans cannot silently become real cloud dossiers',async()=>{assert.equal((await a.post('project-save',{data:{app:'SubsidieReadyPlan',schemaVersion:3,projects:[P.sample()]},revision:0})).r.status,400);});
   await t.test('upload requires ownership and explicit choice, then preserves exact bytes under encryption',async()=>{const {PDFDocument}=require('../vendor/pdf-lib-1.17.1.min.js'),pdf=await PDFDocument.create();pdf.addPage().drawText('FICTIEF TEST');const bytes=await pdf.save();const mid=(await a.post('project-get',{id:projectId})).d.data.projects[0].measures[0].id;

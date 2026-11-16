@@ -176,9 +176,24 @@ function srn_plan(array $input): array {
  if(($p['demo']??false)===true)throw new InvalidArgumentException('Voorbeeldprojecten worden niet online bewaard.');
  $out=['id'=>$p['id'],'title'=>srn_text($p['title']??'',100),'role'=>in_array($p['role']??'', ['owner','tenant','landlord','vve','business','unknown'],true)?$p['role']:'unknown','area'=>in_array($p['area']??'', ['m29','other','unknown'],true)?$p['area']:'unknown','municipality'=>srn_text($p['municipality']??'',80),'created'=>srn_date($p['created']??''),'updated'=>date('Y-m-d'),'ruleVersion'=>srn_text($p['ruleVersion']??'',50),'demo'=>false,'measures'=>[]];
  $types=['warmtepomp','isolatie','zonnepanelen','pv_constructie','thuisbatterij','ventilatie','zonneboiler','warmtenet','koken'];$arr=$p['measures']??null;if(!is_array($arr)||count($arr)>12)throw new InvalidArgumentException('Ongeldige maatregelen.');$ids=[];
- $selects=['insulation'=>['spouw','gevel','vloer','bodem','dak','zolder','hrpp','triple','vacuum'],'building'=>['before2019','permit2018','new','unknown'],'combination'=>['none','insulation','pump','solarheat','heatnet','ventilation','unknown'],'pvVat'=>['zero','paid21','mixed','unknown']];
- foreach(['professional','extension','monument','newFrames','ufFoam','kor','trade','ems','dynamic','sameName','payout','atHome','integratedNewbuild','buildingDelivery','previousInsulation','mixedPrivate']as$key)$selects[$key]=['yes','no','unknown'];
- foreach($arr as$m){if(!is_array($m)||!in_array($m['type']??'',$types,true)||!is_string($m['id']??null)||!preg_match('/^[a-zA-Z0-9_-]{8,64}$/D',$m['id'])||isset($ids[$m['id']]))throw new InvalidArgumentException('Ongeldige maatregel.');$ids[$m['id']]=true;$o=['id'=>$m['id'],'type'=>$m['type'],'title'=>srn_text($m['title']??'',100),'stage'=>in_array($m['stage']??'', ['planning','ordered','installed','submitted'],true)?$m['stage']:'planning','dates'=>[],'details'=>[],'checks'=>[],'checkFingerprint'=>srn_text($m['checkFingerprint']??'',30),'ruleVersion'=>srn_text($m['ruleVersion']??'',50)];foreach(['ordered','installed','invoice','paid','firstGlass','submitted']as$k)$o['dates'][$k]=srn_date($m['dates'][$k]??'');foreach($selects as$k=>$vals)$o['details'][$k]=in_array($m['details'][$k]??'',$vals,true)?$m['details'][$k]:'unknown';foreach(['area'=>12,'rd'=>12,'uValue'=>12,'gross'=>16,'code'=>80,'product'=>120,'notes'=>1500]as$k=>$n)$o['details'][$k]=srn_text($m['details'][$k]??'',$n);foreach(array_slice(is_array($m['checks']??null)?$m['checks']:[],0,40,true)as$k=>$v)if(preg_match('/^[a-z][a-z0-9_-]{0,39}$/D',(string)$k)&&$v===true)$o['checks'][$k]=true;$out['measures'][]=$o;}
+ // Match the client SELECTS ordering in assets/plan-core.js.
+ // Checklist fingerprints hash the serialized details; field order is significant.
+ $yesNo=['yes','no','unknown'];
+ $selects=[
+  'insulation'=>['spouw','gevel','vloer','bodem','dak','zolder','hrpp','triple','vacuum'],
+  'building'=>['before2019','permit2018','new','unknown'],
+  'professional'=>$yesNo,'extension'=>$yesNo,'monument'=>$yesNo,'newFrames'=>$yesNo,'ufFoam'=>$yesNo,
+  'pvVat'=>['zero','paid21','mixed','unknown'],
+  'kor'=>$yesNo,'trade'=>$yesNo,'ems'=>$yesNo,'dynamic'=>$yesNo,'sameName'=>$yesNo,
+  'payout'=>$yesNo,'atHome'=>$yesNo,'integratedNewbuild'=>$yesNo,'buildingDelivery'=>$yesNo,
+  'previousInsulation'=>$yesNo,
+  'combination'=>['none','insulation','pump','solarheat','heatnet','ventilation','unknown'],
+  'mixedPrivate'=>$yesNo,'specialConstruction'=>$yesNo
+ ];
+ foreach($arr as$m){if(!is_array($m)||!in_array($m['type']??'',$types,true)||!is_string($m['id']??null)||!preg_match('/^[a-zA-Z0-9_-]{8,64}$/D',$m['id'])||isset($ids[$m['id']]))throw new InvalidArgumentException('Ongeldige maatregel.');$ids[$m['id']]=true;$o=['id'=>$m['id'],'type'=>$m['type'],'title'=>srn_text($m['title']??'',100),'stage'=>in_array($m['stage']??'', ['planning','ordered','installed','submitted'],true)?$m['stage']:'planning','dates'=>[],'details'=>[],'checks'=>[],'checkFingerprint'=>srn_text($m['checkFingerprint']??'',30),'ruleVersion'=>srn_text($m['ruleVersion']??'',50)];foreach(['ordered','installed','invoice','paid','firstGlass','submitted']as$k)$o['dates'][$k]=srn_date($m['dates'][$k]??'');foreach($selects as$k=>$vals){$value=$m['details'][$k]??null;
+  // Preserve the optional absence of this field for legacy/non-special projects.
+  if($k==='specialConstruction'&&!in_array($value,['yes','no'],true))continue;
+  $o['details'][$k]=in_array($value,$vals,true)?$value:'unknown';}foreach(['area'=>12,'rd'=>12,'uValue'=>12,'gross'=>16,'code'=>80,'product'=>120,'notes'=>1500]as$k=>$n)$o['details'][$k]=srn_text($m['details'][$k]??'',$n);foreach(array_slice(is_array($m['checks']??null)?$m['checks']:[],0,40,true)as$k=>$v)if(preg_match('/^[a-z][a-z0-9_-]{0,39}$/D',(string)$k)&&$v===true)$o['checks'][$k]=true;$out['measures'][]=$o;}
  return ['app'=>'SubsidieReadyPlan','schemaVersion'=>3,'ruleVersion'=>SRN_RULE,'projects'=>[$out]];
 }
 function srn_owned(array $s,?array $u,string $id): ?array {$p=$s['projects'][$id]??null;return $p&&$u&&$p['owner']===$u['id']?$p:null;}

@@ -179,6 +179,32 @@ test('MySQL adapter: real PHP auth, persistent encrypted plans, ownership and ac
       })).r.status, 409);
       assert.equal(JSON.stringify(readState()).includes('SECRET-MUST-NOT-BE-SAVED'), false);
     });
+    await t.test('G1: MySQL PV details and checklist survive an independent login',async()=>{
+      const pv=Plan.newProject('Fictieve PV — MySQL',['zonnepanelen']);
+      pv.measures[0]=Plan.measure({...pv.measures[0],details:{...pv.measures[0].details,specialConstruction:'yes'}});
+      Plan.setCheck(pv,pv.measures[0],'own_review',true);
+      assert.equal(Plan.checked(pv,pv.measures[0],'own_review'),true);
+      const payload=data=>({app:'SubsidieReadyPlan',schemaVersion:3,projects:[data]});
+      const saved=await alice.post('project-save',{data:payload(pv),revision:0});
+      assert.equal(saved.r.status,200,JSON.stringify(saved.d));
+      assert.equal(saved.d.data.projects[0].measures[0].details.specialConstruction,'yes');
+      const anotherSession=new Client();await anotherSession.login('alice@example.invalid');
+      const opened=await anotherSession.post('project-get',{id:pv.id});
+      assert.equal(opened.r.status,200);
+      const restored=Plan.envelope(opened.d.data).projects[0];
+      assert.deepEqual(restored.measures[0].details,pv.measures[0].details);
+      assert.equal(Plan.checked(restored,restored.measures[0],'own_review'),true);
+      restored.title='Fictieve PV — herzien';
+      const changed=await anotherSession.post('project-save',{data:payload(restored),revision:opened.d.revision});
+      assert.equal(changed.r.status,200);
+      assert.equal(changed.d.revision,2);
+      assert.equal((await alice.post('project-save',{data:payload(pv),revision:1})).r.status,409);
+      assert.equal((await anotherSession.post('project-delete',{id:pv.id,confirm:'VERWIJDER'})).r.status,200);
+      assert.equal((await alice.post('project-get',{id:pv.id})).r.status,404);
+      assert.equal((await anotherSession.post('logout')).r.status,200);
+      assert.equal((await anotherSession.post('projects-list')).r.status,403,'logout revokes this device');
+      assert.equal((await alice.post('projects-list')).r.status,200,'first device is unaffected');
+    });
     await t.test('explicit email marketing consent can be withdrawn after verified login',async()=>{
       assert.equal(alice.user.marketingEmail,false);
       const accepted=await alice.post('marketing-email-set',{enabled:true,version:'2026-11-14-nivo-email-v1'});
