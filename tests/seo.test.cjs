@@ -219,7 +219,7 @@ test('NIVO accountvoorwaarden and privacy links are public and separate from opt
  assert.match(privacy,/info@nivogroepholland\.nl/);assert.match(privacy,/niet.*automatisch/);
  assert.ok(app.includes('name="updates"'));
  assert.ok(app.includes('name="terms" required'));
- for(const key of ['fullName','phone','street','houseNumber','postalCode','city'])assert.ok(app.includes('name="'+key+'"'),key+' optional contact field');
+ for(const key of ['fullName','phone','street','houseNumber','postalCode','city'])assert.ok(app.includes("'"+key+"'"),key+' optional contact field');
  assert.ok(app.includes('name="terms"'));
  assert.match(app,/marketing-email-set/);
  assert.ok(!app.includes('name="marketingEmail" required'));
