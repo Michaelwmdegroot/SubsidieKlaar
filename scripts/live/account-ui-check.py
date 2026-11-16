@@ -63,21 +63,40 @@ try:
         assert terms.count() == 1
         assert terms.get_attribute("required") is not None
         assert not terms.is_checked()
-        # PR runs probe currently deployed production (which may still use the
-        # legacy checkbox). New radio cards are verified after deployment.
-        updates_none = page.locator('#login-form input[name="updates"][value="none"]')
-        if updates_none.count():
-            assert updates_none.is_checked()
-            assert not page.locator('#login-form input[name="updates"][value="email"]').is_checked()
-            assert page.locator('#login-form input[name="updates"]').count() == 2
+        # PR checks read currently deployed main, which might still expose the
+        # older radio layout. After deployment, require the compact checkbox
+        # and inspect the actual visible submit button at multiple sizes.
+        marketing = page.locator('#login-form input[name="marketingEmail"]')
+        if marketing.count():
+            assert marketing.count() == 1 and not marketing.is_checked()
+            assert marketing.get_attribute("required") is None
+            assert page.locator('#login-form input[type="checkbox"]').count() == 2
+            assert page.locator('#login-form input[type="radio"]').count() == 0
             for key in ("fullName", "phone", "street", "houseNumber", "postalCode", "city"):
                 assert page.locator(f'#login-form input[name="{key}"]').count() == 1
-            assert page.locator('#login-form input[type="checkbox"]').count() == 1
+            for width, height in ((1280, 720), (390, 844), (375, 667), (320, 740)):
+                page.set_viewport_size({"width": width, "height": height})
+                layout = page.evaluate("""() => {
+                    const d = document.querySelector('#plan-dialog');
+                    const b = d.querySelector('.p-dialog-body');
+                    const submit = d.querySelector('#login-form [type=submit]');
+                    const rect = d.getBoundingClientRect();
+                    const button = submit.getBoundingClientRect();
+                    return {top:rect.top, bottom:rect.bottom, left:rect.left,
+                      right:rect.right, buttonBottom:button.bottom,
+                      bodyScroll:b.scrollHeight>b.clientHeight+1,
+                      dialogScroll:d.scrollHeight>d.clientHeight+1};
+                }""")
+                assert layout["top"] >= 0 and layout["bottom"] <= height-2
+                assert layout["left"] >= -1 and layout["right"] <= width+1
+                assert layout["buttonBottom"] <= height-4
+                assert not layout["bodyScroll"] and not layout["dialogScroll"]
+            page.set_viewport_size({"width": 1280, "height": 900})
         else:
-            marketing = page.locator('#login-form input[name="marketingEmail"]')
-            assert marketing.count() == 1
-            assert not marketing.is_checked()
-            assert marketing.get_attribute("required") is None
+            old_choices = page.locator('#login-form input[name="updates"]')
+            assert old_choices.count() == 2
+            assert page.locator('#login-form input[name="updates"][value="none"]').is_checked()
+            assert not page.locator('#login-form input[name="updates"][value="email"]').is_checked()
         assert "NIVO Groep Holland B.V." in page.locator("#plan-dialog").inner_text()
         assert page.locator('#login-form a[href="/voorwaarden/"]').count() == 1
         assert page.locator('#login-form a[href="/privacy/"]').count() == 1
