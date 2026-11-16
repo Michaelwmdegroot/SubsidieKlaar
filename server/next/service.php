@@ -228,6 +228,9 @@ function srn_handle(array $c,string $action,array $in,string $token,string $csrf
     srn_queue($s,SRN_PORTAL_MAILBOX,'portal',srn_portal_message($id,$ch['portal']),'portal:'.$id,['request'=>$id,'schema'=>'subsidieready.nivo.portal.request.v1']);
     srn_audit($s,'portal_advice_queued','verified_request',$id);
     $new=srn_new_session($s,$u['id']??null);
+    // A separate advice OTP must not reauthenticate an existing account or
+    // refresh the 10-minute sensitive account deletion window.
+    if($u)$s['sessions'][hash('sha256',$new['token'])]['authAt']=$session['authAt']??0;
     unset($s['sessions'][$sessionKey]);
     return ['ok'=>true,'portalQueued'=>true,'reference'=>'SR-'.strtoupper(substr($id,0,16)),'csrf'=>$new['csrf'],'_cookie'=>$new['token']];
    }
