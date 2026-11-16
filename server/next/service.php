@@ -119,12 +119,12 @@ function srn_portal_request(array $in): array {
  $area=$in['area']??'';
  $timeline=$in['timeline']??'orientation';
  $note=trim(is_string($in['note']??null)?$in['note']:'');
- if(!$email||strlen($name)>240||!preg_match('/\\A[^<>\\r\\n\\x00-\\x1f]{2,100}\\z/u',$name))throw new InvalidArgumentException('Vul je naam en een geldig e-mailadres in.');
+ if(!$email||strlen($name)>240||!preg_match('/\A[^<>\r\n\x00-\x1f]{2,100}\z/u',$name))throw new InvalidArgumentException('Vul je naam en een geldig e-mailadres in.');
  if(!in_array($channel,['email','phone'],true)||!in_array($topic,['thuisbatterij','zonnepanelen','laadpaal','warmtepomp','airco','algemeen'],true))throw new InvalidArgumentException('Kies je onderwerp en gewenste contactkanaal.');
- if($channel==='phone'&&!preg_match('/^\\+?[0-9 ()-]{9,22}$/D',$phone))throw new InvalidArgumentException('Vul een geldig telefoonnummer in als je gebeld wilt worden.');
+ if($channel==='phone'&&!preg_match('/^\+?[0-9 ()-]{9,22}$/D',$phone))throw new InvalidArgumentException('Vul een geldig telefoonnummer in als je gebeld wilt worden.');
  if($channel==='email')$phone='';
- if(!is_string($area)||($area!==''&&!preg_match('/^\\d{4}$/D',$area))||!in_array($timeline,['orientation','now','3months','later'],true))throw new InvalidArgumentException('Controleer de locatie en het tijdspad.');
- if(strlen($note)>1500||!preg_match('/\\A[^\\x00-\\x08\\x0b\\x0c\\x0e-\\x1f\\x7f]{0,500}\\z/us',$note))throw new InvalidArgumentException('Gebruik maximaal 500 tekens zonder bijzondere gegevens.');
+ if(!is_string($area)||($area!==''&&!preg_match('/^\d{4}$/D',$area))||!in_array($timeline,['orientation','now','3months','later'],true))throw new InvalidArgumentException('Controleer de locatie en het tijdspad.');
+ if(strlen($note)>1500||!preg_match('/\A[^\x00-\x08\x0b\x0c\x0e-\x1f\x7f]{0,500}\z/us',$note))throw new InvalidArgumentException('Gebruik maximaal 500 tekens zonder bijzondere gegevens.');
  return ['name'=>$name,'email'=>$email,'phone'=>$phone,'channel'=>$channel,'topic'=>$topic,'area'=>$area,'timeline'=>$timeline,'note'=>$note];
 }
 function srn_portal_message(string $id,array $p): string {
@@ -147,13 +147,13 @@ function srn_portal_message(string $id,array $p): string {
   'request_text_version'=>SRN_PORTAL_REQUEST_VERSION,
   'marketing_opt_in'=>false
  ];
- return "SubsidieReady - geverifieerde adviesaanvraag voor NIVO Groep Holland B.V.\\n".
-  "Aanvraagreferentie: ".$payload['request_id']."\\n".
-  "Deze aanvraag is bewust verstuurd en het e-mailadres is geverifieerd.\\n".
-  "Alleen opvolgen via het gekozen kanaal voor deze adviesvraag. Geen nieuwsbrief of automatische dossierdeling.\\n\\n".
-  "BEGIN_SUBSIDIEREADY_PORTAL_JSON\\n".
+ return "SubsidieReady - geverifieerde adviesaanvraag voor NIVO Groep Holland B.V.\n".
+  "Aanvraagreferentie: ".$payload['request_id']."\n".
+  "Deze aanvraag is bewust verstuurd en het e-mailadres is geverifieerd.\n".
+  "Alleen opvolgen via het gekozen kanaal voor deze adviesvraag. Geen nieuwsbrief of automatische dossierdeling.\n\n".
+  "BEGIN_SUBSIDIEREADY_PORTAL_JSON\n".
   json_encode($payload,JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES).
-  "\\nEND_SUBSIDIEREADY_PORTAL_JSON\\n";
+  "\nEND_SUBSIDIEREADY_PORTAL_JSON\n";
 }
 function srn_plan(array $input): array {
  if(($input['schemaVersion']??null)!==3||($input['app']??'')!=='SubsidieReadyPlan'||!is_array($input['projects']??null)||count($input['projects'])!==1)throw new InvalidArgumentException('Bewaar één geldig project per verzoek.');
