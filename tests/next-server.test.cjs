@@ -99,50 +99,74 @@ test('next: real PHP API privacy, authentication, cloud isolation, vault and sal
   await t.test('withdrawal is binding and cannot be undone by a salesperson',async()=>{const guest=new Client();await guest.login('requester@example.invalid','requests');assert.equal((await b.post('request-revoke',{id:leadId})).r.status,404);assert.equal((await guest.post('request-revoke',{id:leadId})).r.status,200);assert.equal((await manager.post('sales-update',{id:leadId,status:'new'})).r.status,409);});
   await t.test('snapshot and restore into a new private directory preserve encrypted files',()=>{const snap=path.join(dir,'snapshot'),restore=path.join(dir,'restored');const result=JSON.parse(execFileSync('php',['scripts/next/snapshot.php','--to='+snap],{cwd:root,env,encoding:'utf8'}));assert.equal(result.encrypted,true);assert.equal(result.keyIncluded,false);const r=JSON.parse(execFileSync('php',['scripts/next/restore.php','--from='+snap,'--to='+restore],{cwd:root,env,encoding:'utf8'}));assert.equal(r.restored,true);assert.ok(fs.existsSync(path.join(restore,'files',fileId+'.bin')));assert.ok(!fs.readFileSync(path.join(snap,'manifest.json'),'utf8').includes('alice@example.invalid'));const restoredEnv={...env,SR_NEXT_CONFIG:path.join(restore,'config.php')};const restored=JSON.parse(execFileSync('php',['-r',phpPrefix+'echo json_encode(srn_tx($c,fn(&$s)=>$s));'],{env:restoredEnv,encoding:'utf8'}));assert.ok(restored.projects[projectId]);});
   await t.test('account deletion removes owned projects files challenges sessions and queued email',async()=>{const id=a.user.id;const r=await a.post('account-delete',{confirm:'VERWIJDER'});assert.equal(r.r.status,200);const s=state();assert.equal(s.accounts[id],undefined);assert.equal(s.projects[projectId],undefined);assert.equal(s.files[fileId],undefined);assert.equal(fs.existsSync(path.join(privateDir,'files',fileId+'.bin')),false);assert.ok(Object.values(s.sessions).every(x=>x.account!==id));assert.ok(Object.values(s.outbox).every(x=>x.to!=='alice@example.invalid'));assert.equal((await a.post('projects-list')).r.status,403);});
-  await t.test('NIVO Portal receives only expressly requested and OTP-verified advice',async()=>{
+  await t.test('NIVO Portal queues explicit NAW advice immediately, without OTP, account or marketing consent',async()=>{
    const guest=new Client();await guest.boot();
    const email='portal-requester@example.invalid';
-   const profile={purpose:'portal',privacyVersion:'2026-11-16-nivo-portal-v1',contactRequested:true,email,name:'Fictieve Aanvrager',topic:'thuisbatterij',channel:'phone',phone:'0612345678',area:'1234',timeline:'3months',note:'Fictieve technische vraag, geen documenten'};
-   alter("$s['limits']=[];"); // Test-only isolation after earlier simulated OTP abuse guards.
+   const profile={purpose:'portal',privacyVersion:'2026-11-16-nivo-portal-v2',contactRequested:true,submissionId:'26fe9110-bdc1-4b41-8d3a-3f8ec47a24c1',website:'',email,name:'Fictieve Aanvrager',topic:'thuisbatterij',channel:'phone',phone:'0612345678',street:'Voorbeeldstraat',houseNumber:'12A',postalCode:'1234 AB',city:'Teststad',timeline:'3months',note:'Fictieve technische vraag, geen documenten'};
+   alter("$s['limits']=[];");
    const beforeAccounts=Object.keys(state().accounts).length;
    const beforeLeads=Object.keys(state().leads).length;
+   const beforeChallenges=Object.keys(state().challenges).length;
    const portalMessages=()=>Object.values(state().outbox).filter(m=>m.type==='portal'&&m.to==='portal@nivogroepholland.nl');
    const initial=portalMessages().length;
-   for(const invalid of [{...profile,contactRequested:false},{...profile,privacyVersion:'oud'},{...profile,income:85000},{...profile,channel:'phone',phone:'oops'},{...profile,topic:'lening'}]){
-     const bad=await guest.post('auth-start',invalid);assert.equal(bad.r.status,400,JSON.stringify(invalid));
+   const invalid=[
+     {...profile,contactRequested:false},{...profile,privacyVersion:'oud'},
+     {...profile,income:85000},{...profile,channel:'sms'},
+     {...profile,phone:''},{...profile,postalCode:'1234'},
+     {...profile,street:''},{...profile,houseNumber:''},{...profile,city:''},
+     {...profile,topic:'lening'},{...profile,website:'https://bot.invalid'},
+     {...profile,submissionId:'bad-key'},{...profile,email:'bad-email'},
+     {...profile,name:'<script>alert(1)</script>'}
+   ];
+   for(const candidate of invalid){
+     const bad=await guest.post('portal-submit',candidate);
+     assert.equal(bad.r.status,400,JSON.stringify(candidate));
    }
-   assert.equal(portalMessages().length,initial,'invalid or unverified requests never reach NIVO mail');
-   const started=await guest.post('auth-start',profile);
-   assert.equal(started.r.status,200);
-   assert.ok(started.d.challenge);
-   const challenge=started.d.challenge;
-   assert.equal(portalMessages().length,initial,'form submission alone cannot create a sales notification');
-   assert.equal((await guest.post('auth-verify',{challenge,code:'00000000'})).r.status,401);
-   assert.equal(portalMessages().length,initial);
-   const verified=await guest.post('auth-verify',{challenge,code:codeFor(email,challenge)});
-   assert.equal(verified.r.status,200,JSON.stringify(verified.d));
-   assert.equal(verified.d.portalQueued,true);
-   assert.match(verified.d.reference,/^SR-[0-9A-F]{16}$/);
-   assert.equal(Object.keys(state().accounts).length,beforeAccounts,'no account automatically created');
-   assert.equal(Object.keys(state().leads).length,beforeLeads,'native sales records remain untouched');
-   const mail=portalMessages().find(m=>m.key==='portal:'+challenge);
+   assert.equal(portalMessages().length,initial,'invalid data never reaches NIVO');
+   assert.equal((await guest.post('portal-submit',profile,{'X-CSRF-Token':'wrong'})).r.status,403,'CSRF is still required');
+   assert.equal((await guest.post('auth-start',profile)).r.status,400,'legacy OTP purpose is disabled');
+   const submitted=await guest.post('portal-submit',profile);
+   assert.equal(submitted.r.status,200,JSON.stringify(submitted.d));
+   assert.equal(submitted.d.portalQueued,true);
+   assert.match(submitted.d.reference,/^SR-[0-9A-F]{16}$/);
+   assert.equal(Object.keys(state().accounts).length,beforeAccounts,'no account created');
+   assert.equal(Object.keys(state().leads).length,beforeLeads,'native sales records untouched');
+   assert.equal(Object.keys(state().challenges).length,beforeChallenges,'no email verification challenge');
+   assert.equal(portalMessages().length,initial+1,'one direct request queues one mail');
+   const replay=await guest.post('portal-submit',profile);
+   assert.equal(replay.r.status,200);
+   assert.equal(replay.d.reference,submitted.d.reference,'network retry is idempotent');
+   assert.equal(portalMessages().length,initial+1,'retry does not queue duplicate');
+   const mail=portalMessages().find(m=>m.meta.request&&submitted.d.reference.endsWith(m.meta.request.slice(0,16).toUpperCase()));
    assert.ok(mail&&mail.state==='queued');
-   assert.equal(portalMessages().length,initial+1,'exactly one mail for one verification');
-   assert.ok(mail.text.includes('BEGIN_SUBSIDIEREADY_PORTAL_JSON'));
+   assert.ok(mail.key.startsWith('portal:'));
    const payloadText=mail.text.split('BEGIN_SUBSIDIEREADY_PORTAL_JSON')[1]?.split('END_SUBSIDIEREADY_PORTAL_JSON')[0]?.trim();
-   assert.ok(payloadText,'machine-readable portal envelope');
+   assert.ok(payloadText,'versioned machine-readable portal envelope');
    const parsed=JSON.parse(payloadText);
+   assert.equal(parsed.schema,'subsidieready.nivo.portal.request.v2');
    assert.equal(parsed.receiver,'portal@nivogroepholland.nl');
-   assert.equal(parsed.verified_email,email);
+   assert.equal(parsed.email,email);
+   assert.equal(parsed.email_verified,false);
+   assert.equal(parsed.verified_email,undefined);
+   assert.deepEqual(parsed.address,{street:'Voorbeeldstraat',house_number:'12A',postal_code:'1234AB',city:'Teststad'});
    assert.equal(parsed.topic,'thuisbatterij');
    assert.equal(parsed.preferred_channel,'phone');
    assert.equal(parsed.phone,'0612345678');
+   assert.equal(parsed.postcode_area,'1234');
    assert.equal(parsed.marketing_opt_in,false);
    assert.equal(parsed.contact_requested,true);
-   assert.equal(parsed.request_id,verified.d.reference);
+   assert.equal(parsed.verification_method,'none');
+   assert.equal(parsed.request_text_version,profile.privacyVersion);
+   assert.equal(parsed.request_id,submitted.d.reference);
+   assert.ok(parsed.contact_consent_at_utc);
    assert.ok(!mail.text.includes('MUST_NOT_SURVIVE'));
-   assert.equal((await guest.post('auth-verify',{challenge,code:codeFor(email,challenge)})).r.status,401);
-   assert.equal(portalMessages().length,initial+1);
+   // Per-address throttling is independent from session idempotency.
+   for(let n=2;n<=3;n++){
+     const next=await guest.post('portal-submit',{...profile,submissionId:'26fe9110-bdc1-4b41-8d3a-3f8ec47a24c'+n});
+     assert.equal(next.r.status,200,JSON.stringify(next.d));
+   }
+   const limited=await guest.post('portal-submit',{...profile,submissionId:'26fe9110-bdc1-4b41-8d3a-3f8ec47a24c4'});
+   assert.equal(limited.r.status,429,'more than three hourly requests per address is blocked');
   });
   await t.test('internal config and implementation files are not reachable through the development router',async()=>{for(const p of ['/server/next/service.php','/scripts/next/setup.php','/.env','/.git/config','/tests/next-server.test.cjs'])assert.equal((await fetch(base+p)).status,404);});
  }finally{child.kill();await new Promise(r=>setTimeout(r,80));fs.rmSync(dir,{recursive:true,force:true});}
