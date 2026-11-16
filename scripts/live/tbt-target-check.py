@@ -46,8 +46,15 @@ try:
         res=page.goto(URL,wait_until="domcontentloaded",timeout=35000)
         assert res and res.status==200
         stage="form"
+        page.wait_for_timeout(1200)
+        # Safe non-identifying diagnostics: only counts and visibility flags.
+        report["httpStatus"]=res.status
+        report["formsSeen"]=page.locator("form").count()
+        report["targetFormsSeen"]=page.locator("form.tbt-conversion__form").count()
+        report["simpleFormsSeen"]=page.locator("form.tbt-leads-simple-contact").count()
         form=page.locator("form.tbt-conversion__form").first
-        form.wait_for(state="visible",timeout=15000)
+        report["targetFormVisible"]=bool(form.count() and form.is_visible())
+        form.wait_for(state="attached",timeout=12000)
         action=form.get_attribute("action") or ""
         action_parts=urlsplit(action)
         required=(
@@ -91,6 +98,6 @@ finally:
     (OUT/"report.json").write_text(json.dumps(report,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
     print(json.dumps({k:report.get(k) for k in
         ("result","failureStage","failureType","formValid","privacyCopyVisible","consentChoiceVisible","denyAttempted",
-         "trackingBeforeDecision","trackingAfterDeny","submittedLeadRequests")},ensure_ascii=False))
+         "trackingBeforeDecision","trackingAfterDeny","submittedLeadRequests","httpStatus","formsSeen","targetFormsSeen","simpleFormsSeen","targetFormVisible")},ensure_ascii=False))
 if report["result"]!="pass":
     raise SystemExit(1)
