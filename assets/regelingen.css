@@ -407,3 +407,13 @@ body.r-dashboard-ready .regelingen-page{--r-ink:#0b1731;--r-muted:#4e6075;--r-gr
  body.r-dashboard-ready .mobile-nav nav a{display:block;font-size:13px;padding:10px 12px;text-decoration:none;border-radius:8px;color:#173a28}
  body.r-dashboard-ready .mobile-nav nav a:hover{background:#f0f8eb}
 }
+
+/* One solar measure; special construction is a contextual tax detail, not an extra product. */
+.regelingen-page .r-special-opt{display:flex;align-items:flex-start;gap:8px;margin:9px 0 1px;padding:8px 10px;border:1px solid #cfe4d1;background:#f3faf1;border-radius:10px;cursor:pointer;color:#264936}
+.regelingen-page .r-special-opt[hidden]{display:none!important}
+.regelingen-page .r-special-opt input{flex:0 0 16px;width:16px;height:16px;margin:2px 0 0;accent-color:#13852e}
+.regelingen-page .r-special-opt span{display:flex;flex-direction:column;gap:3px;min-width:0}
+.regelingen-page .r-special-opt strong{font-size:11px;line-height:1.25}
+.regelingen-page .r-special-opt small{font-size:10px;line-height:1.35;color:#42614f}
+.regelingen-page .r-special-opt:has(input:focus-visible){outline:3px solid #69a76e;outline-offset:2px}
+@media(max-width:365px){.regelingen-page .r-special-opt{padding:7px 8px;margin-top:7px}.regelingen-page .r-special-opt strong{font-size:10px}}
