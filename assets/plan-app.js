@@ -82,30 +82,20 @@
    return;
   }
   const isAccount=purpose==='account';
-  modal(isAccount?'Jouw gratis SubsidieReady-account':'Verifieer je aanvraag',`
-   <div class="p-auth-intro">
-    <span class="p-auth-eyebrow">SUBSIDIEREADY · BEVEILIGD ACCOUNT</span>
-    <p>${isAccount?'Bewaar je verduurzamingsplan wanneer jij dat wilt. Geen wachtwoord nodig: je ontvangt een eenmalige code.':'Controleer je e-mailadres met een eenmalige code.'}</p>
-    <div class="p-auth-benefits"><span>✓ Gratis account</span><span>✓ Zelf je gegevens beheren</span><span>✓ Geen automatische salesdeling</span></div>
-   </div>
+  modal(isAccount?'Gratis account aanmaken of inloggen':'Verifieer je aanvraag',`
    <form id="login-form" class="p-auth-form">
-    <div class="p-auth-section-title"><strong>E-mailadres</strong><span>VERPLICHT</span></div>
-    <label class="p-auth-field p-auth-field-main"><span>Waar mogen we je verificatiecode naartoe sturen?</span><input type="email" name="email" autocomplete="email" required maxlength="254" placeholder="jij@voorbeeld.nl"></label>
+    <p class="p-auth-intro">${isAccount?'Bewaar je plan wanneer je wilt. Je ontvangt een veilige inlogcode per e-mail.':'Je ontvangt een eenmalige verificatiecode per e-mail.'}</p>
+    <label class="p-auth-field p-auth-field-main"><span>E-mailadres <small>Verplicht</small></span><input type="email" name="email" autocomplete="email" required maxlength="254" placeholder="jij@voorbeeld.nl"></label>
     ${isAccount?`
-     <div class="p-auth-section-title"><strong>Jouw contactgegevens</strong><span>OPTIONEEL</span></div>
-     <p class="p-auth-help">Vul in wat je wilt bewaren in je eigen account. Deze gegevens worden niet aan verkoopteams doorgestuurd en we bellen je niet automatisch.</p>
+     <p class="p-auth-caption">Contactgegevens <span>optioneel</span></p>
      ${profileFields()}
-     <fieldset class="p-auth-options">
-      <legend>Wil je aanbiedingen en praktische tips van NIVO per e-mail?</legend>
-      <div class="p-auth-radio-grid">
-       <label class="p-auth-option"><input type="radio" name="updates" value="none" checked><span><strong>Nee, alleen mijn account</strong><small>Geen commerciële e-mails.</small></span></label>
-       <label class="p-auth-option"><input type="radio" name="updates" value="email"><span><strong>Ja, per e-mail</strong><small>NIVO Groep Holland B.V. over zonnepanelen, thuisbatterijen en laadpalen. Altijd intrekbaar.</small></span></label>
-      </div>
-     </fieldset>
-     <label class="p-auth-terms"><input type="checkbox" name="terms" required><span>Ik ga akkoord met de <a href="/voorwaarden/" target="_blank" rel="noopener noreferrer">accountvoorwaarden</a> en heb de <a href="/privacy/" target="_blank" rel="noopener noreferrer">privacyverklaring</a> gelezen.</span></label>
+     <div class="p-auth-consents">
+      <label class="p-auth-terms"><input type="checkbox" name="terms" required><span>Ik ga akkoord met de <a href="/voorwaarden/" target="_blank" rel="noopener noreferrer">accountvoorwaarden</a> en heb de <a href="/privacy/" target="_blank" rel="noopener noreferrer">privacyverklaring</a> gelezen.</span></label>
+      <label class="p-auth-marketing"><input type="checkbox" name="marketingEmail"><span><strong>Ja, ik wil per e-mail aanbiedingen ontvangen</strong> van NIVO Groep Holland B.V. over zonnepanelen, thuisbatterijen en laadpalen. Dit is optioneel en altijd opzegbaar.</span></label>
+     </div>
     `:''}
-    <button class="p-btn primary p-auth-submit" type="submit">Stuur mijn verificatiecode <span aria-hidden="true">→</span></button>
-    <p class="p-auth-foot">Heb je al een account? Bestaande e-mailvoorkeuren kun je na inloggen beheren. Dienstverlener: <strong>NIVO Groep Holland B.V.</strong> · Geen reclame per telefoon op basis van een account. Je keuzes zijn later aan te passen.</p>
+    <button class="p-btn primary p-auth-submit" type="submit">Stuur verificatiecode <span aria-hidden="true">→</span></button>
+    <p class="p-auth-foot">Geen verkooptelefoontjes of automatische doorgifte van jouw plan. Je beheert je keuzes in je account.</p>
    </form>`);
  }
  function editAccountProfile(){
@@ -165,7 +155,7 @@
   if(e.target.id==='project-form'){const p=current(),role=f.get('role'),area=f.get('area');if(role!==p.role||area!==p.area)for(const m of p.measures){m.checks={};m.checkFingerprint='';}p.title=P.text(f.get('title'),100)||'Mijn woning';p.role=role;p.area=area;p.municipality=P.text(f.get('municipality'),80);close();save();shell();}
   if(e.target.id==='measure-form'){const p=current(),m=measure(),d={...m.details},dates={...m.dates};for(const k of [...Object.keys(P.SELECTS),...Object.keys(P.TEXT)])if(f.has(k))d[k]=f.get(k);for(const k of P.DATES)dates[k]=f.get(k);P.update(p,m,{title:f.get('title'),stage:f.get('stage'),dates,details:d});save();shell();toast('Gegevens bijgewerkt; eerdere bevestigingen opnieuw nalopen.');}
   if(e.target.id==='files-form'){const fs=f.getAll('files').filter(x=>x.size>0);if(!fs.length)throw Error('Kies een bestand.');for(const file of fs)await addFile(file,f.get('measure'),f.has('keep'));shell();toast(fs.length+' bestanden lokaal toegevoegd. Niet geüpload.');}
-  if(e.target.id==='login-form'){const r=await C.post('auth-start',{email:f.get('email'),purpose:challengePurpose,serviceAccepted:f.has('terms'),termsAccepted:f.has('terms'),termsVersion:'2026-11-16-account-v2',marketingEmailOptIn:f.get('updates')==='email',profile:profileFromForm(f)});challenge=r.challenge;modal('Controleer je e-mail',`<p>${esc(r.message)}</p>${cloud.mode==='local'?'<p class="p-callout">Lokale test: lees de code via de CLI-testpostbus. Er wordt geen echte mail verstuurd.</p>':''}<form id="verify-form">${field('Eenmalige code (8 cijfers)','code','','text')}<button class="p-btn primary" type="submit">Verifiëren</button></form>`);}
+  if(e.target.id==='login-form'){const r=await C.post('auth-start',{email:f.get('email'),purpose:challengePurpose,serviceAccepted:f.has('terms'),termsAccepted:f.has('terms'),termsVersion:'2026-11-16-account-v2',marketingEmailOptIn:f.has('marketingEmail'),profile:profileFromForm(f)});challenge=r.challenge;modal('Controleer je e-mail',`<p>${esc(r.message)}</p>${cloud.mode==='local'?'<p class="p-callout">Lokale test: lees de code via de CLI-testpostbus. Er wordt geen echte mail verstuurd.</p>':''}<form id="verify-form">${field('Eenmalige code (8 cijfers)','code','','text')}<button class="p-btn primary" type="submit">Verifiëren</button></form>`);}
   if(e.target.id==='verify-form'){await C.post('auth-verify',{challenge,code:f.get('code')});cloud=C.status();close();shell();toast('Ingelogd. Kies zelf welke plannen je online bewaart.');}
   if(e.target.id==='account-profile-form'){await C.post('account-profile-set',{profile:profileFromForm(f)});cloud=C.status();accountDialog();toast('Je contactgegevens zijn bijgewerkt. Er is geen adviesaanvraag verstuurd.');}
   if(e.target.id==='reminder-form'){await C.post('reminder-set',{project:selected,date:f.get('date'),enabled:true});close();toast('Serviceherinnering opgeslagen.');}
