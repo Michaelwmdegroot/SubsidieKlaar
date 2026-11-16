@@ -5,7 +5,7 @@ require_once __DIR__.'/smtp.php';
 /* Testrelease backend: encrypted, locked single-host pilot storage. Off without private config. */
 const SRN_SCHEMA=1;
 const SRN_TERMS_VERSION='2026-11-16-account-v2';
-const SRN_PRIVACY_VERSION='2026-11-16-privacy-v2';
+const SRN_PRIVACY_VERSION='2026-11-16-privacy-v3';
 const SRN_EMAIL_MARKETING_VERSION='2026-11-14-nivo-email-v1';
 const SRN_PROFILE_VERSION='2026-11-16-optional-profile-v1';
 const SRN_PORTAL_MAILBOX='portal@nivogroepholland.nl';
