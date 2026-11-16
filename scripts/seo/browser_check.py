@@ -190,6 +190,66 @@ def run(browser, base):
     check(not vendor_counts(requests), "public home and articles do not load PDF/ZIP dependencies")
     context.close()
 
+    # Real browser/layout verification of the optional account form with a local,
+    # synthetic bootstrap reply. No credentials, user POST, OTP or production mail.
+    context, requests = context_for("one-screen-account-form")
+    page = context.new_page()
+    bootstrap_data = json.dumps({
+        "mode": "production", "accounts": True, "vault": False, "leads": False,
+        "controller": "NIVO Groep Holland B.V.", "contact": "info@nivogroepholland.nl",
+        "user": None, "csrf": "0" * 64
+    })
+    page.route("**/api/next/?action=bootstrap", lambda route: route.fulfill(
+        status=200, content_type="application/json", body=bootstrap_data
+    ))
+    page.goto(base + "/mijn-plan/", wait_until="networkidle")
+    page.locator('[data-pa="login"]').click()
+    checkbox = page.locator('#login-form input[name="marketingEmail"]')
+    terms = page.locator('#login-form input[name="terms"]')
+    check(checkbox.count() == 1 and not checkbox.is_checked() and
+          checkbox.get_attribute("required") is None,
+          "marketing email consent is one unchecked optional checkbox")
+    check(terms.count() == 1 and not terms.is_checked() and
+          terms.get_attribute("required") is not None,
+          "account terms are the only required checkbox")
+    check(page.locator("#login-form input[type=checkbox]").count() == 2 and
+          page.locator("#login-form input[type=radio]").count() == 0,
+          "signup uses two separate checkboxes and no radio-choice cards")
+    for key in ("email", "fullName", "phone", "street", "houseNumber", "postalCode", "city"):
+        check(page.locator(f'#login-form input[name="{key}"]').count() == 1,
+              "signup contact field " + key + " is present")
+    for width, height in ((1440, 900), (1280, 720), (390, 844), (375, 667), (320, 740)):
+        page.set_viewport_size({"width": width, "height": height})
+        page.wait_for_timeout(110)
+        dims = page.evaluate("""() => {
+          const d = document.querySelector('#plan-dialog');
+          const b = d.querySelector('.p-dialog-body');
+          const f = d.querySelector('#login-form');
+          const submit = f.querySelector('[type=submit]');
+          const r = d.getBoundingClientRect();
+          const sr = submit.getBoundingClientRect();
+          return {
+            viewportW: innerWidth, viewportH: innerHeight,
+            dialogLeft: r.left, dialogRight: r.right, dialogTop: r.top,
+            dialogBottom: r.bottom, submitBottom: sr.bottom,
+            dialogOverflow: d.scrollHeight > d.clientHeight + 1,
+            bodyOverflow: b.scrollHeight > b.clientHeight + 1,
+            submitVisible: sr.width > 0 && sr.height > 0
+          };
+        }""")
+        REPORT["screens"].append({"route": "/mijn-plan/", "state": "compact-signup",
+                                  "width": width, "height": height, **dims})
+        check(dims["dialogTop"] >= 0 and dims["dialogBottom"] <= height - 2 and
+              dims["dialogLeft"] >= -1 and dims["dialogRight"] <= width + 1 and
+              dims["submitBottom"] <= height - 4 and dims["submitVisible"] and
+              not dims["dialogOverflow"] and not dims["bodyOverflow"],
+              f"full account form and submit fit {width}x{height} without scrolling", dims)
+        if (width, height) in ((1440, 900), (390, 844), (375, 667)):
+            page.screenshot(path=OUT / f"account-signup-{width}x{height}.png", full_page=False)
+    check(not any(req["method"] != "GET" for req in requests),
+          "opening account form never submits customer data")
+    context.close()
+
     # First PDF/ZIP requests: real UI, real files, no dependency mocks.
     context, requests = context_for("lazy-exports")
     page = context.new_page()
