@@ -30,6 +30,12 @@
 4. **Ontvangst en verkoop-GO (vervolg)** — eerste vrijwillige synthetische aanvraag met expliciete toestemming op de TBT-pagina en bevestiging in juiste TBT-inbox, voordat er attributie of funnelconversie wordt geclaimd. Die test moet opnieuw apart worden afgesproken om geen operationele salesfunnel te vervuilen.
 5. **Rollback** — verwijder de commerciële kaart zonder verlies van consumentengegevens: zet `enabled:false` in `scripts/lead-pilot.config.json`, laat approvals gedocumenteerd staan, bouw/test en deploy opnieuw. Stop geen bestaande TBT-verzoeken of mailworkers.
 
+### Extra live doelcontrole vóór merge
+
+De aparte, read-only GitHub Actions-workflow `.github/workflows/tbt-target-preflight.yml` opent het **echte TBT-adviesformulier** in een nieuwe Chromium-sessie. Hij controleert de WordPress form-action/ontvangerroute, zichtbare privacyuitleg en het ontbreken van marketingtracking vanaf het eerste bezoek tot een eventuele cookie-weigering. De test **verstuurt nooit een formulier**, raakt geen persoonsgegevens en logt alleen classificaties en tracker-hostnamen, niet volledige URL's of cookies. Een trackingverzoek vóór keuze, onbruikbaar formulier of netwerkfout resulteert in **NO-GO/UNKNOWN** en mag niet als positief bewijs gelden.
+
+De waarneming van bestaande TBT-mailmeldingen en deze browsercontrole vullen elkaar aan: de ene bewijst aflevering van eerdere aanvragen, de andere een bereikbare bestemming. Geen van beide bewijst al een eerste nieuwe conversie vanuit SubsidieReady.
+
 ## 4. Juridische afbakening
 
 Het tonen van een gewone link maakt SubsidieReady-accountgebruikers of toolbezoekers **niet** automatisch salesleads. De TBT-website behandelt pas gegevens als de bezoeker daar vrijwillig een aanvraag indient. Algemene marketing-e-mails/telefoongesprekken vereisen een andere, passende en aantoonbare grondslag/toestemming; deze CTA biedt die niet. Een eventueel toekomstig native adviesformulier of CRM-koppeling vereist opnieuw een aparte privacy-, retentie-, rechten- en ontvangstreview.
