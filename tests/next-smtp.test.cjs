@@ -60,3 +60,27 @@ test('SMTP validates headers, protects body lines and enforces reply status',()=
   'if(!str_contains(srn_smtp_read($f,[250]),"AUTH PLAIN"))throw new Exception("multiline");fclose($f);';
  assert.equal(call(code),'headers-safe');
 });
+
+test('OTP gets branded accessible HTML plus plaintext in one secure multipart message',()=>{
+ const template=path.join(root,'server/next/mail-template.php');
+ const output=call('require '+q(service)+';require '+q(template)+';'+
+  '$plain="Je SubsidieReady-code is: 12345678\\nGeldig voor 10 minuten. Alleen gebruiken voor je eigen verzoek.";'+
+  '$html=srn_otp_email_html($plain);'+
+  '$msg=srn_smtp_message("info@subsidieready.nl","recipient@example.invalid","SubsidieReady verificatiecode",$plain,$html);'+
+  '$checks=["multipart"=>str_contains($msg,"multipart/alternative"),'+
+  '"text"=>str_contains($msg,"Content-Type: text/plain"),'+
+  '"html"=>str_contains($msg,"Content-Type: text/html"),'+
+  '"code"=>substr_count($msg,"12345678")===2,'+
+  '"security"=>str_contains($html,"10 minuten")&&str_contains($html,"Deel je code nooit"),'+
+  '"no_remote"=>!preg_match("~<script|<img|<link|https?://~i",$html),'+
+  '"utf8"=>str_contains($msg,"charset=UTF-8"),'+
+  '"auto"=>str_contains($msg,"Auto-Submitted: auto-generated")];'+
+  'try{srn_otp_email_html("Geen code");$checks["reject"]=false;}catch(InvalidArgumentException){$checks["reject"]=true;}'+
+  'echo json_encode($checks);');
+ const checks=JSON.parse(output);
+ for(const [key,ok] of Object.entries(checks))assert.equal(ok,true,key);
+ const worker=fs.readFileSync(path.join(root,'scripts/next/mail-worker.php'),'utf8');
+ assert.match(worker,/srn_otp_email_html/);
+ assert.match(worker,/srn_smtp_send\(\$c,\$v\['to'\],\$subject,\$v\['text'\]/);
+ assert.ok(!worker.includes('SMTP_PASSWORD='));
+});
