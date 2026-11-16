@@ -36,6 +36,12 @@ De aparte, read-only GitHub Actions-workflow `.github/workflows/tbt-target-prefl
 
 De waarneming van bestaande TBT-mailmeldingen en deze browsercontrole vullen elkaar aan: de ene bewijst aflevering van eerdere aanvragen, de andere een bereikbare bestemming. Geen van beide bewijst al een eerste nieuwe conversie vanuit SubsidieReady.
 
+### Doorlopende doelmonitoring
+
+De read-only TBT-bestemmingscontrole draait **dagelijks om 06:31 UTC** via de bestaande GitHub Actions, plus bij relevante codewijzigingen en handmatig op verzoek. Dit is een kleine operationele check, geen nieuwe betaalde infrastructuur. De controletest probeert bij een tijdelijke netwerk-/browserfout één keer opnieuw en behoudt het veilige JSON-resultaat maximaal 14 dagen als CI-artifact. Bij blijvende NO-GO/UNKNOWN faalt de workflow voor opvolging. De workflow maakt **geen account, testlead, formulier-POST, CRM-record of marketinginschrijving**.
+
+**Reikwijdte:** bereikbaar formulier, vaste ontvangende action en purpose, zichtbare privacycopy, weigeren van consent en standaard denied Consent Mode. `externalMeasurementReview` blijft afzonderlijk vermeld omdat verzoeken naar Google-domeinen zichtbaar zijn vóór toestemming; de workflow bewijst geen volledige cookie-compliance. Ook bij groene monitoring blijven **daadwerkelijke individuele leadontvangst, herkomst/attributie en verkoopconversies** apart te bewijzen.
+
 ## 4. Juridische afbakening
 
 Het tonen van een gewone link maakt SubsidieReady-accountgebruikers of toolbezoekers **niet** automatisch salesleads. De TBT-website behandelt pas gegevens als de bezoeker daar vrijwillig een aanvraag indient. Algemene marketing-e-mails/telefoongesprekken vereisen een andere, passende en aantoonbare grondslag/toestemming; deze CTA biedt die niet. Een eventueel toekomstig native adviesformulier of CRM-koppeling vereist opnieuw een aparte privacy-, retentie-, rechten- en ontvangstreview.

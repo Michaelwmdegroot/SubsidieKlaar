@@ -1,6 +1,9 @@
 name: SubsidieReady TBT advice target preflight
 
 on:
+  schedule:
+    # 07:31 CET / 08:31 CEST; no account, form submission or data capture.
+    - cron: '31 6 * * *'
   pull_request:
     paths:
       - 'scripts/lead-pilot.cjs'
@@ -37,7 +40,14 @@ jobs:
       - name: Test TBT advice form and tracking before consent
         id: preflight
         continue-on-error: true
-        run: python scripts/live/tbt-target-check.py
+        run: |
+          # Retry once on transient reachability failures. The final result
+          # still fails closed; no credentials or customer data are sent.
+          for attempt in 1 2; do
+            if python scripts/live/tbt-target-check.py; then exit 0; fi
+            if [ "$attempt" != 2 ]; then sleep 20; fi
+          done
+          exit 1
       - name: Retain safe target inspection evidence
         if: always()
         uses: actions/upload-artifact@v4
