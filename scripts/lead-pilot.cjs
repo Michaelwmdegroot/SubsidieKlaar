@@ -60,13 +60,13 @@ function render(config = defaultConfig) {
   const result = validate(config);
   if (result.status !== 'ready') return '';
   // Render only fixed allowlisted constants, never decision IDs or configurable HTML.
-  return `<aside class="info-box" aria-labelledby="lead-pilot-title">
+  return `<aside class="info-box" aria-labelledby="lead-pilot-title" style="min-width:0;max-width:100%;box-sizing:border-box;overflow-wrap:anywhere">
   <p class="eyebrow">Commercieel productadvies</p>
   <h2 id="lead-pilot-title">Past een thuisbatterij bij jouw woning?</h2>
   <p>Vraag een vrijblijvend adviesgesprek aan bij <strong>${RECIPIENT}</strong>. Je vult je contactgegevens zelf in op hun website.</p>
-  <div class="button-row">
-    <a class="btn btn-secondary" href="${TARGET_URL}" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Vraag thuisbatterijadvies aan<span class="visually-hidden"> bij ${RECIPIENT} (opent een nieuw tabblad)</span></a>
-    <a href="${PRIVACY_URL}" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Privacy bij ${RECIPIENT}<span class="visually-hidden"> (opent een nieuw tabblad)</span></a>
+  <div class="button-row" style="box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr);gap:10px;max-width:100%;min-width:0;padding:0;border:0;background:transparent">
+    <a class="btn btn-secondary" style="white-space:normal;overflow-wrap:anywhere;min-width:0;max-width:100%;box-sizing:border-box;text-align:center" href="${TARGET_URL}" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Vraag thuisbatterijadvies aan<span class="visually-hidden"> bij ${RECIPIENT} (opent een nieuw tabblad)</span></a>
+    <a style="white-space:normal;overflow-wrap:anywhere;min-width:0;max-width:100%;box-sizing:border-box" href="${PRIVACY_URL}" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Privacy bij ${RECIPIENT}<span class="visually-hidden"> (opent een nieuw tabblad)</span></a>
   </div>
   <p>Dit is productadvies, geen beoordeling van je recht op subsidie of btw-teruggaaf. SubsidieReady stuurt geen ingevulde antwoorden of documenten mee. De gratis check en downloads blijven beschikbaar.</p>
 </aside>`;
