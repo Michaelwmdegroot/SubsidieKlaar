@@ -13,8 +13,8 @@ test('premium: all important labels and interactions are HTML, generated images 
   const tag=h.match(new RegExp('<img[^>]+class="'+cls+'"[^>]*>'))?.[0];assert.ok(tag,cls);assert.match(tag,/alt=""/);assert.match(tag,/width="\d+"/);assert.match(tag,/height="\d+"/);
  }
  for(const text of ['Gebaseerd op officiële bronnen','Jouw mogelijke regelingen','Kies je','maatregelen','Vertel iets over je situatie','Maak mijn plan'])assert.ok(h.includes(text));
- assert.equal((h.match(/<input type="checkbox" name="measures"/g)||[]).length,9);
- assert.equal((h.match(/class="r-glyph"/g)||[]).length,9);
+ assert.equal((h.match(/<input type="checkbox" name="measures"/g)||[]).length,8);
+ assert.equal((h.match(/class="r-glyph"/g)||[]).length,8);assert.match(h,/id="pv-construction-option"/);
 });
 test('premium: no illustrative euro estimates or best-match claims become real benefits',()=>{
  for(const f of ['templates/regelingen-page.html','assets/regelingen-app.js']){

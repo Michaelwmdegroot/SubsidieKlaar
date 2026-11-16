@@ -44,7 +44,7 @@ De JSON bevat:
 - Vereist: npm run build, npm test, npm run package, SEO-check, PHP/SQL-regressie en echte Chromium-regressie.
 - Browserdoel: op desktop 1440×900 staat de volledige vorm inclusief verzendknop binnen de viewport; mobiel 390/320 px heeft geen horizontale overflow.
 - API-doel: een geldige aanvraag queued direct één Portal-mail met NAW; een herhaling met dezelfde submissionId geeft dezelfde referentie. Ongeldige schema's, consent, honeypot, postcode, e-mail, telefoon of Origin/CSRF falen.
-- **Productieacceptatie nog afzonderlijk nodig:** na merge en Hostinger-deploy een fictieve aanvraag met een beheerd testadres indienen en in portal@nivogroepholland.nl controleren of exact één mail met V2-schema aankomt. Geen test-NAW of echte klantdata in GitHub.
+- **Productieacceptatie door eigenaar bevestigd op 16 november 2026:** in Outlook is daadwerkelijk één V2-adviesaanvraag in portal@nivogroepholland.nl getoond, met juiste onderwerp, SR-referentie en JSON-markers. Dit is bewijs van één end-to-end afleverpoging en ontvangst, niet van algemene deliverability of automatische Portal-verwerking. Bewaar geen volledige mail, privétestgegevens of afbeelding met persoonsgegevens in publieke GitHub. Zie [milestone en roadmap](./LEADGEN-MILESTONE-2026-11-16.md).
 - Rollback: revert van de PR herstelt eerdere code, maar reeds verzonden mails en openstaande queue-items worden niet automatisch teruggedraaid.
 
 ## Volgende fase: zelfstandige organische leadmachine

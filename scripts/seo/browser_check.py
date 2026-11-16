@@ -322,6 +322,36 @@ def run(browser, base):
           "opening NIVO Portal advice form makes no POST or external request")
     context.close()
 
+    # Solar is one top-level measure; exceptional construction is an optional, contextual question.
+    context, solar_requests = context_for("solar-one-measure")
+    page = context.new_page()
+    page.set_viewport_size({"width":1440,"height":900})
+    page.goto(base + "/regelingen/", wait_until="networkidle")
+    check(page.locator('input[name="measures"][value="zonnepanelen"]').count()==1 and
+          page.locator('input[name="measures"][value="pv_constructie"]').count()==0,
+          "solar is one top-level choice rather than two equivalent measures")
+    check(page.locator("#pv-construction-option").is_hidden(),
+          "special PV construction question starts hidden")
+    page.locator('label.r-measure:has(input[value="zonnepanelen"])').click()
+    check(page.locator("#pv-construction-option").is_visible() and
+          page.locator("#selected-count").inner_text().startswith("1 gekozen"),
+          "solar selection reveals contextual tax question without increasing measure count")
+    check(page.locator('[data-route="pv-construction"]').count()==0,
+          "regular rooftop solar does not get specialist-construction route")
+    page.locator('#pv-construction-option input').check()
+    check(page.locator('[data-route="pv-construction"]').count()==1,
+          "specialized PV construction reveals separate factual tax review")
+    page.set_viewport_size({"width":390,"height":844})
+    check(page.evaluate("document.documentElement.scrollWidth <= window.innerWidth"),
+          "mobile solar special-case form has no horizontal overflow")
+    page.locator('label.r-measure:has(input[value="zonnepanelen"])').click()
+    check(page.locator("#pv-construction-option").is_hidden() and
+          not page.locator('#pv-construction-option input').is_checked(),
+          "removing solar selection clears hidden special-case choice")
+    check(all(r["method"]=="GET" and r["local"] for r in solar_requests),
+          "solar rules check makes no POST or off-domain requests")
+    context.close()
+
     # First PDF/ZIP requests: real UI, real files, no dependency mocks.
     context, requests = context_for("lazy-exports")
     page = context.new_page()

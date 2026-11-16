@@ -7,6 +7,17 @@ test('next: inherited properties and getters are not executed',()=>{const x={};O
 test('next: invalid IDs, duplicate IDs and limits are bounded',()=>{const q=p();q.measures[1].id=q.measures[0].id;assert.throws(()=>P.project(q),/Dubbele/);assert.throws(()=>P.envelope({app:'SubsidieReadyPlan',schemaVersion:3,projects:Array(9).fill(p())}),/acht/);assert.equal(P.id('../../test'),'');assert.throws(()=>P.measure({type:'fake'}));});
 test('next: legacy import preserves original file requirement and never creates a cloud account',()=>{const r=P.importData({app:'SubsidieKlaar',schemaVersion:1,demo:true,state:{ownerType:'owner_occupier',brand:'Test',model:'X',installed:'yes',installationDate:'2026-01-01',applicantName:'Never copy into sales'}});assert.equal(r.projects[0].measures[0].type,'warmtepomp');assert.equal(r.projects[0].demo,true);assert.equal(r.projects[0].measures[0].details.product,'Test X');assert.ok(!JSON.stringify(r).includes('Never copy'));assert.match(r.importNote,/oorspronkelijke/);});
 test('next: route import carries only explicitly chosen coarse situation',()=>{const r=P.fromRoutes({schemaVersion:1,profile:{role:'owner',measures:['zonnepanelen'],pvVat:'zero',kor:'yes',income:90000}});assert.equal(r.measures[0].details.pvVat,'zero');assert.equal(r.income,undefined);});
+test('next: scan-to-plan bridge explicitly passes optional PV-construction context',()=>{const s=fs.readFileSync(path.join(__dirname,'../assets/plan-bridge.js'),'utf8');assert.match(s,/pvConstruction/);assert.match(s,/\.get\(k\)/);});
+test('next: canonical solar plan handles special constructions and preserves legacy projects',()=>{
+ const x=P.fromRoutes({schemaVersion:1,profile:{role:'owner',measures:['zonnepanelen','pv_constructie'],pvConstruction:'yes',pvVat:'zero'}});
+ assert.deepEqual(x.measures.map(m=>m.type),['zonnepanelen']);
+ assert.equal(x.measures[0].details.specialConstruction,'yes');
+ assert.equal(W.evaluate(x,x.measures[0],date).checks.find(r=>r.id==='construction').status,'attention');
+ const old=P.newProject('Oud zonneproject',['pv_constructie']);old.measures[0].details.pvVat='zero';
+ const imported=P.envelope({app:'SubsidieReadyPlan',schemaVersion:3,projects:[old]});
+ assert.equal(imported.projects[0].measures[0].type,'pv_constructie');
+ assert.equal(W.evaluate(imported.projects[0],imported.projects[0].measures[0],date).checks.find(r=>r.id==='construction').status,'attention');
+});
 test('next: changed facts, project context and source version invalidate manual checkmarks',()=>{const q=p(),m=q.measures[0];P.setCheck(q,m,'source',true);assert.equal(P.checked(q,m,'source'),true);m.details.area='50';assert.equal(P.checked(q,m,'source'),false);P.setCheck(q,m,'source',true);q.area='m29';assert.equal(P.checked(q,m,'source'),false);P.setCheck(q,m,'source',true);m.ruleVersion='old';assert.equal(P.checked(q,m,'source'),false);});
 test('next: import never implicitly declares an official award',()=>{const q=p(),m=q.measures[0];for(const t of W.tasks(m))P.setCheck(q,m,t.id,true);const r=W.evaluate(q,m,date);assert.equal(r.status,'Eigen actielijst afgerond');assert.equal(r.eligibilityAssessed,false);assert.equal(r.amount,null);assert.ok(r.checks.some(x=>x.status==='unknown'));});
 test('next: calendar month calculation clamps leap days and month-end dates',()=>{assert.equal(P.addMonths('2024-02-29',24),'2026-02-28');assert.equal(P.addMonths('2026-01-31',1),'2026-02-28');assert.equal(P.date('2026-02-30'),'');assert.equal(P.addMonths('garbage',24),'');});
