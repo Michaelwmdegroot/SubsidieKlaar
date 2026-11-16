@@ -4,9 +4,10 @@ require_once __DIR__.'/mysql.php';
 require_once __DIR__.'/smtp.php';
 /* Testrelease backend: encrypted, locked single-host pilot storage. Off without private config. */
 const SRN_SCHEMA=1;
-const SRN_TERMS_VERSION='2026-11-14-account-v1';
-const SRN_PRIVACY_VERSION='2026-11-14-privacy-v1';
+const SRN_TERMS_VERSION='2026-11-16-account-v2';
+const SRN_PRIVACY_VERSION='2026-11-16-privacy-v2';
 const SRN_EMAIL_MARKETING_VERSION='2026-11-14-nivo-email-v1';
+const SRN_PROFILE_VERSION='2026-11-16-optional-profile-v1';
 const SRN_RULE='2026.11.14.3-beta';
 // PHP/OpenSSL is supported on ordinary shared hosting; sodium is optional for legacy data.
 function srn_openssl_ready(): bool {
@@ -157,7 +158,7 @@ function srn_handle(array $c,string $action,array $in,string $token,string $csrf
     if(!$aid){if(($c['storage_driver']??'file')!=='mysql'&&count($s['accounts'])>=200)return srn_error('Lokale testcapaciteit bereikt.',503);$aid=srn_id();$s['accounts'][$aid]=['id'=>$aid,'email'=>$ch['email'],'emailHash'=>$ch['emailHash'],'created'=>time(),'lastUsed'=>time(),'reminders'=>false,'termsVersion'=>$ch['termsVersion'],'termsAcceptedAt'=>gmdate('c'),'privacyVersion'=>SRN_PRIVACY_VERSION,'marketingEmail'=>false,'marketingHistory'=>[],'profile'=>[]];}
     $s['accounts'][$aid]['lastUsed']=time();
     // Personal profile is never created before OTP. Blank login fields do not erase existing data.
-    if(!empty($ch['profile']))$s['accounts'][$aid]['profile']=array_replace($s['accounts'][$aid]['profile']??[],$ch['profile']);
+    if(!empty($ch['profile'])){$s['accounts'][$aid]['profile']=array_replace($s['accounts'][$aid]['profile']??[],$ch['profile']);$s['accounts'][$aid]['profileUpdatedAt']=gmdate('c');$s['accounts'][$aid]['profileVersion']=SRN_PROFILE_VERSION;}
     if(($ch['termsVersion']??'')===SRN_TERMS_VERSION){$s['accounts'][$aid]['termsVersion']=SRN_TERMS_VERSION;$s['accounts'][$aid]['termsAcceptedAt']=gmdate('c');$s['accounts'][$aid]['privacyVersion']=SRN_PRIVACY_VERSION;}
     if(($ch['marketingEmailOptIn']??false)===true){$s['accounts'][$aid]['marketingEmail']=true;$s['accounts'][$aid]['marketingHistory']=array_slice([...($s['accounts'][$aid]['marketingHistory']??[]),['enabled'=>true,'at'=>gmdate('c'),'version'=>SRN_EMAIL_MARKETING_VERSION,'method'=>'verified-account-signup','entity'=>'NIVO Groep Holland B.V.']],-20);}
    }
@@ -183,6 +184,8 @@ function srn_handle(array $c,string $action,array $in,string $token,string $csrf
    if(!$u)return srn_error('Log eerst in om je contactgegevens te wijzigen.',401);
    try{$profile=srn_profile($in['profile']??null);}catch(InvalidArgumentException $e){return srn_error($e->getMessage(),400);}
    $s['accounts'][$u['id']]['profile']=$profile;
+   $s['accounts'][$u['id']]['profileUpdatedAt']=gmdate('c');
+   $s['accounts'][$u['id']]['profileVersion']=SRN_PROFILE_VERSION;
    srn_audit($s,'account_profile_update',$u['id'],$u['id']);
    return ['ok'=>true,'user'=>srn_public_user($s['accounts'][$u['id']],$c)];
   }
@@ -194,7 +197,7 @@ function srn_handle(array $c,string $action,array $in,string $token,string $csrf
     srn_audit($s,$enabled?'marketing_email_opt_in':'marketing_email_opt_out',$u['id'],$u['id']);
     return ['ok'=>true,'user'=>srn_public_user($s['accounts'][$u['id']],$c)];
    }
-   if($action==='account-export'){if(!$u)return srn_error('Inloggen vereist.',401);return ['account'=>['email'=>$u['email'],'created'=>$u['created'],'termsVersion'=>$u['termsVersion']??null,'termsAcceptedAt'=>$u['termsAcceptedAt']??null,'privacyVersion'=>$u['privacyVersion']??null,'marketingEmail'=>($u['marketingEmail']??false)===true,'marketingHistory'=>$u['marketingHistory']??[],'profile'=>$u['profile']??[]],'projects'=>array_values(array_map(fn($p)=>$p['data'],array_filter($s['projects'],fn($p)=>$p['owner']===$u['id']))),'files'=>array_values(array_map(fn($f)=>array_intersect_key($f,array_flip(['id','project','measure','name','mime','size'])),array_filter($s['files'],fn($f)=>$f['owner']===$u['id']))),'note'=>'Bestanden afzonderlijk downloaden. Geen andere gebruikersdata.' ];}
+   if($action==='account-export'){if(!$u)return srn_error('Inloggen vereist.',401);return ['account'=>['email'=>$u['email'],'created'=>$u['created'],'termsVersion'=>$u['termsVersion']??null,'termsAcceptedAt'=>$u['termsAcceptedAt']??null,'privacyVersion'=>$u['privacyVersion']??null,'marketingEmail'=>($u['marketingEmail']??false)===true,'marketingHistory'=>$u['marketingHistory']??[],'profile'=>$u['profile']??[],'profileVersion'=>$u['profileVersion']??null,'profileUpdatedAt'=>$u['profileUpdatedAt']??null],'projects'=>array_values(array_map(fn($p)=>$p['data'],array_filter($s['projects'],fn($p)=>$p['owner']===$u['id']))),'files'=>array_values(array_map(fn($f)=>array_intersect_key($f,array_flip(['id','project','measure','name','mime','size'])),array_filter($s['files'],fn($f)=>$f['owner']===$u['id']))),'note'=>'Bestanden afzonderlijk downloaden. Geen andere gebruikersdata.' ];}
   if($action==='account-delete'){
    if(!$u||time()-($session['authAt']??0)>600)return srn_error('Log opnieuw in om je account te verwijderen.',401);if(($in['confirm']??'')!=='VERWIJDER')return srn_error('Bevestig verwijderen.');
    $purge=[];foreach($s['files']as$id=>$f)if($f['owner']===$u['id']){unset($s['files'][$id]);$purge[]=$id;}
