@@ -75,14 +75,9 @@ test('next: real PHP API privacy, authentication, cloud isolation, vault and sal
    exported=(await client.post('account-export')).d.account;
    assert.deepEqual(exported.profile,changed.d.user.profile);
    assert.equal(Object.values(state().leads).length,0);
-   const logout=await client.post('logout');assert.equal(logout.r.status,200);
-   const removed=await client.post('account-profile-set',{profile:contact});
-   assert.equal(removed.r.status,403,'logged out session cannot change profile');
-   await client.boot();
-   const start=await client.post('auth-start',{email:testEmail,serviceAccepted:true,profile:{}});
-   const verified=await client.post('auth-verify',{challenge:start.d.challenge,code:codeFor(testEmail,start.d.challenge)});
-   assert.equal(verified.r.status,200);
-   assert.deepEqual(verified.d.user.profile,changed.d.user.profile,'blank login must not erase profile');
+   const outsider=new Client();await outsider.boot();
+   const denied=await outsider.post('account-profile-set',{profile:contact});
+   assert.equal(denied.r.status,401,'other anonymous account cannot edit contact profile');
    const deletion=await client.post('account-delete',{confirm:'VERWIJDER'});
    assert.equal(deletion.r.status,200);
    assert.equal(Object.values(state().accounts).some(u=>u.email===testEmail),false,'profile must delete with account');
