@@ -217,7 +217,9 @@ test('NIVO accountvoorwaarden and privacy links are public and separate from opt
  const terms=read('voorwaarden/index.html'),privacy=read('privacy/index.html'),app=read('assets/plan-app.js');
  assert.match(terms,/NIVO Groep Holland B\.V\./);assert.match(terms,/95227768/);
  assert.match(privacy,/info@nivogroepholland\.nl/);assert.match(privacy,/niet.*automatisch/);
- assert.ok(app.includes('name="marketingEmail"'));
+ assert.ok(app.includes('name="updates"'));
+ assert.ok(app.includes('name="terms" required'));
+ for(const key of ['fullName','phone','street','houseNumber','postalCode','city'])assert.ok(app.includes('name="'+key+'"'),key+' optional contact field');
  assert.ok(app.includes('name="terms"'));
  assert.match(app,/marketing-email-set/);
  assert.ok(!app.includes('name="marketingEmail" required'));
