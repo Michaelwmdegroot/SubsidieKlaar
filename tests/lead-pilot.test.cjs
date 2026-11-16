@@ -101,7 +101,7 @@ test('lead pilot: synthetic approved fixture renders two safe ordinary links and
   const config = syntheticApprovedConfig();
   const html = pilot.render(config);
   assert.equal(pilot.validate(config).status, 'ready');
-  assert.match(html, /<aside class="info-box" aria-labelledby="lead-pilot-title">/);
+  assert.match(html, /<aside class="info-box" aria-labelledby="lead-pilot-title"(?:\s+style="[^"]+")?>/);
   assert.match(html, /Commercieel productadvies/);
   assert.match(html, /Thuisbatterij Team B\.V\./);
   assert.match(html, /geen ingevulde antwoorden of documenten mee/);
