@@ -19,7 +19,7 @@ report={
   "scope":"Read-only remote form, first-visit consent network and fixed recipient; no POST to form",
   "target":"thuisbatterijteam.nl",
   "formValid":False,"privacyCopyVisible":False,
-  "consentChoiceVisible":False,"denyAttempted":False,
+  "consentChoiceVisible":False,"denyAttempted":False,"consentDefaultDenied":False,"externalMeasurementReview":False,
   "trackingBeforeDecision":[],
   "trackingAfterDeny":[],
   "submittedLeadRequests":0,
@@ -32,7 +32,7 @@ def tracking_host(host):
 try:
     with sync_playwright() as pw:
         browser=pw.chromium.launch(headless=True)
-        context=browser.new_context(locale="nl-NL",timezone_id="Europe/Amsterdam")
+        context=browser.new_context(locale="nl-NL",timezone_id="Europe/Amsterdam",viewport={"width":390,"height":844})
         page=context.new_page()
         seen=[]
         def on_request(req):
@@ -71,6 +71,13 @@ try:
             and "alleen" in page.locator(".tbt-conversion__privacy").first.inner_text().lower())
         stage="consent_first_visit"
         page.wait_for_timeout(1800)
+        report["consentDefaultDenied"]=bool(page.evaluate("""() =>
+          [...(window.dataLayer || [])].some(entry => entry &&
+            entry[0] === 'consent' && entry[1] === 'default' &&
+            entry[2] && entry[2].analytics_storage === 'denied' &&
+            entry[2].ad_storage === 'denied' &&
+            entry[2].ad_user_data === 'denied' &&
+            entry[2].ad_personalization === 'denied')"""))
         before={r["host"] for r in seen if r["tracking"]}
         report["trackingBeforeDecision"]=sorted(before)
         denied=page.locator(".cmplz-cookiebanner:not(.cmplz-hidden) .cmplz-deny")
@@ -82,12 +89,14 @@ try:
             page.wait_for_timeout(500)
         report["trackingAfterDeny"]=sorted({r["host"] for r in seen if r["tracking"]})
         report["submittedLeadRequests"]=sum(1 for r in seen if r["submit"])
+        # Denied-default Consent Mode may send cookieless pings. Record these
+        # third-party hosts for a separate owner privacy audit; this probe
+        # cannot certify payloads or cookie lawfulness.
+        report["externalMeasurementReview"]=bool(report["trackingBeforeDecision"] or report["trackingAfterDeny"])
         report["result"]="pass" if all([
-            report["formValid"],
-            report["privacyCopyVisible"],
-            not report["trackingBeforeDecision"],
-            not report["trackingAfterDeny"],
-            report["submittedLeadRequests"]==0
+            report["formValid"], report["privacyCopyVisible"],
+            report["consentDefaultDenied"], report["consentChoiceVisible"],
+            report["denyAttempted"], report["submittedLeadRequests"]==0
         ]) else "no_go"
         context.close()
         browser.close()
@@ -98,6 +107,6 @@ finally:
     (OUT/"report.json").write_text(json.dumps(report,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
     print(json.dumps({k:report.get(k) for k in
         ("result","failureStage","failureType","formValid","privacyCopyVisible","consentChoiceVisible","denyAttempted",
-         "trackingBeforeDecision","trackingAfterDeny","submittedLeadRequests","httpStatus","formsSeen","targetFormsSeen","simpleFormsSeen","targetFormVisible")},ensure_ascii=False))
+         "consentDefaultDenied","externalMeasurementReview","trackingBeforeDecision","trackingAfterDeny","submittedLeadRequests","httpStatus","formsSeen","targetFormsSeen","simpleFormsSeen","targetFormVisible")},ensure_ascii=False))
 if report["result"]!="pass":
     raise SystemExit(1)
