@@ -46,7 +46,7 @@ jobs:
           path: qa/tbt-target/report.json
           retention-days: 14
           if-no-files-found: warn
-      - name: Block misleading consent or unusable destination
+      - name: Block missing consent default or unusable destination
         if: steps.preflight.outcome != 'success'
         run: |
           echo 'TBT target NO-GO/UNKNOWN. Inspect safe report; do not treat this as lead receipt.'
