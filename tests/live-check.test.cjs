@@ -26,7 +26,7 @@ function fixture(overrides = {}) {
       if (p === '/api/next/') {status=503;headers['Cache-Control']='no-store, private';text=JSON.stringify({configured:false,error:'Online functies zijn niet geconfigureerd.'});}
       else text=JSON.stringify(p.endsWith('health.php')?{service:'SubsidieReady',version:'1.0.0',status:'ok',document_processing:'browser-only'}:{service:'SubsidieReady',analytics:false});
     } else if (betaPages.includes(p)) {text='<title>SubsidieReady testrelease</title><meta name="robots" content="noindex,nofollow"><h1>Mijn plan</h1>'+(p==='/mijn-plan/'?'<script defer src="/assets/next-api.js"></script><script defer src="/assets/plan-app.js"></script>':'');headers['X-Robots-Tag']='noindex, nofollow';}
-    else if (pages.includes(p)) text='<h1>SubsidieReady uitleg</h1>';
+    else if (pages.includes(p)) text='<h1>SubsidieReady uitleg</h1>'+(p==='/hulp/thuisbatterij-btw/'?'<aside aria-labelledby="lead-pilot-title"><p>Commercieel productadvies</p><h2 id="lead-pilot-title">Thuisbatterijadvies</h2><a href="https://thuisbatterijteam.nl/contact/adviesgesprek/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Vraag advies</a><a href="https://thuisbatterijteam.nl/voorwaarden-beleid/privacybeleid/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Privacy</a></aside>':'');
     else if (p.startsWith('/assets/')) {headers['Content-Type']=p.endsWith('.css')?'text/css':'application/javascript';text=p==='/assets/plan-app.js'?'Inloggen & bewaren name="terms" required name="marketingEmail" input(\'Naam\',\'fullName\' input(\'Telefoonnummer\',\'phone\' input(\'Straat\',\'street\' input(\'Postcode\',\'postalCode\'':p==='/assets/next-api.js'?"/api/next/?action=bootstrap credentials:'same-origin'":'x'.repeat(1001);}
     else if (p === '/robots.txt') text='User-agent: *\nDisallow: /admin/\nSitemap: '+origin+'/sitemap.xml\n';
     else if (p === '/sitemap.xml') text=['/',...pages].map(p=>'<loc>'+origin+p+'</loc>').join('');
@@ -41,6 +41,15 @@ const failed = (r, name) => r.checks.some(c=>c.name.includes(name) && !c.pass);
 test('public release can pass with admin and analytics explicitly unconfigured',async()=>{
   const f=fixture(),r=await checkLive({expected,fetchImpl:f.fetchImpl});assert.equal(r.ok,true);assert.ok(r.warnings.some(w=>w.includes('niet geactiveerd')));
   for(const {url,options} of f.calls){assert.equal(options.method,'GET');assert.equal(options.redirect,'manual');assert.equal(options.credentials,'omit');assert.equal(options.body,undefined);assert.equal(options.headers.Cookie,undefined);assert.ok(['subsidieready.nl','www.subsidieready.nl'].includes(new URL(url).hostname));}
+});
+test('live TBT referral check fails closed when destination is absent, altered or leaking queries',async()=>{
+  const absent=fixture({'/hulp/thuisbatterij-btw/':{text:'<h1>SubsidieReady</h1>'}});
+  const a=await checkLive({expected,fetchImpl:absent.fetchImpl});
+  assert.ok(failed(a,'Vrijwillige TBT-advieskaart'));
+  const unsafe=fixture({'/hulp/thuisbatterij-btw/':{text:'<h1>SubsidieReady</h1><h2 id="lead-pilot-title">Advies</h2>Commercieel productadvies<a href="https://thuisbatterijteam.nl/contact/adviesgesprek/?email=example" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Verzoek</a><a href="https://thuisbatterijteam.nl/voorwaarden-beleid/privacybeleid/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Privacy</a>'}});
+  const b=await checkLive({expected,fetchImpl:unsafe.fetchImpl});
+  assert.ok(failed(b,'Vrijwillige TBT-advieskaart'));
+  assert.ok(unsafe.calls.every(x=>x.options.method==='GET'&&!x.options.body&&!x.options.headers.Cookie));
 });
 test('network failure does not trigger further probes or leak error messages',async()=>{
   let n=0;const r=await checkLive({expected,fetchImpl:async()=>{n++;throw Error('SECRET-DO-NOT-LOG');}});
