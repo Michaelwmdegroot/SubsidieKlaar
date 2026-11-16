@@ -64,3 +64,62 @@
 
 /* The generic flex label rule must never override the hidden callback choice. */
 #portal-phone-field[hidden]{display:none!important}
+
+/* NIVO direct-lead form V2 — compact on desktop, accessible mobile fallback. */
+#main.p-container:has(#advice-app){width:min(1150px,calc(100% - 40px));margin:22px auto 36px}
+#advice-app .p-portal{max-width:none}
+#advice-app .sr-lead-hero{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:0 0 16px}
+#advice-app .sr-lead-hero h1{font-size:clamp(25px,2.5vw,35px);line-height:1.13;letter-spacing:-1.15px;margin:6px 0 6px;color:#14253c}
+#advice-app .sr-lead-hero p{margin:0;color:#566777;font-size:13px;line-height:1.45}
+#advice-app .sr-lead-hero .eyebrow{font-size:10px;letter-spacing:.07em;color:#157a29;font-weight:750}
+#advice-app .sr-lead-trust{display:flex;flex-wrap:wrap;align-content:center;justify-content:flex-end;gap:7px 10px;max-width:265px;flex-shrink:0}
+#advice-app .sr-lead-trust span{font-size:11px;color:#296235;font-weight:650;white-space:nowrap}
+#advice-app .p-portal-form{padding:20px 24px 18px;margin:0 0 8px;box-shadow:0 12px 32px #113e2420;border-radius:18px}
+#advice-app .sr-lead-title{display:flex;gap:8px;align-items:baseline;color:#16283e;margin:0 0 9px;font-size:14px}
+#advice-app .sr-lead-title>span{color:#168028;font-size:12px;font-weight:750}
+#advice-app .sr-lead-title strong{font-size:14px}
+#advice-app .sr-lead-title small{margin-left:auto;font-size:11px;color:#6b7971;font-weight:450}
+#advice-app .sr-lead-title-contact{border-top:1px solid #e7eee7;padding-top:15px;margin-top:15px}
+#advice-app .sr-lead-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:11px 13px;margin:0}
+#advice-app .sr-lead-grid>.p-field{margin:0;gap:5px;min-width:0;font-size:12px;font-weight:650;color:#385344}
+#advice-app .sr-lead-grid>.p-field>span small{font-weight:450;color:#748077}
+#advice-app .sr-lead-grid input,#advice-app .sr-lead-grid select{min-height:41px;padding:8px 10px;font-size:13px;border-radius:9px}
+#advice-app .sr-lead-grid textarea{min-height:57px;padding:9px 10px;font-size:13px;border-radius:9px;resize:vertical}
+#advice-app .sr-span-2{grid-column:span 2}
+#advice-app .sr-span-3{grid-column:span 3}
+#advice-app .sr-span-4{grid-column:span 4}
+#advice-app .sr-span-5{grid-column:span 5}
+#advice-app .sr-span-12{grid-column:span 12}
+#advice-app .sr-lead-note{margin-top:1px}
+#advice-app .sr-lead-bottom{display:flex;justify-content:space-between;gap:22px;align-items:center;border-top:1px solid #e7eee7;margin-top:14px;padding-top:13px}
+#advice-app .p-portal-consent{max-width:640px;margin:0;font-size:11px;line-height:1.45;color:#374858}
+#advice-app .p-portal-consent a{color:#116c25;text-decoration:underline;text-underline-offset:2px}
+#advice-app .p-portal-consent input{margin-top:1px;min-width:17px}
+#advice-app .sr-lead-actions{display:flex;flex-direction:column;align-items:stretch;gap:5px;min-width:244px}
+#advice-app .sr-lead-actions .p-btn{min-height:43px;font-size:13px;white-space:nowrap}
+#advice-app .sr-lead-actions small{font-size:10px;color:#667772;text-align:center}
+#advice-app .sr-lead-footnote{font-size:11px;line-height:1.5;color:#64736d;text-align:center;margin:7px 0}
+#advice-app .sr-honeypot{position:absolute!important;clip-path:inset(50%);width:1px;height:1px;overflow:hidden;white-space:nowrap}
+#advice-app .p-portal-success{max-width:690px;margin:38px auto;text-align:center}
+#advice-app .p-portal-success h1{font-size:30px}
+@media(max-width:960px){
+ #advice-app .sr-lead-trust{display:none}
+ #advice-app .sr-lead-bottom{align-items:stretch;flex-direction:column;gap:12px}
+ #advice-app .sr-lead-actions{align-items:flex-start;min-width:0}
+ #advice-app .sr-lead-actions small{text-align:left}
+ #advice-app .sr-span-5{grid-column:span 4}
+ #advice-app .sr-span-2{grid-column:span 2}
+ #advice-app .sr-span-3{grid-column:span 4}
+}
+@media(max-width:640px){
+ #main.p-container:has(#advice-app){width:calc(100% - 24px);margin:17px auto 24px}
+ #advice-app .sr-lead-hero h1{font-size:27px;letter-spacing:-.8px}
+ #advice-app .sr-lead-hero p{font-size:12px}
+ #advice-app .p-portal-form{padding:17px 15px 16px;border-radius:14px}
+ #advice-app .sr-lead-grid{gap:10px}
+ #advice-app .sr-span-4,#advice-app .sr-span-5,#advice-app .sr-span-3{grid-column:span 12}
+ #advice-app .sr-span-2{grid-column:span 6}
+ #advice-app .sr-lead-title small{display:none}
+ #advice-app .sr-lead-actions .p-btn{width:100%}
+ #advice-app .sr-lead-actions{align-items:stretch}
+}

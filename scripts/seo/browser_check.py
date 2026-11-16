@@ -280,30 +280,42 @@ def run(browser, base):
     form.wait_for(state="visible")
     check(form.locator('input[name="contactRequested"][required]').count()==1 and
           not form.locator('input[name="contactRequested"]').is_checked(),
-          "NIVO advice form requires separate unchecked contact request")
-    for key in ("topic","timeline","name","email","channel","area","note"):
-        check(form.locator(f'[name="{key}"]').count()==1,"NIVO advice field "+key+" is present")
+          "NIVO direct advice requires one unchecked request-only contact permission")
+    for key in ("topic","timeline","name","email","channel","phone","street","houseNumber","postalCode","city","note"):
+        check(form.locator(f'[name="{key}"]').count()==1,
+              "NIVO direct advice field "+key+" is present")
+    for key in ("name","email","phone","street","houseNumber","postalCode","city"):
+        check(form.locator(f'[name="{key}"][required]').count()==1,
+              "NIVO lead identification is required: "+key)
     check(page.locator('a[href="/privacy/"]').count()>0,
-          "NIVO advice links to own privacy policy")
+          "NIVO advice links to privacy disclosure")
     check("NIVO Groep Holland B.V." in page.locator("#advice-app").inner_text(),
-          "NIVO recipient is explicitly named")
-    page.locator("#portal-channel").select_option("phone")
-    check(page.locator('#portal-phone-field input[name="phone"]').is_visible() and
-          page.locator('#portal-phone-field input[name="phone"]').get_attribute("required") is not None,
-          "phone is required only for voluntarily selected callback")
-    page.locator("#portal-channel").select_option("email")
-    check(page.locator('#portal-phone-field').is_hidden(),
-          "email-only contact doesn't collect a phone number")
+          "NIVO controller is named")
+    check(form.locator('input[name="website"]').count()==1 and
+          page.evaluate("""() => {
+            const field=document.querySelector('#portal-advice-form [name="website"]');
+            if(!field || field.tabIndex!==-1)return false;
+            const wrapper=field.closest('.sr-honeypot');
+            return !!wrapper && getComputedStyle(wrapper).clipPath.includes('inset(50%');
+          }"""),
+          "a non-intrusive spam trap is clipped and skipped in keyboard tab order")
+    check(page.locator('#portal-code-form').count()==0 and
+          'verificatiecode' in page.locator("#advice-app").inner_text().lower(),
+          "advice is one step and explicitly needs no verification code")
     for width,height in ((1440,900),(390,844),(320,740)):
         page.set_viewport_size({"width":width,"height":height})
         page.wait_for_timeout(80)
         values=page.evaluate("""() => ({
             width: innerWidth, scrollWidth: document.documentElement.scrollWidth,
-            submitVisible: (()=>{const b=document.querySelector('#portal-advice-form [type=submit]');return !!(b && b.getBoundingClientRect().width>0)})()
+            submitVisible: (()=>{const b=document.querySelector('#portal-advice-form [type=submit]');return !!(b && b.getBoundingClientRect().width>0)})(),
+            formBottom: Math.ceil(document.querySelector('#portal-advice-form').getBoundingClientRect().bottom)
         })""")
         REPORT["screens"].append({"route":"/advies/","state":"nivo-portal",**values})
         check(values["scrollWidth"]<=width and values["submitVisible"],
               f"NIVO Portal advice form fits {width}px without horizontal scrolling",values)
+        if width==1440:
+            check(values["formBottom"]<=height-8,
+                  "desktop 1440x900 direct lead form fits within one screen",values)
         if width in (1440,390):
             page.screenshot(path=OUT/f"portal-advice-{width}.png",full_page=True)
     check(all(item["method"]=="GET" and item["local"] for item in portal_requests),

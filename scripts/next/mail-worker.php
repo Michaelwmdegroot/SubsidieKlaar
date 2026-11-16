@@ -36,7 +36,7 @@ try {
             } else {
                 $subject=$v['type']==='otp'
                     ?'SubsidieReady verificatiecode'
-                    :($v['type']==='portal'?'SubsidieReady | Nieuwe geverifieerde adviesaanvraag':'SubsidieReady: je gekozen herinnering');
+                    :($v['type']==='portal'?'SubsidieReady | Nieuwe adviesaanvraag':'SubsidieReady: je gekozen herinnering');
                 try {
                     $ok=$c['transport']==='smtp'
                         ?srn_smtp_send($c,$v['to'],$subject,$v['text'],$v['type']==='otp'?srn_otp_email_html($v['text']):null)

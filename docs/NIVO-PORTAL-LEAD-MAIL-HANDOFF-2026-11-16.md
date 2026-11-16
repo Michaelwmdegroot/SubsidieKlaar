@@ -1,60 +1,52 @@
-# SubsidieReady → NIVO Portal-mailbox | geverifieerde adviesaanvragen
+# SubsidieReady → NIVO Portal | directe adviesleads V2
 
-**Opdracht:** 16 november 2026. **Bestemming:** `portal@nivogroepholland.nl` (eigen NIVO Groep Holland B.V.).  
-**Eigenaarbesluit:** [Issue #9, centrale mailroutering](https://github.com/Michaelwmdegroot/SubsidieKlaar/issues/9#issuecomment-6905282062).  
-**Vervangt:** de eerdere TBT B.V.-adviesverwijzing op de thuisbatterijpagina. Deze wordt in `scripts/lead-pilot.config.json` weer uitgeschakeld en de TBT-monitor blijft alleen handmatig beschikbaar.
+**Eigenaarbesluit (16 november 2026):** schaf de e-mailverificatie voor vrijwillige adviesaanvragen af; vraag direct NAW, e-mail en telefoon. De ontvanger blijft **portal@nivogroepholland.nl**, onder NIVO Groep Holland B.V. Deze overdracht vervangt het OTP-contract V1 uit PR #45/#46. De bestaande accountlogin houdt wel zijn OTP.
 
-## Werkelijke flow
+## Flow
 
-1. Bezoeker gebruikt gratis SubsidieReady-informatie en **kiest zelf** `Vraag vrijblijvend advies aan` op `/hulp/thuisbatterij-btw/`.
-2. `/advies/` laat een zelfstandig, vrijwillig formulier zien; **geen account nodig**. De bezoeker kiest het onderwerp, gewenste contactkanaal en eventueel tijdspad, vult naam en e-mail in, eventueel telefoon bij gekozen belcontact, optioneel postcodegebied (vier cijfers) en een korte vraag (maximaal 500 tekens). Geen documenten, fiscaal profiel, inkomen, accountdata, tracker-id, volledige woning-/energiedossieropslag of automatische profielvooraanvulling.
-3. Na een **afzonderlijk verplicht akkoord voor specifiek gevraagd contact**, maar zonder toestemming voor marketing, maakt de bestaande `auth-start`-API met `purpose=portal` een tijdgebonden OTP aan. Alleen de contactvraag is maximaal tien minuten in de bestaande versleutelde private challenges opgeslagen. Aanvraag is dan **nog niet verzonden naar sales**.
-4. Alleen na de juiste **eenmalige, sessiegebonden achtcijferige e-mailcode** stuurt `auth-verify` een klein, getypeerd `portal`-bericht naar de bestaande versleutelde MySQL-mailwachtrij, gericht aan de op serverniveau vaste mailbox `portal@nivogroepholland.nl`. De respons `portalQueued=true` betekent **in de wachtrij opgenomen**, geen bewijs van aflevering.
-5. De al bestaande Hostinger-cronworker verzendt via de huidige beveiligde SMTP-AUTH-verbinding. De mail heeft een generiek onderwerp zonder persoonsgegevens, een unieke `SR-`-referentie en uitsluitend een versiegebonden JSON-blok voor de toekomstige NIVO Portal-agent.
-6. Zodra SMTP het bericht accepteert, wist de bestaande worker de volledige berichtinhoud uit de eigen wachtrij. De gebruiker ontvangt geen automatische reclame of account.
-7. Een latere, aparte **Portal-agent** verwerkt de mailbox, dedupliceert op `request_id`, registreert verificatie en gekozen contactkanaal, voert opvolging/retentie/bezwaar uit en koppelt eventuele afspraak/offerte/verkoop. **Geen Portal-API of draaiende Mac nodig om een aanvraagmail te versturen.**
+1. Een bezoeker kiest vrijwillig /advies/, zonder account of gekoppeld verduurzamingsdossier.
+2. Het compacte formulier vraagt onderwerp, tijdspad, contactvoorkeur, volledige naam, e-mail, telefoon, straat, huisnummer, volledige Nederlandse postcode, woonplaats en optioneel een korte vraag.
+3. Een standaard niet-aangevinkte, verplichte contactcheckbox geldt alleen voor deze aanvraag, niet voor reclame. Na de klik gaat POST /api/next/?action=portal-submit rechtstreeks naar de backend, **zonder OTP**.
+4. Backend controleert Origin, CSRF, vaste schema- en consentversie, veldvalidatie, een verborgen honeypot en limieten (3 per e-mailadres / uur en 10 per IP / uur). Herhaalde POST met dezelfde sessiegebonden submissionId is idempotent.
+5. Er volgt één SR-referentie en één bericht in de bestaande versleutelde MySQL-mailwachtrij. De Hostinger-cronworker verzendt via bestaande SMTP-AUTH naar het vaste, server-side Portal-adres. Er is geen Portal-API-koppeling of draaiende Mac nodig.
+6. De succesmelding betekent **veilig in de verzendwachtrij geplaatst**, niet bewezen SMTP-acceptatie, inboxontvangst of opvolging.
 
-## Stabiel mailcontract
+## Mailcontract voor toekomstige Portal-agent
 
-**Onderwerp:** `SubsidieReady | Nieuwe geverifieerde adviesaanvraag`  
-**Nodige kenmerken:** `BEGIN_SUBSIDIEREADY_PORTAL_JSON` en `END_SUBSIDIEREADY_PORTAL_JSON`.
+**Onderwerp:** SubsidieReady | Nieuwe adviesaanvraag
 
-Het JSON-blok bevat exact:
-- `schema=subsidieready.nivo.portal.request.v1`
-- `request_id=SR-...` — uniek en te gebruiken als idempotentiesleutel
-- `verified_at_utc`
-- `controller=NIVO Groep Holland B.V.`, `receiver=portal@nivogroepholland.nl`, `source=subsidieready`
-- `topic` (eigen aanbod), `name`, `verified_email`, `preferred_channel`
-- `phone` uitsluitend bij zelf gekozen telefonisch contact
-- `postcode_area` (optioneel), `timeline`, `question` (maximaal 500 tekens)
-- `contact_requested=true`, `request_text_version=2026-11-16-nivo-portal-v1`
-- `marketing_opt_in=false` — expliciet géén nieuwsbrief of algemene reclame.
+**Markers:** BEGIN_SUBSIDIEREADY_PORTAL_JSON en END_SUBSIDIEREADY_PORTAL_JSON
 
-**Let op:** de e-mailbevestiging bewijst toegang tot e-mail, **niet** bezit van het opgegeven telefoonnummer. Bij gekozen belcontact mag NIVO alleen over dat concrete gevraagde advies spreken. De Portal-agent mag niet automatisch andere aanbiedingen versturen of dossiers inzien.
+**Schema:** subsidieready.nivo.portal.request.v2
 
-## Bewijs en privacygrenzen
+De JSON bevat:
+- request_id (unieke SR-... sleutel), submitted_at_utc
+- controller=NIVO Groep Holland B.V., receiver=portal@nivogroepholland.nl, source=subsidieready
+- topic, timeline, preferred_channel (email / phone), question (maximaal 500 tekens)
+- name, email, phone, postcode_area
+- address: street, house_number, postal_code (genormaliseerd tot 1234AB), city
+- email_verified=false, verification_method=none
+- contact_requested=true, contact_consent_at_utc, request_text_version=2026-11-16-nivo-portal-v2
+- marketing_opt_in=false
 
-- MySQL/AES-GCM-config en SMTP zijn eerder op de echte Hostinger-server geverifieerd. In deze wijziging worden **geen bestaande private secrets, databasegegevens, cronfrequenties, accountflags of encryptiesleutels aangepast**.
-- De native `leads_enabled=false`, `vault_enabled=false`, `staff_enabled=false` productiegates blijven vereist; dit is een **apart, klein transactioneel e-mailpad**, geen CRM-/salesinboxactivatie.
-- Formulier/subsidiebezoek, accountaanmaak, accountprofiel, opt-in voor marketing en opgeslagen project zijn geen adviesaanvraag.
-- OTP- en submitlimieten, same-origin / CSRF, de bestaande mailqueue met idempotent `portal:<challenge-id>` en gescheiden account-/requestpurpose blijven behouden.
-- De private mailwachtrij bevat noodzakelijke contactdata alleen totdat het bericht is verzonden, verlopen of mislukt. Het mailbericht zelf en verdere bewaartermijnen vallen daarna onder de NIVO Portal/mailbox; die retentie en eventuele back-upverwerking moeten door de Portal-agent worden vastgelegd. Een gebruiker kan bij `info@nivogroepholland.nl` om inzage, correctie of intrekking van gewenste opvolging verzoeken.
-- SMTP-acceptatie is **niet** hetzelfde als ontvangst in de mailbox. Dat moet na de eerste echte synthetische, geverifieerde aanvraag van de eigenaar afzonderlijk worden aangetoond. Geen persoonsgegevens, voorbeeld-OTP of bestaande klantenmail in GitHub.
+**Migratie V1 → V2:** V1 had verified_email en verified_at_utc na een e-mailcode; V2 gebruikt email, email_verified=false en submitted_at_utc. De Portal-parser moet beide schema's expliciet onderscheiden. Markeer V2-leads nooit als geverifieerd; het opgegeven telefoonnummer is evenmin geverifieerd. Gebruik request_id voor deduplicatie.
 
-## Release- en herstelprocedure
+## Privacy- en veiligheidsgrenzen
 
-1. Quality, PHP-test, MySQL/MariaDB, browser, gegenereerde publieke assets, privacytekst, endpoint- en consenttesten zijn geslaagd op een kleine PR.
-2. Productie-URL `/advies/` toont de juiste NIVO-ontvanger; e-mailcode wordt via bestaande worker bezorgd; géén aanvraagmail vóór verificatie.
-3. Eenmalige eigenaarstest met fictieve naam/onderwerp en een eigen testmailadres; controleer inbox `portal@nivogroepholland.nl` op onderwerp, referentie, juiste JSON-velden, één uniek bericht en geen ongevraagde extra afleveringen. Deel nooit echte code of klantinhoud via GitHub/chat.
-4. Daarna kan de **Portal-agent** de parser, duplicaten, opvolging en rechtensysteem bouwen zonder dat deze SubsidieReady-code opnieuw moet worden gekoppeld.
+- De vrijwillige aanvraag heeft geen toegang tot accountprofielen, plannen, documenten, fiscale gegevens, marketingvoorkeuren of de native salesdatabase.
+- De ontvanger staat vast in de code. Alleen lokale testconfig of productie met NIVO-controller, gereedstaande transactiemail en versleutelde MySQL voldoet aan de productiegate.
+- De browser bewaart de formulierinhoud niet via localStorage of sessionStorage; berichtinhoud wordt na succesvolle SMTP-acceptatie door de mailworker uit de queue verwijderd.
+- De toekomstig Portal-agent beheert de verdere bewaartermijnen, bezwaar, verwijdering, eerste contact, kwalificatie en opvolging. Geen generieke nieuwsbrief of verkooptelefoontjes buiten deze vraag.
+- Zonder OTP wordt de drempel lager, maar neemt het risico op verkeerd getypte of valse gegevens toe. Bewaak spamvolume en afleverbaarheid; voeg niet opnieuw standaard een code toe zonder eigenaarbesluit.
 
-**Rollback bij fouten:** een gecontroleerde revert van de PR herstelt de eerdere publieke advieskaart en stuurt geen nieuwe native NIVO-mails meer. Al verzonden e-mails blijven in de Portal-mailbox bestaan en mogen niet als onderdeel van een Git rollback worden verwijderd. Een eventuele private mailwachtrij moet apart worden geïnventariseerd voordat een rollback uitgevoerde aanvragen raakt.
+## QA, release en echte ontvangst
 
-## Open vervolg
+- Vereist: npm run build, npm test, npm run package, SEO-check, PHP/SQL-regressie en echte Chromium-regressie.
+- Browserdoel: op desktop 1440×900 staat de volledige vorm inclusief verzendknop binnen de viewport; mobiel 390/320 px heeft geen horizontale overflow.
+- API-doel: een geldige aanvraag queued direct één Portal-mail met NAW; een herhaling met dezelfde submissionId geeft dezelfde referentie. Ongeldige schema's, consent, honeypot, postcode, e-mail, telefoon of Origin/CSRF falen.
+- **Productieacceptatie nog afzonderlijk nodig:** na merge en Hostinger-deploy een fictieve aanvraag met een beheerd testadres indienen en in portal@nivogroepholland.nl controleren of exact één mail met V2-schema aankomt. Geen test-NAW of echte klantdata in GitHub.
+- Rollback: revert van de PR herstelt eerdere code, maar reeds verzonden mails en openstaande queue-items worden niet automatisch teruggedraaid.
 
-- Bestaande account-E2E: werkelijk online plan ophalen in tweede browsersessie en accountdelete.
-- Echte Portal-inboxontvangst en veilige mailverwerking, retries/monitoring per afzender en formulierafhandeling onder consent.
-- Beheer van wettelijke bewaartermijnen, bezwaar en rechten door de toekomstige Portal-agent.
-- Echte funnelstatistieken uit eigen NIVO-verwerkingen, niet uit fictieve klik-/leadcounts.
-- Google Search Console/indexering en de daadwerkelijke organische conversie.
+## Volgende fase: zelfstandige organische leadmachine
 
+Bouw door op broncontrole, Search Console, betrouwbare SEO-landingspagina's per maatregel, contextuele contact-CTA's, premium mobiel formulier, privacyvriendelijke funnelmeting en echte leadkwaliteit-/verkoopfeedback uit de toekomstige NIVO Portal. Een accountaanmaak of advertentieklik telt niet als gekwalificeerde lead.
