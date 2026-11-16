@@ -172,16 +172,16 @@ def run(browser, base):
         page.goto(base + route, wait_until="networkidle")
         if route == "/hulp/thuisbatterij-btw/":
             pilot = page.locator('#lead-pilot-title')
-            target = page.locator('a[href="https://thuisbatterijteam.nl/contact/adviesgesprek/"]')
-            privacy = page.locator('a[href="https://thuisbatterijteam.nl/voorwaarden-beleid/privacybeleid/"]')
-            check(pilot.count() == 1 and target.count() == 1 and privacy.count() == 1,
-                  "published battery article has exactly one voluntary advice CTA and privacy link")
-            for candidate in (target, privacy):
-                check(candidate.get_attribute("target") == "_blank" and
-                      "noopener" in candidate.get_attribute("rel").split() and
-                      "noreferrer" in candidate.get_attribute("rel").split() and
-                      candidate.get_attribute("referrerpolicy") == "no-referrer",
-                      "TBT outbound link protects referrer and new-tab isolation")
+            target = page.locator('a[href="/advies/"]')
+            privacy = page.locator('a[href="/privacy/"]')
+            check(pilot.count() == 1 and target.count() == 1 and privacy.count() >= 1,
+                  "published battery article has exactly one voluntary NIVO Portal CTA and internal privacy link")
+            check(target.get_attribute("target") is None and
+                  "?" not in target.get_attribute("href") and
+                  "#" not in target.get_attribute("href"),
+                  "NIVO request remains same-origin with no query or fragment")
+            check(page.locator('a[href^="https://thuisbatterijteam.nl/contact/adviesgesprek/"]').count()==0,
+                  "old TBT destination is absent")
             check(page.locator('#lead-pilot-title').is_visible(),
                   "the voluntary commercial label is readable in the article")
         check(page.locator("h1").count() == 1, route + " has one rendered H1")
