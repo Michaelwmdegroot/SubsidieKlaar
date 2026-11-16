@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: '22'
       - run: php -v && npm run build && npm test && npm run package && npm run preview:next
-      - name: Verify public SEO and disabled lead pilot
+      - name: Verify public SEO and reviewed first-party lead pilot
         run: node scripts/audit-seo.cjs && node scripts/lead-pilot.cjs --check
       - name: Verify generated files
         run: git diff --exit-code -- index.html .htaccess robots.txt sitemap.xml version.json next-version.json concept hulp privacy voorwaarden bronnen over regelingen subsidies btw financiering mijn-plan advies sales bronbeheer assets/regelingen-engine.js
