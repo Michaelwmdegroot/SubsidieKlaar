@@ -104,7 +104,7 @@ async function checkLive({fetchImpl = globalThis.fetch, expected} = {}) {
     status200(planApp) &&
     planApp.text.includes('Inloggen & bewaren') &&
     planApp.text.includes('name="terms" required') &&
-    planApp.text.includes('name="updates"') &&
+    planApp.text.includes('name="marketingEmail"') &&
     planApp.text.includes("input('Naam','fullName'") &&
     planApp.text.includes("input('Telefoonnummer','phone'") &&
     planApp.text.includes("input('Straat','street'") &&
