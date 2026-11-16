@@ -2,6 +2,7 @@
 declare(strict_types=1);
 if (PHP_SAPI!=='cli') {http_response_code(404);exit;}
 require dirname(__DIR__,2).'/server/next/service.php';
+require_once dirname(__DIR__,2).'/server/next/mail-template.php';
 try {
     $c=srn_config();
     $local=in_array('--local-inbox',$argv,true);
@@ -38,7 +39,7 @@ try {
                     :'SubsidieReady: je gekozen herinnering';
                 try {
                     $ok=$c['transport']==='smtp'
-                        ?srn_smtp_send($c,$v['to'],$subject,$v['text'])
+                        ?srn_smtp_send($c,$v['to'],$subject,$v['text'],$v['type']==='otp'?srn_otp_email_html($v['text']):null)
                         :mail($v['to'],$subject,$v['text'],[
                             'From'=>$c['mail_from'],
                             'Content-Type'=>'text/plain; charset=UTF-8',
