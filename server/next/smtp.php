@@ -90,45 +90,45 @@ function srn_smtp_command($socket,string $cmd,array $expected): string {
 
 function srn_smtp_message(string $from,string $to,string $subject,string $body,?string $html=null): string {
     if (!filter_var($from,FILTER_VALIDATE_EMAIL)||!filter_var($to,FILTER_VALIDATE_EMAIL)||
-        $subject===''||strlen($subject)>180||!preg_match('/^[\\x20-\\x7e]+$/D',$subject)||
-        strlen($body)>30000||($html!==null&&(strlen($html)>45000||str_contains($html,"\\0")))) {
+        $subject===''||strlen($subject)>180||!preg_match('/^[\x20-\x7e]+$/D',$subject)||
+        strlen($body)>30000||($html!==null&&(strlen($html)>45000||str_contains($html,"\0")))) {
         throw new RuntimeException('Ongeldige SMTP-berichtinhoud.');
     }
     // Quoted-printable preserves readable text and UTF-8 in both email clients.
     // Only the trusted server-generated HTML alternative can be included.
     $encode=static function(string $value): string {
-        $normalized=str_replace(["\\r\\n","\\r"],"\\n",$value);
-        return quoted_printable_encode(str_replace("\\n","\\r\\n",$normalized));
+        $normalized=str_replace(["\r\n","\r"],"\n",$value);
+        return quoted_printable_encode(str_replace("\n","\r\n",$normalized));
     };
-    $headers='Date: '.gmdate('D, d M Y H:i:s +0000')."\\r\\n".
-        'From: <'.$from.">\\r\\n".
-        'To: <'.$to.">\\r\\n".
-        'Subject: '.$subject."\\r\\n".
-        'Message-ID: <'.bin2hex(random_bytes(16)).'@'.substr($from,strrpos($from,'@')+1).">\\r\\n".
-        "MIME-Version: 1.0\\r\\n".
-        "Auto-Submitted: auto-generated\\r\\n";
+    $headers='Date: '.gmdate('D, d M Y H:i:s +0000')."\r\n".
+        'From: <'.$from.">\r\n".
+        'To: <'.$to.">\r\n".
+        'Subject: '.$subject."\r\n".
+        'Message-ID: <'.bin2hex(random_bytes(16)).'@'.substr($from,strrpos($from,'@')+1).">\r\n".
+        "MIME-Version: 1.0\r\n".
+        "Auto-Submitted: auto-generated\r\n";
     if($html===null){
-        $headers.="Content-Type: text/plain; charset=UTF-8\\r\\n".
-            "Content-Transfer-Encoding: quoted-printable\\r\\n";
-        $payload=$encode($body)."\\r\\n";
+        $headers.="Content-Type: text/plain; charset=UTF-8\r\n".
+            "Content-Transfer-Encoding: quoted-printable\r\n";
+        $payload=$encode($body)."\r\n";
     }else{
         $boundary='srn-'.bin2hex(random_bytes(16));
-        $headers.='Content-Type: multipart/alternative; boundary="'.$boundary.'"'."\\r\\n";
-        $payload='--'.$boundary."\\r\\n".
-            "Content-Type: text/plain; charset=UTF-8\\r\\n".
-            "Content-Transfer-Encoding: quoted-printable\\r\\n\\r\\n".
-            $encode($body)."\\r\\n".
-            '--'.$boundary."\\r\\n".
-            "Content-Type: text/html; charset=UTF-8\\r\\n".
-            "Content-Transfer-Encoding: quoted-printable\\r\\n\\r\\n".
-            $encode($html)."\\r\\n".
-            '--'.$boundary."--\\r\\n";
+        $headers.='Content-Type: multipart/alternative; boundary="'.$boundary.'"'."\r\n";
+        $payload='--'.$boundary."\r\n".
+            "Content-Type: text/plain; charset=UTF-8\r\n".
+            "Content-Transfer-Encoding: quoted-printable\r\n\r\n".
+            $encode($body)."\r\n".
+            '--'.$boundary."\r\n".
+            "Content-Type: text/html; charset=UTF-8\r\n".
+            "Content-Transfer-Encoding: quoted-printable\r\n\r\n".
+            $encode($html)."\r\n".
+            '--'.$boundary."--\r\n";
     }
     // SMTP DATA lines beginning with a dot must be dot-stuffed.
-    $lines=explode("\\r\\n",$payload);
+    $lines=explode("\r\n",$payload);
     foreach($lines as &$line)if(str_starts_with($line,'.'))$line='.'.$line;
     unset($line);
-    return $headers."\\r\\n".implode("\\r\\n",$lines);
+    return $headers."\r\n".implode("\r\n",$lines);
 }
 
 function srn_smtp_send(array $c,string $to,string $subject,string $body,?string $html=null): bool {
