@@ -1,0 +1,53 @@
+name: SubsidieReady TBT advice target preflight
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/lead-pilot.cjs'
+      - 'scripts/lead-pilot.config.json'
+      - 'scripts/live/tbt-target-check.py'
+      - '.github/workflows/tbt-target-preflight.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/lead-pilot.cjs'
+      - 'scripts/lead-pilot.config.json'
+      - 'scripts/live/tbt-target-check.py'
+      - '.github/workflows/tbt-target-preflight.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tbt-target:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned Chromium
+        run: |
+          python -m pip install playwright==1.62.0
+          python -m playwright install --with-deps chromium
+      - name: Test TBT advice form and tracking before consent
+        id: preflight
+        continue-on-error: true
+        run: python scripts/live/tbt-target-check.py
+      - name: Retain safe target inspection evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tbt-target-readonly
+          path: qa/tbt-target/report.json
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Block misleading consent or unusable destination
+        if: steps.preflight.outcome != 'success'
+        run: |
+          echo 'TBT target NO-GO/UNKNOWN. Inspect safe report; do not treat this as lead receipt.'
+          exit 1
