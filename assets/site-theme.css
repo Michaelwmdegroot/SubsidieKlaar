@@ -163,32 +163,3 @@ body:not(.r-dashboard-ready) .nav-actions a[aria-current="page"]{background:#e8f
 .reading-shell .sr-reading-section table tbody td{color:var(--sr-copy);font-size:13px}
 .reading-shell .sr-reading-section table tbody tr:not(:last-child)>*{border-bottom:1px solid #e4eee2}
 @media(max-width:600px){.reading-shell .sr-reading-section table thead th:first-child{width:39%}.reading-shell .sr-reading-section table th,.reading-shell .sr-reading-section table td{padding:10px 9px;font-size:12px;line-height:1.55}.reading-shell .sr-reading-section table tbody th,.reading-shell .sr-reading-section table tbody td{font-size:12px}}
-
-/* Reviewed, voluntary first-party battery advice referral — never overflow mobile. */
-.reading-shell .reading #lead-pilot-title{overflow-wrap:anywhere}
-.reading-shell .reading .info-box[aria-labelledby="lead-pilot-title"]{
- box-sizing:border-box;min-width:0;max-width:100%;overflow-wrap:anywhere;
- border:1px solid #cfe2ca;border-radius:18px;padding:20px 22px;
- background:linear-gradient(130deg,#eef8e9,#fff);color:#274333
-}
-.reading-shell .reading .info-box[aria-labelledby="lead-pilot-title"] .button-row{
- box-sizing:border-box;display:flex;flex-wrap:wrap;gap:12px;align-items:center;
- min-width:0;width:100%;max-width:100%;margin:18px 0 14px;
- padding:0;border:0;background:none
-}
-.reading-shell .reading .info-box[aria-labelledby="lead-pilot-title"] .button-row a{
- min-width:0;max-width:100%;box-sizing:border-box;
- white-space:normal;overflow-wrap:anywhere;line-height:1.4
-}
-.reading-shell .reading .info-box[aria-labelledby="lead-pilot-title"] .button-row .btn{
- width:auto;flex:0 1 auto;text-align:center;padding:12px 15px
-}
-@media(max-width:600px){
- .reading-shell .reading .info-box[aria-labelledby="lead-pilot-title"]{padding:17px 14px}
- .reading-shell .reading .info-box[aria-labelledby="lead-pilot-title"] .button-row{
-  display:grid;grid-template-columns:minmax(0,1fr)
- }
- .reading-shell .reading .info-box[aria-labelledby="lead-pilot-title"] .button-row .btn{
-  width:100%;min-width:0;max-width:100%;justify-self:stretch
- }
-}
