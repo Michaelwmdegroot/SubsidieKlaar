@@ -60,12 +60,24 @@ try:
         stage = "marketing_consent_default"
         login.click()
         terms = page.locator('#login-form input[name="terms"]')
-        marketing = page.locator('#login-form input[name="marketingEmail"]')
-        assert terms.count() == 1 and marketing.count() == 1
+        assert terms.count() == 1
         assert terms.get_attribute("required") is not None
         assert not terms.is_checked()
-        assert not marketing.is_checked()
-        assert marketing.get_attribute("required") is None
+        # PR runs probe currently deployed production (which may still use the
+        # legacy checkbox). New radio cards are verified after deployment.
+        updates_none = page.locator('#login-form input[name="updates"][value="none"]')
+        if updates_none.count():
+            assert updates_none.is_checked()
+            assert not page.locator('#login-form input[name="updates"][value="email"]').is_checked()
+            assert page.locator('#login-form input[name="updates"]').count() == 2
+            for key in ("fullName", "phone", "street", "houseNumber", "postalCode", "city"):
+                assert page.locator(f'#login-form input[name="{key}"]').count() == 1
+            assert page.locator('#login-form input[type="checkbox"]').count() == 1
+        else:
+            marketing = page.locator('#login-form input[name="marketingEmail"]')
+            assert marketing.count() == 1
+            assert not marketing.is_checked()
+            assert marketing.get_attribute("required") is None
         assert "NIVO Groep Holland B.V." in page.locator("#plan-dialog").inner_text()
         assert page.locator('#login-form a[href="/voorwaarden/"]').count() == 1
         assert page.locator('#login-form a[href="/privacy/"]').count() == 1

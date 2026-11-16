@@ -104,7 +104,7 @@ test('MySQL adapter: real PHP auth, persistent encrypted plans, ownership and ac
     async login(email) {
       const bootstrap = await this.boot();
       assert.equal(bootstrap.r.status, 200);
-      const first = await this.post('auth-start', {email, serviceAccepted: true, termsAccepted: true, termsVersion: '2026-11-14-account-v1', marketingEmailOptIn: false});
+      const first = await this.post('auth-start', {email, serviceAccepted: true, termsAccepted: true, termsVersion: '2026-11-16-account-v2', marketingEmailOptIn: false});
       assert.equal(first.r.status, 200);
       const response = await this.post('auth-verify', {
         challenge: first.d.challenge,
