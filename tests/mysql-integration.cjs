@@ -201,6 +201,9 @@ test('MySQL adapter: real PHP auth, persistent encrypted plans, ownership and ac
       assert.equal((await alice.post('project-save',{data:payload(pv),revision:1})).r.status,409);
       assert.equal((await anotherSession.post('project-delete',{id:pv.id,confirm:'VERWIJDER'})).r.status,200);
       assert.equal((await alice.post('project-get',{id:pv.id})).r.status,404);
+      assert.equal((await anotherSession.post('logout')).r.status,200);
+      assert.equal((await anotherSession.post('projects-list')).r.status,403,'logout revokes this device');
+      assert.equal((await alice.post('projects-list')).r.status,200,'first device is unaffected');
     });
     await t.test('explicit email marketing consent can be withdrawn after verified login',async()=>{
       assert.equal(alice.user.marketingEmail,false);
