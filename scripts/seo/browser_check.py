@@ -292,8 +292,13 @@ def run(browser, base):
     check("NIVO Groep Holland B.V." in page.locator("#advice-app").inner_text(),
           "NIVO controller is named")
     check(form.locator('input[name="website"]').count()==1 and
-          form.locator('input[name="website"]').is_hidden(),
-          "a non-intrusive spam trap is hidden from real visitors")
+          page.evaluate("""() => {
+            const field=document.querySelector('#portal-advice-form [name="website"]');
+            if(!field || field.tabIndex!==-1)return false;
+            const wrapper=field.closest('.sr-honeypot');
+            return !!wrapper && getComputedStyle(wrapper).clipPath.includes('inset(50%');
+          }"""),
+          "a non-intrusive spam trap is clipped and skipped in keyboard tab order")
     check(page.locator('#portal-code-form').count()==0 and
           'verificatiecode' in page.locator("#advice-app").inner_text().lower(),
           "advice is one step and explicitly needs no verification code")
