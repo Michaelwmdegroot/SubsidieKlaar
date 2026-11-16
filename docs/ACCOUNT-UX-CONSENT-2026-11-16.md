@@ -41,3 +41,16 @@ Houd versies en standaarduitgeschakelde marketingkeuze expliciet in de server en
 ## Stand van de bouw
 
 De wijzigingen worden via een kleine feature-PR beoordeeld; geen Hostinger-secret, database-schema, sleutel, cronjob of SMTP-instelling wordt aangepast. De email-layout krijgt een aparte PR.
+
+## Correctie door eigenaar — compacte single-screen registratie (16 november 2026)
+
+De aanvankelijke versie uit PR #38 was te lang en vereiste scrollen binnen het registratievenster. De eigenaar heeft expliciet gevraagd het hele formulier, inclusief de verzendknop, **in één scherm** te tonen en de marketingradiokaarten te vervangen door een normaal vinkje.
+
+- Het lange intro, de voordelenchips, lange sectieteksten en de radiokaarten zijn verwijderd.
+- De benodigde e-mail en zes optionele contactvelden staan in één compact, responsive tweekolomsraster. Alle velden blijven op desktop én mobiel bruikbaar; geen extra stappen of verborgen formulierdelen.
+- Exact twee checkboxen: verplicht akkoord met accountvoorwaarden + kennisname privacy; apart, **niet verplicht, standaard UIT** een specifieke e-mailopt-in voor NIVO Groep Holland B.V. Geen telefonische toestemming of automatische account→leadroute.
+- Eén zichtbare groene actie 'Stuur verificatiecode' onder de checkboxen. De server ontvangt nog steeds expliciet `marketingEmailOptIn` op basis van de echte, standaard niet aangevinkte marketingcheckbox.
+- De browsertest gebruikt een synthetisch accountbootstrap-antwoord op een lokale HTTP-preview en meet zonder formulier-POST: alle velden, de juridische en commerciële keuze, venster- en formulierhoogte en een zichtbare verzendknop bij **1440×900, 1280×720, 390×844, 375×667 en 320×740**. Screenshots en afmetingen komen als bewijs in de GitHub Actions-browserartifact. De live browsercheck bevestigt na daadwerkelijke publicatie dezelfde lay-out.
+- Bestaande gebruikersprofielen, OTP, encryptie, mailworker, database, gast-PDF/ZIP en toestemmingstijdstempels blijven ongemoeid.
+
+De volledige bewijslast vereist groene quality/release/browserchecks op de definitieve PR-head en post-merge controles op het echte domein. Een geslaagde statische CSS-check alleen is niet voldoende.
