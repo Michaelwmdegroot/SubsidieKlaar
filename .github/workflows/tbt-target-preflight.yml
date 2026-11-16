@@ -1,22 +1,7 @@
 name: SubsidieReady TBT advice target preflight
 
+# Historical TBT monitor: explicit manual use only, no longer a SubsidieReady lead destination.
 on:
-  schedule:
-    # 07:31 CET / 08:31 CEST; no account, form submission or data capture.
-    - cron: '31 6 * * *'
-  pull_request:
-    paths:
-      - 'scripts/lead-pilot.cjs'
-      - 'scripts/lead-pilot.config.json'
-      - 'scripts/live/tbt-target-check.py'
-      - '.github/workflows/tbt-target-preflight.yml'
-  push:
-    branches: [main]
-    paths:
-      - 'scripts/lead-pilot.cjs'
-      - 'scripts/lead-pilot.config.json'
-      - 'scripts/live/tbt-target-check.py'
-      - '.github/workflows/tbt-target-preflight.yml'
   workflow_dispatch:
 
 permissions:

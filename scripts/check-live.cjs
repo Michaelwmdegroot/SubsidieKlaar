@@ -80,18 +80,16 @@ async function checkLive({fetchImpl = globalThis.fetch, expected} = {}) {
     if(page === '/hulp/thuisbatterij-btw/') batteryArticle = r;
     check('Pagina ' + page, status200(r) && /SubsidieReady/.test(r.text) && /<h1\b/.test(r.text));
   }
-  // The only live commercial pilot is an explicitly clicked, parameter-free
-  // outgoing link to the previously reviewed own TBT request and privacy pages.
-  // This read-only GET check must never follow the links or send customer data.
+  // The only active referral is a same-origin, explicitly chosen NIVO advice form.
   const referralHtml = batteryArticle?.text || '';
-  const tbtRequest = (referralHtml.match(/<a\b[^>]*href="https:\/\/thuisbatterijteam\.nl\/contact\/adviesgesprek\/"[^>]*>/g)||[]);
-  const tbtPrivacy = (referralHtml.match(/<a\b[^>]*href="https:\/\/thuisbatterijteam\.nl\/voorwaarden-beleid\/privacybeleid\/"[^>]*>/g)||[]);
-  const safeReferralLink = tag=>/target="_blank"/.test(tag)&&/rel="noopener noreferrer"/.test(tag)&&/referrerpolicy="no-referrer"/.test(tag)&&!/[?#]/.test(tag.match(/href="([^"]+)"/)?.[1]||'');
-  check('Vrijwillige TBT-advieskaart live en zonder gegevensoverdracht',
+  const portalCount=referralHtml.split('href="/advies/"').length-1;
+  const privacyCount=referralHtml.split('href="/privacy/"').length-1;
+  check('Vrijwillige NIVO-advieskaart verwijst intern zonder dossierdata',
     status200(batteryArticle) && referralHtml.includes('id="lead-pilot-title"') &&
-    referralHtml.includes('Commercieel productadvies') &&
-    tbtRequest.length===1 && tbtPrivacy.length===1 &&
-    safeReferralLink(tbtRequest[0]) && safeReferralLink(tbtPrivacy[0]));
+    referralHtml.includes('NIVO Groep Holland B.V.') &&
+    portalCount===1 && privacyCount>=1 &&
+    !referralHtml.includes('href="/advies/?') &&
+    !referralHtml.includes('https://thuisbatterijteam.nl/contact/adviesgesprek/'));
   for (const [file, type] of [['assets/app.js', /(?:javascript|ecmascript)/i], ['assets/style.css', /text\/css/i]]) {
     const r = await request(ORIGIN + '/' + file);
     check('Asset ' + file, status200(r) && type.test(r.headers.get('content-type') || '') && r.text.length > 1000 && !/^\s*<!doctype/i.test(r.text));

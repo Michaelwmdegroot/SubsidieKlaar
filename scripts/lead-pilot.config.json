@@ -1,14 +1,14 @@
 {
-  "enabled": true,
+  "enabled": false,
   "recipient": "Thuisbatterij Team B.V.",
   "targetUrl": "https://thuisbatterijteam.nl/contact/adviesgesprek/",
   "privacyUrl": "https://thuisbatterijteam.nl/voorwaarden-beleid/privacybeleid/",
   "approvals": {
-    "controller": "https://github.com/Michaelwmdegroot/SubsidieKlaar/issues/12#issuecomment-6904477332",
-    "relationship": "https://github.com/Michaelwmdegroot/SubsidieKlaar/issues/12#issuecomment-6904477332",
-    "recipient": "https://github.com/Michaelwmdegroot/SubsidieKlaar/issues/12#issuecomment-6904477332",
-    "formAndPrivacy": "https://github.com/Michaelwmdegroot/SubsidieKlaar/issues/12#issuecomment-6904477332",
-    "receipt": "https://github.com/Michaelwmdegroot/SubsidieKlaar/issues/12#issuecomment-6904477332",
-    "ownerPublication": "https://github.com/Michaelwmdegroot/SubsidieKlaar/issues/12#issuecomment-6904477332"
+    "controller": null,
+    "relationship": null,
+    "recipient": null,
+    "formAndPrivacy": null,
+    "receipt": null,
+    "ownerPublication": null
   }
 }

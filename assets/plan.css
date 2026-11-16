@@ -61,3 +61,6 @@
  .p-auth-foot{margin-top:5px!important}
 }
 @media(prefers-reduced-motion:reduce){.p-auth-submit{box-shadow:none}}
+
+/* The generic flex label rule must never override the hidden callback choice. */
+#portal-phone-field[hidden]{display:none!important}

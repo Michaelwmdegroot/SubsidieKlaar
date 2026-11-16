@@ -172,16 +172,16 @@ def run(browser, base):
         page.goto(base + route, wait_until="networkidle")
         if route == "/hulp/thuisbatterij-btw/":
             pilot = page.locator('#lead-pilot-title')
-            target = page.locator('a[href="https://thuisbatterijteam.nl/contact/adviesgesprek/"]')
-            privacy = page.locator('a[href="https://thuisbatterijteam.nl/voorwaarden-beleid/privacybeleid/"]')
-            check(pilot.count() == 1 and target.count() == 1 and privacy.count() == 1,
-                  "published battery article has exactly one voluntary advice CTA and privacy link")
-            for candidate in (target, privacy):
-                check(candidate.get_attribute("target") == "_blank" and
-                      "noopener" in candidate.get_attribute("rel").split() and
-                      "noreferrer" in candidate.get_attribute("rel").split() and
-                      candidate.get_attribute("referrerpolicy") == "no-referrer",
-                      "TBT outbound link protects referrer and new-tab isolation")
+            target = page.locator('a[href="/advies/"]')
+            privacy = page.locator('a[href="/privacy/"]')
+            check(pilot.count() == 1 and target.count() == 1 and privacy.count() >= 1,
+                  "published battery article has exactly one voluntary NIVO Portal CTA and internal privacy link")
+            check(target.get_attribute("target") is None and
+                  "?" not in target.get_attribute("href") and
+                  "#" not in target.get_attribute("href"),
+                  "NIVO request remains same-origin with no query or fragment")
+            check(page.locator('a[href^="https://thuisbatterijteam.nl/contact/adviesgesprek/"]').count()==0,
+                  "old TBT destination is absent")
             check(page.locator('#lead-pilot-title').is_visible(),
                   "the voluntary commercial label is readable in the article")
         check(page.locator("h1").count() == 1, route + " has one rendered H1")
@@ -262,6 +262,52 @@ def run(browser, base):
             page.screenshot(path=OUT / f"account-signup-{width}x{height}.png", full_page=False)
     check(not any(req["method"] != "GET" for req in requests),
           "opening account form never submits customer data")
+    context.close()
+
+    # Real Chromium regression of the NIVO Portal advice UI with a synthetic
+    # public bootstrap. This does not submit a lead, request OTP or send email.
+    context, portal_requests = context_for("portal-advice")
+    page = context.new_page()
+    portal_bootstrap = json.dumps({
+      "mode":"production", "accounts":True, "portalAdvice":True, "leads":False,
+      "vault":False, "controller":"NIVO Groep Holland B.V.",
+      "contact":"info@nivogroepholland.nl", "user":None, "csrf":"0"*64
+    })
+    page.route("**/api/next/?action=bootstrap", lambda route: route.fulfill(
+        status=200, content_type="application/json", body=portal_bootstrap))
+    page.goto(base + "/advies/", wait_until="networkidle")
+    form = page.locator("#portal-advice-form")
+    form.wait_for(state="visible")
+    check(form.locator('input[name="contactRequested"][required]').count()==1 and
+          not form.locator('input[name="contactRequested"]').is_checked(),
+          "NIVO advice form requires separate unchecked contact request")
+    for key in ("topic","timeline","name","email","channel","area","note"):
+        check(form.locator(f'[name="{key}"]').count()==1,"NIVO advice field "+key+" is present")
+    check(page.locator('a[href="/privacy/"]').count()>0,
+          "NIVO advice links to own privacy policy")
+    check("NIVO Groep Holland B.V." in page.locator("#advice-app").inner_text(),
+          "NIVO recipient is explicitly named")
+    page.locator("#portal-channel").select_option("phone")
+    check(page.locator('#portal-phone-field input[name="phone"]').is_visible() and
+          page.locator('#portal-phone-field input[name="phone"]').get_attribute("required") is not None,
+          "phone is required only for voluntarily selected callback")
+    page.locator("#portal-channel").select_option("email")
+    check(page.locator('#portal-phone-field').is_hidden(),
+          "email-only contact doesn't collect a phone number")
+    for width,height in ((1440,900),(390,844),(320,740)):
+        page.set_viewport_size({"width":width,"height":height})
+        page.wait_for_timeout(80)
+        values=page.evaluate("""() => ({
+            width: innerWidth, scrollWidth: document.documentElement.scrollWidth,
+            submitVisible: (()=>{const b=document.querySelector('#portal-advice-form [type=submit]');return !!(b && b.getBoundingClientRect().width>0)})()
+        })""")
+        REPORT["screens"].append({"route":"/advies/","state":"nivo-portal",**values})
+        check(values["scrollWidth"]<=width and values["submitVisible"],
+              f"NIVO Portal advice form fits {width}px without horizontal scrolling",values)
+        if width in (1440,390):
+            page.screenshot(path=OUT/f"portal-advice-{width}.png",full_page=True)
+    check(all(item["method"]=="GET" and item["local"] for item in portal_requests),
+          "opening NIVO Portal advice form makes no POST or external request")
     context.close()
 
     # First PDF/ZIP requests: real UI, real files, no dependency mocks.
