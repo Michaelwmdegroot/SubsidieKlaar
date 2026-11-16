@@ -105,10 +105,10 @@ async function checkLive({fetchImpl = globalThis.fetch, expected} = {}) {
     planApp.text.includes('Inloggen & bewaren') &&
     planApp.text.includes('name="terms" required') &&
     planApp.text.includes('name="updates"') &&
-    planApp.text.includes('name="fullName"') &&
-    planApp.text.includes('name="phone"') &&
-    planApp.text.includes('name="street"') &&
-    planApp.text.includes('name="postalCode"') &&
+    planApp.text.includes("input('Naam','fullName'") &&
+    planApp.text.includes("input('Telefoonnummer','phone'") &&
+    planApp.text.includes("input('Straat','street'") &&
+    planApp.text.includes("input('Postcode','postalCode'") &&
     status200(cloudClient) &&
     cloudClient.text.includes('/api/next/?action=bootstrap') &&
     cloudClient.text.includes("credentials:'same-origin'"));
