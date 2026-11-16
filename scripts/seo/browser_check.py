@@ -170,6 +170,20 @@ def run(browser, base):
     page = context.new_page()
     for route in ("/", "/hulp/zonnepanelen-btw/", "/hulp/thuisbatterij-btw/"):
         page.goto(base + route, wait_until="networkidle")
+        if route == "/hulp/thuisbatterij-btw/":
+            pilot = page.locator('#lead-pilot-title')
+            target = page.locator('a[href="https://thuisbatterijteam.nl/contact/adviesgesprek/"]')
+            privacy = page.locator('a[href="https://thuisbatterijteam.nl/voorwaarden-beleid/privacybeleid/"]')
+            check(pilot.count() == 1 and target.count() == 1 and privacy.count() == 1,
+                  "published battery article has exactly one voluntary advice CTA and privacy link")
+            for candidate in (target, privacy):
+                check(candidate.get_attribute("target") == "_blank" and
+                      "noopener" in candidate.get_attribute("rel").split() and
+                      "noreferrer" in candidate.get_attribute("rel").split() and
+                      candidate.get_attribute("referrerpolicy") == "no-referrer",
+                      "TBT outbound link protects referrer and new-tab isolation")
+            check(page.locator('#lead-pilot-title').is_visible(),
+                  "the voluntary commercial label is readable in the article")
         check(page.locator("h1").count() == 1, route + " has one rendered H1")
         check(page.locator('link[rel="canonical"]').get_attribute("href") == "https://subsidieready.nl" + route,
               route + " keeps its absolute production canonical")

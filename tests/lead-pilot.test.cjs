@@ -19,12 +19,16 @@ function syntheticApprovedConfig() {
   return config;
 }
 
-test('lead pilot: committed default is disabled and has no approval evidence', () => {
+test('lead pilot: active default is limited to one evidence-backed outbound TBT destination', () => {
   const config = configuration();
-  assert.equal(config.enabled, false);
-  assert.deepEqual(config.approvals, Object.fromEntries(keys.map(key => [key, null])));
-  assert.equal(pilot.render(), '');
-  assert.deepEqual(pilot.validate(config), {status: 'disabled', missingApprovals: keys, renderAllowed: false});
+  assert.equal(config.enabled, true);
+  const approval = 'https://github.com/Michaelwmdegroot/SubsidieKlaar/issues/12#issuecomment-6904477332';
+  assert.deepEqual(config.approvals, Object.fromEntries(keys.map(key => [key, approval])));
+  assert.equal(config.recipient, 'Thuisbatterij Team B.V.');
+  assert.equal(config.targetUrl, 'https://thuisbatterijteam.nl/contact/adviesgesprek/');
+  assert.equal(config.privacyUrl, 'https://thuisbatterijteam.nl/voorwaarden-beleid/privacybeleid/');
+  assert.match(pilot.render(), /Vraag thuisbatterijadvies aan/);
+  assert.deepEqual(pilot.validate(config), {status: 'ready', missingApprovals: [], renderAllowed: true});
 });
 
 test('lead pilot: enabling with any missing decision fails closed', () => {
@@ -97,7 +101,7 @@ test('lead pilot: synthetic approved fixture renders two safe ordinary links and
   const config = syntheticApprovedConfig();
   const html = pilot.render(config);
   assert.equal(pilot.validate(config).status, 'ready');
-  assert.match(html, /<aside class="info-box" aria-labelledby="lead-pilot-title">/);
+  assert.match(html, /<aside class="info-box" aria-labelledby="lead-pilot-title"(?:\s+style="[^"]+")?>/);
   assert.match(html, /Commercieel productadvies/);
   assert.match(html, /Thuisbatterij Team B\.V\./);
   assert.match(html, /geen ingevulde antwoorden of documenten mee/);
@@ -122,9 +126,24 @@ test('lead pilot: report discloses statuses only, without approval values or con
   assert.doesNotMatch(JSON.stringify(pilot.report(config)), /https|issuecomment|recipient|controller|@/);
 });
 
-test('lead pilot: CLI checks disabled configuration without rendering or collecting anything', () => {
+test('lead pilot: CLI verifies current approved no-PII outbound configuration without leaking evidence', () => {
   const cli = path.join(__dirname, '../scripts/lead-pilot.cjs');
   const output = execFileSync(process.execPath, [cli, '--check'], {encoding: 'utf8'});
-  assert.deepEqual(JSON.parse(output), {status: 'disabled', missingApprovals: keys, renderAllowed: false});
+  assert.deepEqual(JSON.parse(output), {status: 'ready', missingApprovals: [], renderAllowed: true});
   assert.doesNotMatch(output, /https|<a |@|issuecomment/);
+});
+
+test('lead pilot: generated live battery article contains only explicit safe ordinary outgoing links', () => {
+  const read = name => fs.readFileSync(path.join(__dirname,'../',name),'utf8');
+  const html = read('hulp/thuisbatterij-btw/index.html');
+  const config = configuration();
+  assert.ok(html.includes(pilot.render()),'real generated battery article includes exact reviewed pilot markup');
+  assert.equal((html.match(/id="lead-pilot-title"/g)||[]).length,1);
+  assert.equal((html.match(/href="https:\/\/thuisbatterijteam.nl\/contact\/adviesgesprek\/"/g)||[]).length,1);
+  assert.equal((html.match(/href="https:\/\/thuisbatterijteam.nl\/voorwaarden-beleid\/privacybeleid\/"/g)||[]).length,1);
+  assert.ok(html.indexOf('id="lead-pilot-title"')>html.indexOf('Vier vragen voor je vervolggesprek'),'only after substantive content');
+  assert.ok(!read('hulp/zonnepanelen-btw/index.html').includes('id="lead-pilot-title"'),'no unrelated upsell');
+  const core = read('scripts/lead-pilot.cjs');
+  assert.doesNotMatch(core,/utm_source=|fetch\(|sendBeacon\(|window\.location|document\.cookie/);
+  assert.equal(config.targetUrl.includes('?'),false);
 });

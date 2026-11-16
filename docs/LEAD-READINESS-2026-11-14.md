@@ -1,5 +1,8 @@
 # Vrijwillige eigen adviesaanvragen — audit en activatiecontract
 
+> **ACTUELE AANVULLING 16-11-2026 — eerste vrijwillige TBT-uitlinkpilot:** de eerdere status 'pilot voorbereid/niet geactiveerd' hieronder is historisch. De afgebakende route en read-only TBT-ontvangstcontrole staan in [TBT-OUTBOUND-LEAD-PILOT-2026-11-16.md](TBT-OUTBOUND-LEAD-PILOT-2026-11-16.md) en [Issue #12](https://github.com/Michaelwmdegroot/SubsidieKlaar/issues/12#issuecomment-6904477332). Alleen de vaste CTA op het thuisbatterij-btw-artikel wordt gepubliceerd; geen PII-overdracht, native saleslead, telefoonmarketing of aangetoonde SubsidieReady-specifieke conversie. Native formulieren/CRM behouden alle P0-gates hieronder.
+
+
 **Status: voorbereid; geen productieactivatie.** Onderzoek op 14 november 2026, broncodebasis `30be4c0e6bda6c5cdd1a550fb611d71740d3d99f`. Dit document vult [Issue #21](https://github.com/Michaelwmdegroot/SubsidieKlaar/issues/21), [#5](https://github.com/Michaelwmdegroot/SubsidieKlaar/issues/5), [#9](https://github.com/Michaelwmdegroot/SubsidieKlaar/issues/9), [#10](https://github.com/Michaelwmdegroot/SubsidieKlaar/issues/10) en [#12](https://github.com/Michaelwmdegroot/SubsidieKlaar/issues/12) concreet in. Het geeft geen toestemming om persoonsgegevens, accounts, tracking, mail of een CRM-koppeling te activeren.
 
 ## 1. Vastgesteld en nog te bewijzen
