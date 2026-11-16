@@ -1,21 +1,21 @@
 # SubsidieReady: productieacceptatie optionele accounts
 
 **Start:** 15 november 2026 (Europe/Amsterdam)  
-**Status:** OPEN — echte productieaccount-E2E nog niet bewezen  
-**Basis:** startcommit `dc514c9` (PR #28); actuele account-/browsercontrole op `main` na PRs #29–#34, laatst `f64e932`.  
+**Status:** DEELS PASS — eigenaar heeft nieuwe OTP ontvangen, ingelogd en accountdata geëxporteerd; cloud-planwissel en verwijdering nog OPEN  
+**Basis:** oorspronkelijke PR #28, accountbewijs 16 november 2026, verbeterde premium account-UX PR #38 en branded mail PR #39.  
 **Scope:** https://subsidieready.nl/mijn-plan/; testmailbox onder beheer eigenaar; uitsluitend fictieve planinhoud.
 
-Dit document onderscheidt controle van broncode/CI, de **uitgevoerde echte productie-Chromiumtest** en nog niet uitgevoerde mailbox-, cron- en geregistreerde-accountacceptatie. Een geslaagde SMTP-test of browserknop is geen bewijs van werkelijke registratie.
+Dit document onderscheidt broncode/CI, echte productie-Chromiumtest en de **door eigenaar getoonde nieuwe accountregistratie met ontvangen OTP, geslaagde login en uitgevoerde accountexport**. Er is nog geen onafhankelijk bewijs van een in een andere browser teruggehaald online plan of definitieve accountverwijdering.
 
 ## 1. Bevestigd op basis van code
 
 - De accountknop **Inloggen & bewaren** verschijnt alleen als de bootstrap-API configured en accounts beide waar meldt.
-- Accountvoorwaarden hebben een verplicht, versiegebonden akkoord. Marketing-e-mail is een afzonderlijk, standaard uitgevinkt keuzevak.
+- Accountvoorwaarden hebben een verplicht, versiegebonden akkoord. Sinds PR #38 bestaat één verplicht juridisch vinkje en een afzonderlijke e-mailvoorkeurskeuze die standaard op 'geen aanbiedingen' staat. Telefoonmarketing is hiermee niet toegestaan.
 - Een OTP bestaat uit acht cijfers, verloopt na tien minuten, is sessiegebonden, eenmalig en beperkt in verzoeken/pogingen.
 - Na verificatie wordt de sessie vernieuwd. Plannen gaan uitsluitend online na expliciete keuze; demo's en bijlagen niet automatisch.
 - Online plannen hebben revisiecontrole; account-export en -delete zijn aanwezig. Definitief verwijderen vereist een recent geverifieerde sessie (maximaal tien minuten).
 - Productiecode eist vault_enabled=false, leads_enabled=false, staff_enabled=false. Accounts betekenen geen salesverzoek.
-- Quality/release/browser CI op basiscommit zijn groen, maar de echte productiemail via cron is nog niet getest.
+- De eigenaar heeft een echte OTP per e-mail ontvangen en daarna ingelogd; de exacte Hostinger-cronuitvoeringslog is niet onafhankelijk ingezien.
 
 **Codeverbetering in PR #29:** Wanneer een nieuwe OTP de vorige vervangt, krijgt een nog niet verzonden oud bericht de status superseded en wordt de oude code uit de wachtrij gewist. De mailworker verwerkt alleen queued. Een PHP API-regressietest verifieert dit gedrag en de nieuwe geldige code.
 
@@ -24,21 +24,28 @@ Dit document onderscheidt controle van broncode/CI, de **uitgevoerde echte produ
 - **PR #32**, commit `1faebff`: slechts de te strenge case-sensitive Secure-cookiecontrole in de audit gecorrigeerd; echte Secure-vlag blijft verplicht. [Live acceptance](https://github.com/Michaelwmdegroot/SubsidieKlaar/actions/runs/43773670176) was groen: bootstrap HTTP 200, geldig JSON, 0 afgekeurde contractvoorwaarden.
 - **PR #34**, commit `f64e932`: echte productie-Chromiumtest met acht geslaagde controles in [PR-run 43774473213](https://github.com/Michaelwmdegroot/SubsidieKlaar/actions/runs/43774473213), uitsluitend fictieve browser-lokale gegevens: accountknop en toestemmingvelden zichtbaar, JSON- en ZIP-download van plan, PDF/ZIP van warmtepompwerkbank; **0 POST-verzoeken, 0 externe domeinen**. Een geplande worker of mailbox is niet gebruikt. Screenshots en geanonimiseerd QA-rapport zijn als GitHub Actions-artifact vastgelegd.
 - **Technische SEO afzonderlijk:** [wekelijkse siteaudit](https://github.com/Michaelwmdegroot/SubsidieKlaar/actions/runs/43774333587) controleerde 15 sitemap-URL's en 21 routes zonder fouten/waarschuwingen; geen bewijs van Google-indexering.
-- **Nog geen PASS voor productieaccount-E2E:** echte 8-cijferige OTP-bezorging via cron, login/logout, expliciete plancloudopslag, tweede sessie, accountexport en accountverwijdering. De eigenaar beheert de testmailbox en voert de code zelf in.
+- **Eigenaarbewijs, 16 november:** screenshot van vrijwillige registratie, daadwerkelijk ontvangen eenmalige code en daaropvolgend ingelogde weergave; eigen account-JSON geëxporteerd. Die export registreert een actieve, door gebruiker aangevinkte marketing-e-mailvoorkeur en bevat **nul online projecten**. Persoonlijke gegevens en de achtcijferige code zijn niet in dit dossier overgenomen.
+- **Nog OPEN voor volledige E2E:** expliciete online opslag van een niet-demo-plan, terughalen vanuit tweede browsersessie, eventuele accountherregistratie, verwijdering; cronjob-uitvoer niet apart gezien. Nieuwe HTML-mail uit PR #39 moet in echte inbox visueel worden beoordeeld. Geen account automatisch naar sales.
 
 ## 2. Live acceptatie — uitsluitend PASS invullen met waarnemingsbewijs
 
 | Stap | Te bewijzen | Status |
 | --- | --- | --- |
 | Bootstrap en zichtbare knop | /mijn-plan/ geladen, registratieknop; /api/next/?action=bootstrap HTTP 200, mode production, accounts true, leads/vault false | **PASS** — live HTTP [run 43773670176](https://github.com/Michaelwmdegroot/SubsidieKlaar/actions/runs/43773670176), cookiecontract 0 fouten; echte Chromium [run 43774473213](https://github.com/Michaelwmdegroot/SubsidieKlaar/actions/runs/43774473213) bevestigt zichtbaar formulier en aparte uitgevinkte marketingkeuze |
-| Aanmaken | Registratie met eigen testmailbox, voorwaarden aangevinkt, marketing uit | OPEN |
-| OTP via cron | Achtcijferige mail daadwerkelijk binnen tien minuten ontvangen zonder handmatige workeractie | OPEN |
-| Login/logout | Correcte code, login, uitloggen en opnieuw aanmelden | OPEN |
+| Aanmaken | Registratie met eigen testmailbox, voorwaarden en eigen marketingkeuze | **PASS (eigenaarbewijs)** — registratie is getoond; in de test werd vrijwillig voor marketing-e-mails gekozen, dus geen bewijs van de default-NEE-keuze uit de oude UI |
+| OTP via cron | Achtcijferige mail daadwerkelijk ontvangen; afzonderlijk bewijs dat cron vanzelf mailde | **DEELS PASS:** echte code ontvangen, maar geen afzonderlijk cronlog overgelegd. De code en het adres zijn niet bewaard in documentatie |
+| Login/logout | Correcte code, login, uitloggen en opnieuw aanmelden | **DEELS PASS:** screenshot ingelogde en uitgelogde toestand; aparte herlogin met nieuwe OTP niet onafhankelijk gezien |
 | Online opslaan | Zelfbewuste bevestiging op fictief niet-demo project, revisie teruggekoppeld | OPEN |
 | Cross-browser | Nieuwe privé-/browsersessie na login toont exact hetzelfde serverplan | OPEN |
-| Export en verwijderen | Eigen export-JSON, daarna serveraccount en plan definitief weg | OPEN |
+| Export en verwijderen | Eigen export-JSON, daarna serveraccount en plan definitief weg | **DEELS PASS:** export-JSON is geleverd, geen projecten aanwezig; volledige serververwijdering nog niet met onafhankelijke handeling aangetoond |
 | Gastregressie | Regelingencheck, lokale import/export, PDF-print en dossier-ZIP zonder account | **DEELS PASS:** echte Chromium op productie bevestigt fictief gastproject, JSON-plan en dossier-ZIP, en originele gratis warmtepomp-PDF en ZIP. Lokale herimport en cross-browser persistente gastdata nog niet op echte productie met eigenaar geaccepteerd |
-| Privacy | Geen automatische verkoopdata, marketing of dossierdeling | **PASS voor beperkte read-only/gastscope:** Chromium zag 0 niet-GET en 0 off-site verzoeken; vault/leads/staff bleven uit in servergate. Marketinginstelling na echte accountverificatie blijft OPEN |
+| Privacy | Geen automatische verkoopdata, marketing of dossierdeling | **PASS voor beperkte gastscope en consent-opslag:** Chromium zag 0 niet-GET en 0 off-site verzoeken; account-export bevestigde eigen e-mailvoorkeur. Geen toestemming voor telefonie of cross-B.V.-sales. Leadvault/staff blijven uit |
+
+### Volgende UX- en mailrelease
+
+- **PR #38:** premium formulier met optionele naam/telefoon/straat/huisnummer/postcode/plaats, één verplicht akkoord met accountvoorwaarden en aparte (standaard NEE) keuze voor NIVO-aanbiedingen per e-mail. Profiel na OTP versleuteld in bestaande account-state; eigenaar kan wijzigen, exporteren en verwijderen.
+- **PR #39:** verificatiemail in professioneel SubsidieReady-design met HTML- en platte-tekstversie via bestaande TLS-SMTP-worker. Nog geen daadwerkelijke mobiele mailappacceptatie op deze nieuwe versie gemeld.
+- De commerciële waarde ontstaat alleen na een afzonderlijk, vrijwillig adviesverzoek bij de correct genoemde ontvangende rechtspersoon. Een account of optioneel telefoonnummer wordt **niet** automatisch een saleslead.
 
 ## 3. Eenvoudig stappenprotocol voor eigenaar
 
