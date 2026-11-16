@@ -93,6 +93,9 @@ test('next: real PHP API privacy, authentication, cloud isolation, vault and sal
    const saved=await a.post('project-save',{data:payload(pv),revision:0});
    assert.equal(saved.r.status,200,JSON.stringify(saved.d));
    assert.equal(saved.d.data.projects[0].measures[0].details.specialConstruction,'yes','PV answer must not disappear on server');
+   // Isolate the additional synthetic second-device OTP from shared-IP mail rate limits.
+   // OTP limits are tested independently; later fixture accounts must remain testable.
+   alter("foreach(array_keys($s['limits']) as $k)if(str_starts_with($k,'mailip:'))unset($s['limits'][$k]);");
    const otherBrowser=new Client();await otherBrowser.login('alice@example.invalid');
    const reopened=await otherBrowser.post('project-get',{id:pv.id});
    assert.equal(reopened.r.status,200);
