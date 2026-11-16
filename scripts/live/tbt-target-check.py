@@ -89,8 +89,8 @@ except Exception as exc:
     report["failureType"]=type(exc).__name__
 finally:
     (OUT/"report.json").write_text(json.dumps(report,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
-    print(json.dumps({k:report[k] for k in
-        ("result","formValid","privacyCopyVisible","consentChoiceVisible","denyAttempted",
+    print(json.dumps({k:report.get(k) for k in
+        ("result","failureStage","failureType","formValid","privacyCopyVisible","consentChoiceVisible","denyAttempted",
          "trackingBeforeDecision","trackingAfterDeny","submittedLeadRequests")},ensure_ascii=False))
 if report["result"]!="pass":
     raise SystemExit(1)
